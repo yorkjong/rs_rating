@@ -110,8 +110,42 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
     # Get reference index data
     df_ref = yf.Ticker(ref_ticker).history(period=period)
 
+    def process_stocks():
+        """
+        Processes stock data to extract relevant information for rankings.
+
+        Iterates through the provided tickers, fetches historical data,
+        calculates relative strength values, and gathers sector and industry
+        information. It also updates industry-specific data for later
+        processing.
+
+        Returns:
+            tuple: A tuple containing two elements:
+                - df_stocks (pd.DataFrame): DataFrame with stock information,
+                including ticker, sector, industry, and RS values.
+                - industries (dict): Dictionary containing industry-specific
+                data, such as RS values and tickers for each industry.
+        """
+        data = []
+        industries = {}
+        for ticker, stock, df in gen_stock_data(tickers, period):
+            rs_values = calculate_rs_values(df['Close'], df_ref['Close'])
+            info = stock.info
+            sector = info.get('sector', 'Unknown')
+            industry = info.get('industry', 'Unknown')
+
+            data.append((ticker, sector, industry, *rs_values.values()))
+            update_industry_data(industries, industry, sector, rs_values, ticker)
+
+        df_stocks = pd.DataFrame(
+            data,
+            columns=[TITLE_TICKER, TITLE_SECTOR, TITLE_INDUSTRY,
+                     TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]
+        )
+        return df_stocks, industries
+
     def gen_stock_data(tickers, period):
-        '''Generate stock data.'''
+        """Generate stock data."""
         for ticker in tickers:
             stock = yf.Ticker(ticker)
             df = stock.history(period=period)
@@ -132,26 +166,8 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
             "6m": rs_series.iloc[-6*month]
         }
 
-    def process_stocks():
-        data = []
-        industries = {}
-        for ticker, stock, df in gen_stock_data(tickers, period):
-            rs_values = calculate_rs_values(df['Close'], df_ref['Close'])
-            info = stock.info
-            sector = info.get('sector', 'Unknown')
-            industry = info.get('industry', 'Unknown')
-
-            data.append((ticker, sector, industry, *rs_values.values()))
-            update_industry_data(industries, industry, sector, rs_values, ticker)
-
-        df_stocks = pd.DataFrame(
-            data,
-            columns=[TITLE_TICKER, TITLE_SECTOR, TITLE_INDUSTRY,
-                     TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]
-        )
-        return df_stocks, industries
-
     def update_industry_data(industries, industry, sector, rs_values, ticker):
+        """Updates industry data with information from a single stock."""
         industry_row = industries.setdefault(industry, {
             "info": (industry, sector),
             TITLE_RS: [],
@@ -162,6 +178,8 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         industry_row[TITLE_3M].append(rs_values['3m'])
         industry_row[TITLE_6M].append(rs_values['6m'])
         industry_row[TITLE_TICKERS].append(ticker)
+
+    #--------------------------------------------------------------------------
 
     def calculate_percentiles(df):
         """Calculate percentiles for RS and its historical values."""
@@ -178,17 +196,26 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         df[TITLE_RANK] = range(1, len(df) + 1)
         return df
 
-    def rs_avg(industry_info, column):
-        """Calculate average RS value for an industry."""
-        return round(np.mean(industry_info[column]), 2)
-
-    def tickers_str(industry_info, stock_rs):
-        """Create a comma-separated string of tickers for an industry."""
-        tickers = sorted(industry_info[TITLE_TICKERS],
-                         key=lambda x: stock_rs[x], reverse=True)
-        return ",".join(tickers)
+    #--------------------------------------------------------------------------
 
     def process_industries(industries, stock_rs):
+        """Processes industry data to prepare it for ranking.
+
+        Takes a dictionary of industry data and a dictionary of stock relative
+        strengths as input. It extracts relevant information for each industry,
+        such as average RS values and a list of tickers, and creates a DataFrame
+        suitable for ranking.
+
+        Args:
+            industries (dict): Dictionary containing industry-specific data,
+                including RS values and tickers for each industry.
+            stock_rs (dict): Dictionary mapping stock tickers to their
+                relative strength values.
+
+        Returns:
+            pd.DataFrame: DataFrame with industry information, including
+                industry name, sector, average RS values, and a list of tickers.
+        """
         industry_data = [
             get_industry_row(info, stock_rs)
             for info in industries.values() if len(info[TITLE_TICKERS]) > 1
@@ -200,6 +227,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         )
 
     def get_industry_row(industry_info, stock_rs):
+        """Extracts a single row of data for an industry."""
         industry, sector = industry_info["info"]
         return (
             industry,
@@ -208,6 +236,16 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
                 for col in [TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]],
             tickers_str(industry_info, stock_rs)
         )
+
+    def rs_avg(industry_info, column):
+        """Calculate average RS value for an industry."""
+        return round(np.mean(industry_info[column]), 2)
+
+    def tickers_str(industry_info, stock_rs):
+        """Create a comma-separated string of tickers for an industry."""
+        tickers = sorted(industry_info[TITLE_TICKERS],
+                         key=lambda x: stock_rs[x], reverse=True)
+        return ",".join(tickers)
 
     df_stocks, industries = process_stocks()
     stock_rankings = rank_by_rs(calculate_percentiles(df_stocks))
