@@ -110,7 +110,8 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
     # Get reference index data
     df_ref = yf.Ticker(ref_ticker).history(period=period)
 
-    def get_stock_data(tickers, period):
+    def gen_stock_data(tickers, period):
+        '''Generate stock data.'''
         for ticker in tickers:
             stock = yf.Ticker(ticker)
             df = stock.history(period=period)
@@ -134,7 +135,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
     def process_stocks():
         data = []
         industries = {}
-        for ticker, stock, df in get_stock_data(tickers, period):
+        for ticker, stock, df in gen_stock_data(tickers, period):
             rs_values = calculate_rs_values(df['Close'], df_ref['Close'])
             info = stock.info
             sector = info.get('sector', 'Unknown')
