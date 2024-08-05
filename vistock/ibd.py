@@ -118,9 +118,9 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
                 continue
             yield ticker, stock, df
 
-    def calculate_rs_values(df):
+    def calculate_rs_values(prices_stock, prices_ref):
         """Calculate RS values for a single ticker."""
-        rs_series = relative_strength(df['Close'], df_ref['Close'])
+        rs_series = relative_strength(prices_stock, prices_ref)
         rs_latest = rs_series.iloc[-1]
         month = 20
 
@@ -135,7 +135,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         data = []
         industries = {}
         for ticker, stock, df in get_stock_data(tickers, period):
-            rs_values = calculate_rs_values(df)
+            rs_values = calculate_rs_values(df['Close'], df_ref['Close'])
             info = stock.info
             sector = info.get('sector', 'Unknown')
             industry = info.get('industry', 'Unknown')
