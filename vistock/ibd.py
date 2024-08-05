@@ -115,7 +115,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
     # Get reference index data
     df_ref = yf.Ticker(ref_ticker).history(period=period)
 
-    def calculate_relative_strength(ticker, df):
+    def calculate_rs_values(ticker, df):
         """Calculate RS values for a single ticker."""
         rs_series = relative_strength(df['Close'], df_ref['Close'])
         rs_latest = rs_series.iloc[-1]
@@ -136,7 +136,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         if len(df) < 6 * 20:  # Ensure at least 6 months of data
             return
 
-        rs_values = calculate_relative_strength(ticker, df)
+        rs_values = calculate_rs_values(ticker, df)
         sector = stock.info.get('sector', 'Unknown')
         industry = stock.info.get('industry', 'Unknown')
 
