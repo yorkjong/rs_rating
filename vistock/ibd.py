@@ -115,56 +115,56 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
     # Get reference index data
     df_ref = yf.Ticker(ref_ticker).history(period=period)
 
-    for ticker in tickers:
-        stock = yf.Ticker(ticker)
-        df = stock.history(period=period)
-
-        if len(df) < 6 * 20:  # Ensure at least 6 months of data
-            continue
-
-        # Calculate RS values as a pd.Series
+    def calculate_relative_strength(ticker, df):
+        """Calculate RS values for a single ticker."""
         rs_series = relative_strength(df['Close'], df_ref['Close'])
         rs_latest = rs_series.iloc[-1]
         month = 20
 
-        rs1m = rs_series.iloc[-month]
-        rs3m = rs_series.iloc[-3*month]
-        rs6m = rs_series.iloc[-6*month]
-        #rs1m = relative_strength(df['Close'].head(-1*month),
-        #                         df_ref['Close'].head(-1*month)).iloc[-1]
-        #rs3m = relative_strength(df['Close'].head(-3*month),
-        #                         df_ref['Close'].head(-3*month)).iloc[-1]
-        #rs6m = relative_strength(df['Close'].head(-6*month),
-        #                         df_ref['Close'].head(-6*month)).iloc[-1]
+        return {
+            "latest": rs_latest,
+            "1m": rs_series.iloc[-month],
+            "3m": rs_series.iloc[-3*month],
+            "6m": rs_series.iloc[-6*month]
+        }
 
+    def process_stock(ticker):
+        """Process stock data and update stock_rs and industries."""
+        stock = yf.Ticker(ticker)
+        df = stock.history(period=period)
+
+        if len(df) < 6 * 20:  # Ensure at least 6 months of data
+            return
+
+        rs_values = calculate_relative_strength(ticker, df)
         sector = stock.info.get('sector', 'Unknown')
         industry = stock.info.get('industry', 'Unknown')
 
-        relative_strengths.append(
-            (ticker, sector, industry, rs_latest, rs1m, rs3m, rs6m)
-        )
-        stock_rs[ticker] = rs_latest
+        relative_strengths.append((
+            ticker, sector, industry,
+            rs_values['latest'], rs_values['1m'], rs_values['3m'], rs_values['6m']
+        ))
+        stock_rs[ticker] = rs_values['latest']
 
-        industry_row = industries.setdefault(industry, {
-            "info": (industry, sector),
-            TITLE_RS: [],
-            TITLE_1M: [],
-            TITLE_3M: [],
-            TITLE_6M: [],
-            TITLE_TICKERS: []
-        })
-        industry_row[TITLE_RS].append(rs_latest)
-        industry_row[TITLE_1M].append(rs1m)
-        industry_row[TITLE_3M].append(rs3m)
-        industry_row[TITLE_6M].append(rs6m)
+        if industry not in industries:
+            industries[industry] = {
+                "info": (industry, sector),
+                TITLE_RS: [],
+                TITLE_1M: [],
+                TITLE_3M: [],
+                TITLE_6M: [],
+                TITLE_TICKERS: []
+            }
+
+        industry_row = industries[industry]
+        industry_row[TITLE_RS].append(rs_values['latest'])
+        industry_row[TITLE_1M].append(rs_values['1m'])
+        industry_row[TITLE_3M].append(rs_values['3m'])
+        industry_row[TITLE_6M].append(rs_values['6m'])
         industry_row[TITLE_TICKERS].append(ticker)
 
-    # Stock data processing
-    df = pd.DataFrame(relative_strengths,
-                      columns=[TITLE_TICKER, TITLE_SECTOR, TITLE_INDUSTRY,
-                               TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M])
-
     def calculate_percentiles(df):
+        """Calculate percentiles for RS and its historical values."""
         df[TITLE_PERCENTILE] = pd.qcut(df[TITLE_RS], 100, labels=False,
                                        duplicates="drop")
         for title in [TITLE_1M, TITLE_3M, TITLE_6M]:
@@ -173,52 +173,65 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         return df
 
     def rank_by_rs(df):
+        """Rank stocks or industries by RS."""
         df = df.sort_values(TITLE_RS, ascending=False)
         df[TITLE_RANK] = range(1, len(df) + 1)
         return df
 
-    stock_rankings = rank_by_rs(calculate_percentiles(df))
-    stock_rankings = stock_rankings[
-        stock_rankings[TITLE_PERCENTILE] >= min_percentile]
+    def rs_avg(industry_info, column):
+        """Calculate average RS value for an industry."""
+        return round(np.mean(industry_info[column]), 2)
 
-    # Industry data processing functions
-    def rs_avg(industries, industry, column):
-        rs = np.mean(industries[industry][column])
-        return round(rs, 2)
-        #return rs.round().astype(int)
-
-    def tickers_str(industries, industry):
-        tickers = industries[industry][TITLE_TICKERS]
-        tickers = sorted(tickers, key=lambda x: stock_rs[x], reverse=True)
+    def tickers_str(industry_info):
+        """Create a comma-separated string of tickers for an industry."""
+        tickers = sorted(industry_info[TITLE_TICKERS],
+                         key=lambda x: stock_rs[x], reverse=True)
         return ",".join(tickers)
 
-    def industry_data(industry_info, industries):
-        industry, sector = industry_info
+    def industry_data(industry_info):
+        """Generate a tuple of industry data."""
+        industry, sector = industry_info["info"]
         return (
             industry,
             sector,
-            rs_avg(industries, industry, TITLE_RS),
-            rs_avg(industries, industry, TITLE_1M),
-            rs_avg(industries, industry, TITLE_3M),
-            rs_avg(industries, industry, TITLE_6M),
-            tickers_str(industries, industry)
+            rs_avg(industry_info, TITLE_RS),
+            rs_avg(industry_info, TITLE_1M),
+            rs_avg(industry_info, TITLE_3M),
+            rs_avg(industry_info, TITLE_6M),
+            tickers_str(industry_info)
         )
 
-    # Filter and compute industry data
-    industry_data = [
-        industry_data(i["info"], industries)
-        for i in industries.values() if len(i[TITLE_TICKERS]) > 1
+    # Process all tickers
+    for ticker in tickers:
+        process_stock(ticker)
+
+    # Create DataFrames for stock and industry rankings
+    df_stocks = pd.DataFrame(
+        relative_strengths,
+        columns=[TITLE_TICKER, TITLE_SECTOR, TITLE_INDUSTRY, TITLE_RS,
+                 TITLE_1M, TITLE_3M, TITLE_6M]
+    )
+
+    stock_rankings = rank_by_rs(calculate_percentiles(df_stocks))
+    stock_rankings = stock_rankings[
+        stock_rankings[TITLE_PERCENTILE] >= min_percentile
     ]
 
-    # Create DataFrame
+    industry_data_list = [
+        industry_data(info)
+        for info in industries.values() if len(info[TITLE_TICKERS]) > 1
+    ]
+
     df_industries = pd.DataFrame(
-        industry_data,
-        columns=[TITLE_INDUSTRY, TITLE_SECTOR, TITLE_RS, TITLE_1M, TITLE_3M,
-                 TITLE_6M, TITLE_TICKERS]
+        industry_data_list,
+        columns=[TITLE_INDUSTRY, TITLE_SECTOR, TITLE_RS, TITLE_1M,
+                 TITLE_3M, TITLE_6M, TITLE_TICKERS]
     )
 
     industry_rankings = rank_by_rs(calculate_percentiles(df_industries))
+
     return stock_rankings, industry_rankings
+
 
 #------------------------------------------------------------------------------
 # Test
