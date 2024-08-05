@@ -194,10 +194,8 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         return (
             industry,
             sector,
-            rs_avg(industry_info, TITLE_RS),
-            rs_avg(industry_info, TITLE_1M),
-            rs_avg(industry_info, TITLE_3M),
-            rs_avg(industry_info, TITLE_6M),
+            *[rs_avg(industry_info, col) for col
+              in [TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]],
             tickers_str(industry_info)
         )
 
