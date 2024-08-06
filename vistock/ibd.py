@@ -264,10 +264,14 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
 # Test
 #------------------------------------------------------------------------------
 
-def main(out_dir='output'):
-    tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "META", "TSLA", "NVDA", "JPM",
-               "JNJ", "V", "PG", "UNH", "HD", "MA", "DIS"]
-    rank_stock, rank_indust = rankings(tickers, min_percentile=80)
+def main(out_dir='out'):
+    sox_tickers = [
+        'AMD', 'ADI', 'AMAT', 'ASML', 'AZTA', 'AVGO', 'COHR', 'ENTG', 'GFS',
+        'INTC', 'IPGP', 'KLAC', 'LRCX', 'LSCC', 'MRVL', 'MCHP', 'MU', 'MPWR',
+        'NOVT', 'NVDA', 'NXPI', 'ON', 'QRVO', 'QCOM', 'SWKS', 'SYNA', 'TSM',
+        'TER', 'TXN', 'WOLF'
+    ]
+    rank_stock, rank_indust = rankings(sox_tickers, min_percentile=80)
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
