@@ -293,12 +293,12 @@ def main(min_percentile=80, out_dir='out'):
         os.makedirs(out_dir)
 
     # Save to CSV
-    print("\n***")
+    print("\n\n***")
     for table, kind in zip([rank_stock, rank_indust],
                            ['stocks', 'industries']):
         filename = f'rs_{kind}.csv'
         table.to_csv(os.path.join(out_dir, filename), index=False)
-        print(f"Your '{filename}' is in the output folder.")
+        print(f'Your "{filename}" is in the "{out_dir}" folder.')
     print("***\n")
 
 
