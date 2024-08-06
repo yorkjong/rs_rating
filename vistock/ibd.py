@@ -3,7 +3,7 @@ Functions for IBD RS and IBD RS Rating
 """
 __version__ = "1.1"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/06 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/07 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -91,7 +91,7 @@ def quarters_return(closes, n):
 # IBD RS Rating
 #------------------------------------------------------------------------------
 
-def rankings(tickers, ref_ticker='^GSPC', period='1y'):
+def rankings(tickers, ref_ticker='^GSPC', period='2y'):
     """Generate the stock and industry rankings.
 
     Args:
@@ -99,7 +99,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y'):
         ref_ticker (str, optional): The ticker symbol for the reference index.
             Defaults to '^GSPC' (S&P 500).
         period (str, optional): The period for which to fetch historical data.
-            Defaults to '1y' (one year).
+            Defaults to '2y' (two year).
 
     Returns:
         list: A list of two Pandas DataFrames:
