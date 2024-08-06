@@ -1,14 +1,13 @@
 """
 Functions for IBD RS and IBD RS Rating
 """
-__version__ = "1.0"
+__version__ = "1.1"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/06 (last revision)"
 
 __all__ = [
     'relative_strength',
     'rankings',
-    'sox_tickers',
 ]
 
 import pandas as pd
@@ -285,7 +284,8 @@ def sox_tickers():
 
 
 def main(out_dir='out'):
-    rank_stock, rank_indust = rankings(sox_tickers(), min_percentile=80)
+    from stock_indices import get_sox_tickers
+    rank_stock, rank_indust = rankings(get_sox_tickers(), min_percentile=80)
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
