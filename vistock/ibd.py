@@ -3,11 +3,12 @@ Functions for IBD RS and IBD RS Rating
 """
 __version__ = "1.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/05 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/06 (last revision)"
 
 __all__ = [
     'relative_strength',
     'rankings',
+    'sox_tickers',
 ]
 
 import pandas as pd
@@ -264,14 +265,27 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
 # Test
 #------------------------------------------------------------------------------
 
-def main(out_dir='out'):
+def sox_tickers():
+    """
+    Provides a list of SOX (PHLX Semiconductor Index) tickers.
+
+    This function returns a manually maintained list of SOX tickers.
+    Note: This list may not be up-to-date and requires periodic updates.
+
+    Returns:
+        list: A list of SOX tickers.
+    """
     sox_tickers = [
         'AMD', 'ADI', 'AMAT', 'ASML', 'AZTA', 'AVGO', 'COHR', 'ENTG', 'GFS',
         'INTC', 'IPGP', 'KLAC', 'LRCX', 'LSCC', 'MRVL', 'MCHP', 'MU', 'MPWR',
         'NOVT', 'NVDA', 'NXPI', 'ON', 'QRVO', 'QCOM', 'SWKS', 'SYNA', 'TSM',
         'TER', 'TXN', 'WOLF'
     ]
-    rank_stock, rank_indust = rankings(sox_tickers, min_percentile=80)
+    return sox_tickers
+
+
+def main(out_dir='out'):
+    rank_stock, rank_indust = rankings(sox_tickers(), min_percentile=80)
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
