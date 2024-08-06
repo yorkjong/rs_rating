@@ -28,6 +28,10 @@ TITLE_6M = "6 Months Ago"
 TITLE_RS = "Relative Strength"
 
 
+#------------------------------------------------------------------------------
+# IBD RS (Relative Strength)
+#------------------------------------------------------------------------------
+
 def relative_strength(closes, closes_ref):
     """
     Calculate the relative strength of a stock compared to a reference index.
@@ -82,6 +86,10 @@ def quarters_return(closes, n):
     ret = closes.pct_change(periods=length)
     return ret.replace([np.inf, -np.inf], np.nan).fillna(0)
 
+
+#------------------------------------------------------------------------------
+# IBD RS Rating
+#------------------------------------------------------------------------------
 
 def rankings(tickers, ref_ticker='^GSPC', period='1y'):
     """Generate the stock and industry rankings.
@@ -257,7 +265,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y'):
 
 
 #------------------------------------------------------------------------------
-# Test
+# Unit Test
 #------------------------------------------------------------------------------
 
 def main(min_percentile=80, out_dir='out'):
