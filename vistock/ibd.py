@@ -275,13 +275,13 @@ def sox_tickers():
     Returns:
         list: A list of SOX tickers.
     """
-    sox_tickers = [
+    tickers = [
         'AMD', 'ADI', 'AMAT', 'ASML', 'AZTA', 'AVGO', 'COHR', 'ENTG', 'GFS',
         'INTC', 'IPGP', 'KLAC', 'LRCX', 'LSCC', 'MRVL', 'MCHP', 'MU', 'MPWR',
         'NOVT', 'NVDA', 'NXPI', 'ON', 'QRVO', 'QCOM', 'SWKS', 'SYNA', 'TSM',
         'TER', 'TXN', 'WOLF'
     ]
-    return sox_tickers
+    return tickers
 
 
 def main(out_dir='out'):
