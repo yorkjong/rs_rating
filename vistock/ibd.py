@@ -8,6 +8,7 @@ __date__ = "2024/08/05 (initial version) ~ 2024/08/06 (last revision)"
 __all__ = [
     'relative_strength',
     'rankings',
+    'TITLE_PERCENTILE',
 ]
 
 import pandas as pd
@@ -82,7 +83,7 @@ def quarters_return(closes, n):
     return ret.replace([np.inf, -np.inf], np.nan).fillna(0)
 
 
-def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
+def rankings(tickers, ref_ticker='^GSPC', period='1y'):
     """Generate the stock and industry rankings.
 
     Args:
@@ -91,8 +92,6 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
             Defaults to '^GSPC' (S&P 500).
         period (str, optional): The period for which to fetch historical data.
             Defaults to '1y' (one year).
-        min_percentile (int, optional): The minimum percentile for a stock to be
-            included in the rankings. Defaults to 80.
 
     Returns:
         list: A list of two Pandas DataFrames:
@@ -248,64 +247,51 @@ def rankings(tickers, ref_ticker='^GSPC', period='1y', min_percentile=80):
         return ",".join(tickers)
 
     df_stocks, industries = process_stocks()
-    stock_rankings = rank_by_rs(calculate_percentiles(df_stocks))
-    stock_rs = dict(zip(stock_rankings[TITLE_TICKER], stock_rankings[TITLE_RS]))
+    stock_ranking = rank_by_rs(calculate_percentiles(df_stocks))
+    stock_rs = dict(zip(stock_ranking[TITLE_TICKER], stock_ranking[TITLE_RS]))
 
     industry_df = process_industries(industries, stock_rs)
-    industry_rankings = rank_by_rs(calculate_percentiles(industry_df))
+    industry_ranking = rank_by_rs(calculate_percentiles(industry_df))
 
-    return (
-        stock_rankings[stock_rankings[TITLE_PERCENTILE] >= min_percentile],
-        industry_rankings
-    )
+    return stock_ranking, industry_ranking
 
 
 #------------------------------------------------------------------------------
 # Test
 #------------------------------------------------------------------------------
 
-def sox_tickers():
-    """
-    Provides a list of SOX (PHLX Semiconductor Index) tickers.
-
-    This function returns a manually maintained list of SOX tickers.
-    Note: This list may not be up-to-date and requires periodic updates.
-
-    Returns:
-        list: A list of SOX tickers.
-    """
-    tickers = [
-        'AMD', 'ADI', 'AMAT', 'ASML', 'AZTA', 'AVGO', 'COHR', 'ENTG', 'GFS',
-        'INTC', 'IPGP', 'KLAC', 'LRCX', 'LSCC', 'MRVL', 'MCHP', 'MU', 'MPWR',
-        'NOVT', 'NVDA', 'NXPI', 'ON', 'QRVO', 'QCOM', 'SWKS', 'SYNA', 'TSM',
-        'TER', 'TXN', 'WOLF'
-    ]
-    return tickers
-
-
-def main(out_dir='out'):
+def main(min_percentile=80, out_dir='out'):
+    '''
+    Args:
+        min_percentile (int, optional): The minimum percentile for a stock to be
+            included in the rankings. Defaults to 80.
+        out_dir (str, optional): The output directory to store CSV tables.
+            Defaults to 'out'
+    '''
     from stock_indices import get_sox_tickers
-    rank_stock, rank_indust = rankings(get_sox_tickers(), min_percentile=80)
+    rank_stock, rank_indust = rankings(get_sox_tickers())
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
         return
 
     print('Stock Rankings:')
-    print(rank_stock)
+    print(rank_stock[rank_stock[TITLE_PERCENTILE] >= min_percentile])
 
     print('\n\nIndustry Rankings:')
     print(rank_indust)
 
-    # Create output directory
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
     # Save to CSV
-    rank_stock.to_csv(os.path.join(out_dir, 'rs_stocks.csv'), index=False)
-    rank_indust.to_csv(os.path.join(out_dir, 'rs_industries.csv'), index=False)
-
-    print(f"\n***\nTables are in the {out_dir} folder.\n***")
+    print("\n***")
+    for table, kind in zip([rank_stock, rank_indust],
+                           ['stocks', 'industries']):
+        filename = f'rs_{kind}.csv'
+        table.to_csv(os.path.join(out_dir, filename), index=False)
+        print(f"Your '{filename}' is in the output folder.")
+    print("***\n")
 
 
 if __name__ == "__main__":
