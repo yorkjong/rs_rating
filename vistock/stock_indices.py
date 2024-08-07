@@ -9,8 +9,8 @@ Main functions:
 - get_nasdaq100_tickers(): Get NASDAQ-100 tickers
 - get_djia_tickers(): Get Dow Jones Industrial Average tickers
 - get_sox_tickers(): Get PHLX Semiconductor Index tickers
-- get_tickers(index_ticker): Get tickers for a specified index
-- get_name(ticker): Get the name of an index from its ticker
+- get_tickers(index_symbol): Get tickers for a specified index
+- get_name(index_symbol): Get the name of an index from its symbol
 
 Usage:
     from stock_indices import get_tickers, get_name
@@ -18,7 +18,7 @@ Usage:
     sp500_tickers = get_tickers('^GSPC')
     index_name = get_name('^NDX')
 """
-__version__ = "1.1"
+__version__ = "1.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/08/07 (last revision)"
 
@@ -141,20 +141,25 @@ def get_sox_tickers():
     return tickers
 
 
-def get_tickers(index_ticker):
+def get_tickers(index_symbol):
     """
-    Returns a list of tickers for the given index.
+    Retrieves a list of tickers for the specified index.
 
     Args:
-        index_ticker: The ticker symbol of the index.
+        index_symbol (str): The ticker symbol used by Yahoo Finance (e.g.,
+            '^GSPC' for S&P 500, '^NDX' for NASDAQ-100), or a common
+            abbreviation for the index (e.g., 'SPX' for S&P 500, 'NDX' for
+            NASDAQ-100).
 
     Returns:
-        A list of tickers for the given index.
+        list: A list of tickers for the given index.
 
     Raises:
-        KeyError: If the index ticker is not found.
+        KeyError: If the provided index ticker is not recognized.
 
     Examples:
+        >>> len(get_tickers('SPX')) >= 500
+        True
         >>> len(get_tickers('^GSPC')) >= 500
         True
         >>> len(get_tickers('^NDX')) >= 100
@@ -162,57 +167,73 @@ def get_tickers(index_ticker):
         >>> get_tickers('^UNKNOWN')
         Traceback (most recent call last):
             ...
-        KeyError: "Index ticker '^UNKNOWN' not found."
+        KeyError: "Index symbol '^UNKNOWN' not found."
     """
     dic = {
         '^GSPC': get_sp500_tickers,
         '^DJI': get_djia_tickers,
         '^NDX': get_nasdaq100_tickers,
         '^SOX': get_sox_tickers,
+        'SPX': get_sp500_tickers,
+        'DJIA': get_djia_tickers,
+        'NDX': get_nasdaq100_tickers,
+        'SOX': get_sox_tickers,
     }
     try:
-        return dic[index_ticker]()
+        return dic[index_symbol]()
     except KeyError:
-        raise KeyError(f"Index ticker '{index_ticker}' not found.")
+        raise KeyError(f"Index symbol '{index_symbol}' not found.")
 
 
-def get_name(ticker):
+def get_name(index_symbol):
     """
-    Return the name of the index based on the ticker.
+    Return the name of the index based on the index_symbol.
 
     Args:
-        ticker: The ticker symbol of the index.
+        index_symbol (str): The ticker symbol used by Yahoo Finance (e.g.,
+            '^GSPC' for S&P 500, '^NDX' for NASDAQ-100), or a common
+            abbreviation for the index (e.g., 'SPX' for S&P 500, 'NDX' for
+            NASDAQ-100).
 
     Returns:
-        The name of the index, or 'Unknow' if the ticker is not found.
+        The name of the index, or 'Unknow' if the index_symbol is not found.
 
     Examples:
+        >>> get_name('SPX')
+        'S&P 500'
         >>> get_name('^GSPC')
         'S&P 500'
         >>> get_name('^DJI')
-        'DJIA'
+        'Dow Jones Industrial Average'
         >>> get_name('^IXIC')
         'NASDAQ'
         >>> get_name('^NDX')
-        'NASDAQ-100'
+        'NASDAQ 100'
         >>> get_name('^RUT')
         'Russell 2000'
         >>> get_name('^SOX')
-        'SOX Index'
+        'PHLX Semiconductor Sector'
         >>> get_name('^HSI')
         'Unknown'
     """
     dic = {
         '^GSPC': 'S&P 500',
-        '^DJI': 'DJIA',
+        '^DJI': 'Dow Jones Industrial Average',
         '^IXIC': 'NASDAQ',
-        '^NDX': 'NASDAQ-100',
+        '^NDX': 'NASDAQ 100',
         '^RUT': 'Russell 2000',
-        '^SOX': 'SOX Index',
+        '^SOX': 'PHLX Semiconductor Sector',
         '^NYA': 'NYSE Composite',
-        '^MID': 'S&P MidCap 400'
+        '^MID': 'S&P MidCap 400',
+        'SPX': 'S&P 500',
+        'DJIA': 'Dow Jones Industrial Average',
+        'NDX': 'NASDAQ 100',
+        'SOX': 'PHLX Semiconductor Sector',
+        'RUT': 'Russell 2000',
+        'NYA': 'NYSE Composite',
+        'MID': 'S&P MidCap 400',
     }
-    return dic.get(ticker, 'Unknown')
+    return dic.get(index_symbol, 'Unknown')
 
 
 if __name__ == "__main__":
