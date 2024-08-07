@@ -5,28 +5,21 @@ This module provides functions for retrieving ticker symbols of various stock
 market indices and identifying index names from their ticker symbols.
 
 Main functions:
-- get_sp500_tickers(): Get S&P 500 tickers
-- get_nasdaq100_tickers(): Get NASDAQ-100 tickers
-- get_djia_tickers(): Get Dow Jones Industrial Average tickers
-- get_sox_tickers(): Get PHLX Semiconductor Index tickers
 - get_tickers(index_symbol): Get tickers for a specified index
 - get_name(index_symbol): Get the name of an index from its symbol
 
 Usage:
     from stock_indices import get_tickers, get_name
 
-    sp500_tickers = get_tickers('^GSPC')
+    spx_tickers = get_tickers('SPX')
+    sox_tickers = get_tickers('SOX')
     index_name = get_name('^NDX')
 """
-__version__ = "1.2"
+__version__ = "1.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/08/07 (last revision)"
 
 __all__ = [
-    'get_sp500_tickers',
-    'get_nasdaq100_tickers',
-    'get_djia_tickers',
-    'get_sox_tickers',
     'get_tickers',
     'get_name',
 ]
@@ -38,15 +31,15 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def get_sp500_tickers():
+def fetch_spx_tickers():
     """
-    Retrieves a list of tickers for companies in the S&P 500 index.
+    Retrieve a list of tickers for companies in the SPX (S&P 500 index).
 
     Returns:
         list: A list of ticker symbols.
 
     Examples:
-        >>> tickers = get_sp500_tickers()
+        >>> tickers = fetch_spx_tickers()
         >>> len(tickers) >= 500
         True
         >>> 'AAPL' in tickers
@@ -62,15 +55,15 @@ def get_sp500_tickers():
     return df['Symbol'].tolist()
 
 
-def get_nasdaq100_tickers():
+def fetch_ndx_tickers():
     """
-    Retrieves a list of tickers for companies in the NASDAQ-100 index.
+    Retrieve a list of tickers for companies in the NDX (NASDAQ-100 Index).
 
     Returns:
         list: A list of ticker symbols.
 
     Examples:
-        >>> tickers = get_nasdaq100_tickers()
+        >>> tickers = fetch_ndx_tickers()
         >>> len(tickers) >= 100
         True
         >>> 'NVDA' in tickers
@@ -86,16 +79,16 @@ def get_nasdaq100_tickers():
     return df['Ticker'].tolist()
 
 
-def get_djia_tickers():
+def fetch_djia_tickers():
     """
-    Retrieves a list of tickers for companies in the DJIA (Dow Jones Industrial
+    Retrieve a list of tickers for companies in the DJIA (Dow Jones Industrial
     Average) index.
 
     Returns:
         list: A list of ticker symbols.
 
     Examples:
-        >>> tickers = get_djia_tickers()
+        >>> tickers = fetch_djia_tickers()
         >>> len(tickers) == 30
         True
         >>> 'MSFT' in tickers
@@ -111,9 +104,10 @@ def get_djia_tickers():
     return df['Symbol'].tolist()
 
 
-def get_sox_tickers():
+def fetch_sox_tickers():
     """
-    Provides a list of SOX (PHLX Semiconductor Index) tickers.
+    Retrieve a list of tickers for companies in the SOX (PHLX Semiconductor
+    Index).
 
     This function returns a manually maintained list of SOX tickers.
     Note: This list may not be up-to-date and requires periodic updates.
@@ -122,7 +116,7 @@ def get_sox_tickers():
         list: A list of SOX tickers.
 
     Examples:
-        >>> tickers = get_sox_tickers()
+        >>> tickers = fetch_sox_tickers()
         >>> len(tickers) == 30
         True
         >>> 'NVDA' in tickers
@@ -141,9 +135,37 @@ def get_sox_tickers():
     return tickers
 
 
+def fetch_all_tickers():
+    """
+    Retrieve a combined list of tickers from multiple major stock market indices.
+
+    This function aggregates ticker symbols from the following indices:
+    - S&P 500
+    - Dow Jones Industrial Average
+    - NASDAQ-100
+    - PHLX Semiconductor
+
+    Returns:
+        list: A list of unique ticker symbols from the specified indices.
+
+    Examples:
+        >>> tickers = fetch_all_tickers()
+        >>> 500 <= len(tickers) < 660
+        True
+        >>> 'AAPL' in fetch_all_tickers()
+        True
+        >>> 'MSFT' in fetch_all_tickers()
+        True
+    """
+    return list(set(fetch_spx_tickers()) |
+                set(fetch_djia_tickers()) |
+                set(fetch_ndx_tickers()) |
+                set(fetch_sox_tickers()))
+
+
 def get_tickers(index_symbol):
     """
-    Retrieves a list of tickers for the specified index.
+    Retrieve a list of tickers for the specified index.
 
     Args:
         index_symbol (str): The ticker symbol used by Yahoo Finance (e.g.,
@@ -170,17 +192,18 @@ def get_tickers(index_symbol):
         KeyError: "Index symbol '^UNKNOWN' not found."
     """
     dic = {
-        '^GSPC': get_sp500_tickers,
-        '^DJI': get_djia_tickers,
-        '^NDX': get_nasdaq100_tickers,
-        '^SOX': get_sox_tickers,
-        'SPX': get_sp500_tickers,
-        'DJIA': get_djia_tickers,
-        'NDX': get_nasdaq100_tickers,
-        'SOX': get_sox_tickers,
+        '^GSPC': fetch_spx_tickers,
+        '^DJI': fetch_djia_tickers,
+        '^NDX': fetch_ndx_tickers,
+        '^SOX': fetch_sox_tickers,
+        'SPX': fetch_spx_tickers,
+        'DJIA': fetch_djia_tickers,
+        'NDX': fetch_ndx_tickers,
+        'SOX': fetch_sox_tickers,
+        'ALL': fetch_all_tickers,
     }
     try:
-        return dic[index_symbol]()
+        return dic[index_symbol.upper()]()
     except KeyError:
         raise KeyError(f"Index symbol '{index_symbol}' not found.")
 
@@ -212,7 +235,7 @@ def get_name(index_symbol):
         >>> get_name('^RUT')
         'Russell 2000'
         >>> get_name('^SOX')
-        'PHLX Semiconductor Sector'
+        'PHLX Semiconductor'
         >>> get_name('^HSI')
         'Unknown'
     """
@@ -222,13 +245,13 @@ def get_name(index_symbol):
         '^IXIC': 'NASDAQ',
         '^NDX': 'NASDAQ 100',
         '^RUT': 'Russell 2000',
-        '^SOX': 'PHLX Semiconductor Sector',
+        '^SOX': 'PHLX Semiconductor',
         '^NYA': 'NYSE Composite',
         '^MID': 'S&P MidCap 400',
         'SPX': 'S&P 500',
         'DJIA': 'Dow Jones Industrial Average',
         'NDX': 'NASDAQ 100',
-        'SOX': 'PHLX Semiconductor Sector',
+        'SOX': 'PHLX Semiconductor',
         'RUT': 'Russell 2000',
         'NYA': 'NYSE Composite',
         'MID': 'S&P MidCap 400',
