@@ -31,10 +31,11 @@ __all__ = [
     'get_name',
 ]
 
-import requests
-import pandas as pd
-from bs4 import BeautifulSoup
 from io import StringIO
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 
 def get_sp500_tickers():
