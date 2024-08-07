@@ -1,9 +1,26 @@
 """
-Functions for Stock Indices
+Stock Indices Functions
+
+This module provides functions for retrieving ticker symbols of various stock
+market indices and identifying index names from their ticker symbols.
+
+Main functions:
+- get_sp500_tickers(): Get S&P 500 tickers
+- get_nasdaq100_tickers(): Get NASDAQ-100 tickers
+- get_djia_tickers(): Get Dow Jones Industrial Average tickers
+- get_sox_tickers(): Get PHLX Semiconductor Index tickers
+- get_tickers(index_ticker): Get tickers for a specified index
+- get_name(ticker): Get the name of an index from its ticker
+
+Usage:
+    from stock_indices import get_tickers, get_name
+
+    sp500_tickers = get_tickers('^GSPC')
+    index_name = get_name('^NDX')
 """
-__version__ = "1.0"
+__version__ = "1.1"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/08/06 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/08/07 (last revision)"
 
 __all__ = [
     'get_sp500_tickers',
@@ -135,6 +152,16 @@ def get_tickers(index_ticker):
 
     Raises:
         KeyError: If the index ticker is not found.
+
+    Examples:
+        >>> len(get_tickers('^GSPC')) >= 500
+        True
+        >>> len(get_tickers('^NDX')) >= 100
+        True
+        >>> get_tickers('^UNKNOWN')
+        Traceback (most recent call last):
+            ...
+        KeyError: "Index ticker '^UNKNOWN' not found."
     """
     dic = {
         '^GSPC': get_sp500_tickers,
@@ -172,7 +199,7 @@ def get_name(ticker):
         >>> get_name('^SOX')
         'SOX Index'
         >>> get_name('^HSI')
-        'Unknow'
+        'Unknown'
     """
     dic = {
         '^GSPC': 'S&P 500',
@@ -184,7 +211,7 @@ def get_name(ticker):
         '^NYA': 'NYSE Composite',
         '^MID': 'S&P MidCap 400'
     }
-    return dic.get(ticker, 'Unknow')
+    return dic.get(ticker, 'Unknown')
 
 
 if __name__ == "__main__":
