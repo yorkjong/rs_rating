@@ -5,7 +5,7 @@ This module provides functions for retrieving ticker symbols of various stock
 market indices and identifying index names from their ticker symbols.
 
 Main functions:
-- get_tickers(index_symbol): Get tickers for a specified index
+- get_tickers(source): Get tickers for a specified source
 - get_name(index_symbol): Get the name of an index from its symbol
 
 Usage:
@@ -15,7 +15,7 @@ Usage:
     sox_tickers = get_tickers('SOX')
     index_name = get_name('^NDX')
 """
-__version__ = "1.3"
+__version__ = "1.4"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/08/07 (last revision)"
 
@@ -31,7 +31,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def fetch_spx_tickers():
+def get_spx_tickers():
     """
     Retrieve a list of tickers for companies in the SPX (S&P 500 index).
 
@@ -39,7 +39,7 @@ def fetch_spx_tickers():
         list: A list of ticker symbols.
 
     Examples:
-        >>> tickers = fetch_spx_tickers()
+        >>> tickers = get_spx_tickers()
         >>> len(tickers) >= 500
         True
         >>> 'AAPL' in tickers
@@ -55,7 +55,7 @@ def fetch_spx_tickers():
     return df['Symbol'].tolist()
 
 
-def fetch_ndx_tickers():
+def get_ndx_tickers():
     """
     Retrieve a list of tickers for companies in the NDX (NASDAQ-100 Index).
 
@@ -63,7 +63,7 @@ def fetch_ndx_tickers():
         list: A list of ticker symbols.
 
     Examples:
-        >>> tickers = fetch_ndx_tickers()
+        >>> tickers = get_ndx_tickers()
         >>> len(tickers) >= 100
         True
         >>> 'NVDA' in tickers
@@ -79,7 +79,7 @@ def fetch_ndx_tickers():
     return df['Ticker'].tolist()
 
 
-def fetch_djia_tickers():
+def get_djia_tickers():
     """
     Retrieve a list of tickers for companies in the DJIA (Dow Jones Industrial
     Average) index.
@@ -88,7 +88,7 @@ def fetch_djia_tickers():
         list: A list of ticker symbols.
 
     Examples:
-        >>> tickers = fetch_djia_tickers()
+        >>> tickers = get_djia_tickers()
         >>> len(tickers) == 30
         True
         >>> 'MSFT' in tickers
@@ -104,9 +104,9 @@ def fetch_djia_tickers():
     return df['Symbol'].tolist()
 
 
-def fetch_sox_tickers():
+def get_sox_tickers():
     """
-    Retrieve a list of tickers for companies in the SOX (PHLX Semiconductor
+    Get a list of tickers for companies in the SOX (PHLX Semiconductor
     Index).
 
     This function returns a manually maintained list of SOX tickers.
@@ -116,7 +116,7 @@ def fetch_sox_tickers():
         list: A list of SOX tickers.
 
     Examples:
-        >>> tickers = fetch_sox_tickers()
+        >>> tickers = get_sox_tickers()
         >>> len(tickers) == 30
         True
         >>> 'NVDA' in tickers
@@ -135,49 +135,60 @@ def fetch_sox_tickers():
     return tickers
 
 
-def fetch_all_tickers():
+def get_all_tickers():
     """
     Retrieve a combined list of tickers from multiple major stock market indices.
 
     This function aggregates ticker symbols from the following indices:
-    - S&P 500
-    - Dow Jones Industrial Average
-    - NASDAQ-100
-    - PHLX Semiconductor
+    - S&P 500, SPX
+    - Dow Jones Industrial Average, DJIA
+    - NASDAQ 100, NDX
+    - PHLX Semiconductor, SOX
 
     Returns:
         list: A list of unique ticker symbols from the specified indices.
 
     Examples:
-        >>> tickers = fetch_all_tickers()
+        >>> tickers = get_all_tickers()
         >>> 500 <= len(tickers) < 660
         True
-        >>> 'AAPL' in fetch_all_tickers()
+        >>> 'AAPL' in tickers
         True
-        >>> 'MSFT' in fetch_all_tickers()
+        >>> 'MSFT' in tickers
         True
     """
-    return list(set(fetch_spx_tickers()) |
-                set(fetch_djia_tickers()) |
-                set(fetch_ndx_tickers()) |
-                set(fetch_sox_tickers()))
+    return list(set(get_spx_tickers()) |
+                set(get_djia_tickers()) |
+                set(get_ndx_tickers()) |
+                set(get_sox_tickers()))
 
 
-def get_tickers(index_symbol):
+def get_tickers(source):
     """
-    Retrieve a list of tickers for the specified index.
+    Retrieve a list of tickers for the specified index or combined index.
 
     Args:
-        index_symbol (str): The ticker symbol used by Yahoo Finance (e.g.,
-            '^GSPC' for S&P 500, '^NDX' for NASDAQ-100), or a common
-            abbreviation for the index (e.g., 'SPX' for S&P 500, 'NDX' for
-            NASDAQ-100).
+        source (str): The ticker symbol or common abbreviation for the index.
+            - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX'
+              for NASDAQ-100).
+            - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
+              NASDAQ-100).
+            - Special keyword 'ALL' to retrieve tickers for all indices
+              combined.
+
+            Possible values include:
+            - '^GSPC', 'SPX': S&P 500
+            - '^DJI', 'DJIA': Dow Jones Industrial Average
+            - '^NDX', 'NDX': NASDAQ-100
+            - '^SOX', 'SOX': PHLX Semiconductor Index
+            - 'ALL': All indices combined
 
     Returns:
-        list: A list of tickers for the given index.
+        list: A list of tickers for the specified source.
 
     Raises:
-        KeyError: If the provided index ticker is not recognized.
+        KeyError: If the provided source is not recognized or does not
+            correspond to a known index.
 
     Examples:
         >>> len(get_tickers('SPX')) >= 500
@@ -190,36 +201,50 @@ def get_tickers(index_symbol):
         Traceback (most recent call last):
             ...
         KeyError: "Index symbol '^UNKNOWN' not found."
+        >>> len(get_tickers('ALL')) > 500
+        True
     """
     dic = {
-        '^GSPC': fetch_spx_tickers,
-        '^DJI': fetch_djia_tickers,
-        '^NDX': fetch_ndx_tickers,
-        '^SOX': fetch_sox_tickers,
-        'SPX': fetch_spx_tickers,
-        'DJIA': fetch_djia_tickers,
-        'NDX': fetch_ndx_tickers,
-        'SOX': fetch_sox_tickers,
-        'ALL': fetch_all_tickers,
+        '^GSPC': get_spx_tickers,
+        '^DJI': get_djia_tickers,
+        '^NDX': get_ndx_tickers,
+        '^SOX': get_sox_tickers,
+        'SPX': get_spx_tickers,
+        'DJIA': get_djia_tickers,
+        'NDX': get_ndx_tickers,
+        'SOX': get_sox_tickers,
+        'ALL': get_all_tickers,
     }
     try:
-        return dic[index_symbol.upper()]()
+        return dic[source.upper()]()
     except KeyError:
-        raise KeyError(f"Index symbol '{index_symbol}' not found.")
+        raise KeyError(f"Index symbol '{source}' not found.")
 
 
 def get_name(index_symbol):
     """
-    Return the name of the index based on the index_symbol.
+    Return the name of the index based on the provided symbol.
 
     Args:
-        index_symbol (str): The ticker symbol used by Yahoo Finance (e.g.,
-            '^GSPC' for S&P 500, '^NDX' for NASDAQ-100), or a common
-            abbreviation for the index (e.g., 'SPX' for S&P 500, 'NDX' for
-            NASDAQ-100).
+        index_symbol (str): The ticker symbol or common abbreviation for the index.
+            - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX' for
+              NASDAQ-100).
+            - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
+              NASDAQ-100).
+
+            Possible values include:
+            - '^GSPC', 'SPX': S&P 500
+            - '^DJI', 'DJIA': Dow Jones Industrial Average
+            - '^IXIC': NASDAQ
+            - '^NDX', 'NDX': NASDAQ 100
+            - '^RUT', 'RUT': Russell 2000
+            - '^SOX', 'SOX': PHLX Semiconductor Index
+            - '^NYA', 'NYA': NYSE Composite
+            - '^MID', 'MID': S&P MidCap 400
 
     Returns:
-        The name of the index, or 'Unknow' if the index_symbol is not found.
+        str: The name of the index corresponding to the provided symbol, or
+            'Unknown' if the symbol is not found.
 
     Examples:
         >>> get_name('SPX')
@@ -235,7 +260,7 @@ def get_name(index_symbol):
         >>> get_name('^RUT')
         'Russell 2000'
         >>> get_name('^SOX')
-        'PHLX Semiconductor'
+        'PHLX Semiconductor Index'
         >>> get_name('^HSI')
         'Unknown'
     """
@@ -245,13 +270,13 @@ def get_name(index_symbol):
         '^IXIC': 'NASDAQ',
         '^NDX': 'NASDAQ 100',
         '^RUT': 'Russell 2000',
-        '^SOX': 'PHLX Semiconductor',
+        '^SOX': 'PHLX Semiconductor Index',
         '^NYA': 'NYSE Composite',
         '^MID': 'S&P MidCap 400',
         'SPX': 'S&P 500',
         'DJIA': 'Dow Jones Industrial Average',
         'NDX': 'NASDAQ 100',
-        'SOX': 'PHLX Semiconductor',
+        'SOX': 'PHLX Semiconductor Index',
         'RUT': 'Russell 2000',
         'NYA': 'NYSE Composite',
         'MID': 'S&P MidCap 400',
