@@ -398,5 +398,9 @@ def main(min_percentile=80, out_dir='out'):
 
 
 if __name__ == "__main__":
+    import time
+
+    start_time = time.time()
     main()
+    print(f"Execution time: {time.time() - start_time:.4f} seconds")
 

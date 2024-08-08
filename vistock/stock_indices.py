@@ -297,6 +297,9 @@ def get_name(index_symbol):
 #------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import doctest
+    import doctest, time
+
+    start_time = time.time()
     doctest.testmod()
+    print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
