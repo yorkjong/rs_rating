@@ -5,9 +5,6 @@ This module provides tools for analyzing and ranking stocks based on their
 relative strength compared to a benchmark index, inspired by the Investor's
 Business Daily (IBD) methodology.
 
-The module includes functions for calculating relative strength and generating
-stock and industry rankings.
-
 Key Features:
 - Relative strength calculation
 - Stock and industry ranking generation
@@ -57,8 +54,8 @@ __all__ = [
 
 import os
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 import yfinance as yf
 

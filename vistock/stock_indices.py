@@ -1,18 +1,26 @@
 """
-Stock Indices Functions
+stock_indices.py - Functions for retrieving and managing stock market indices data.
 
-This module provides functions for retrieving ticker symbols of various stock
-market indices and identifying index names from their ticker symbols.
+This module provides functions for retrieving ticker symbols for various stock
+market indices and identifying index names from their ticker symbols. It
+supports querying index tickers from specified sources and obtaining the name
+of an index based on its symbol.
 
-Main functions:
-- get_tickers(source): Get tickers for a specified source
-- get_name(index_symbol): Get the name of an index from its symbol
+Main Functions:
+- get_tickers(source): Retrieve ticker symbols for a specified stock market
+    index source.
+- get_name(index_symbol): Retrieve the name of an index from its ticker symbol.
 
-Usage:
+Usage Examples:
     from stock_indices import get_tickers, get_name
 
+    # Get tickers for the S&P 500 index
     spx_tickers = get_tickers('SPX')
+
+    # Get tickers for the Philadelphia Semiconductor Index
     sox_tickers = get_tickers('SOX')
+
+    # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
 __version__ = "1.4"
@@ -26,8 +34,8 @@ __all__ = [
 
 from io import StringIO
 
-import pandas as pd
 import requests
+import pandas as pd
 from bs4 import BeautifulSoup
 
 
@@ -284,7 +292,11 @@ def get_name(index_symbol):
     return dic.get(index_symbol, 'Unknown')
 
 
-if __name__ == "__main__":
+#------------------------------------------------------------------------------
+# Test
+#------------------------------------------------------------------------------
+
+if __name__ == '__main__':
     import doctest
     doctest.testmod()
 
