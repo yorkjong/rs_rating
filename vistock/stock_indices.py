@@ -20,12 +20,15 @@ Usage Examples:
     # Get tickers for the Philadelphia Semiconductor Index
     sox_tickers = get_tickers('SOX')
 
+    # Get tickers for the SPX and the SOX
+    tickers = get_tickers('SPX+SOX')
+
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "1.4"
+__version__ = "1.5"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/08/07 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/08/08 (last revision)"
 
 __all__ = [
     'get_tickers',
@@ -143,53 +146,24 @@ def get_sox_tickers():
     return tickers
 
 
-def get_all_tickers():
-    """
-    Retrieve a combined list of tickers from multiple major stock market indices.
-
-    This function aggregates ticker symbols from the following indices:
-    - S&P 500, SPX
-    - Dow Jones Industrial Average, DJIA
-    - NASDAQ 100, NDX
-    - PHLX Semiconductor, SOX
-
-    Returns:
-        list: A list of unique ticker symbols from the specified indices.
-
-    Examples:
-        >>> tickers = get_all_tickers()
-        >>> 500 <= len(tickers) < 660
-        True
-        >>> 'AAPL' in tickers
-        True
-        >>> 'MSFT' in tickers
-        True
-    """
-    return list(set(get_spx_tickers()) |
-                set(get_djia_tickers()) |
-                set(get_ndx_tickers()) |
-                set(get_sox_tickers()))
-
-
 def get_tickers(source):
     """
-    Retrieve a list of tickers for the specified index or combined index.
+    Retrieve a list of tickers for the specified index or combined indices.
 
     Args:
-        source (str): The ticker symbol or common abbreviation for the index.
+        source (str): The ticker symbol or common abbreviation for the index
+            or indices.
             - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX'
-              for NASDAQ-100).
+                for NASDAQ-100).
             - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
-              NASDAQ-100).
-            - Special keyword 'ALL' to retrieve tickers for all indices
-              combined.
+                NASDAQ-100).
+            - Multiple indices can be combined using '+' (e.g., '^GSPC+^NDX').
 
             Possible values include:
             - '^GSPC', 'SPX': S&P 500
             - '^DJI', 'DJIA': Dow Jones Industrial Average
             - '^NDX', 'NDX': NASDAQ-100
             - '^SOX', 'SOX': PHLX Semiconductor Index
-            - 'ALL': All indices combined
 
     Returns:
         list: A list of tickers for the specified source.
@@ -205,12 +179,14 @@ def get_tickers(source):
         True
         >>> len(get_tickers('^NDX')) >= 100
         True
+        >>> 500 < len(get_tickers('^GSPC+^NDX')) < (500+100)
+        True
+        >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
+        True
         >>> get_tickers('^UNKNOWN')
         Traceback (most recent call last):
             ...
         KeyError: "Index symbol '^UNKNOWN' not found."
-        >>> len(get_tickers('ALL')) > 500
-        True
     """
     dic = {
         '^GSPC': get_spx_tickers,
@@ -221,12 +197,18 @@ def get_tickers(source):
         'DJIA': get_djia_tickers,
         'NDX': get_ndx_tickers,
         'SOX': get_sox_tickers,
-        'ALL': get_all_tickers,
     }
-    try:
-        return dic[source.upper()]()
-    except KeyError:
-        raise KeyError(f"Index symbol '{source}' not found.")
+
+    sources = [s.strip().upper() for s in source.split('+')]
+    tickers = set()
+
+    for s in sources:
+        if s in dic:
+            tickers.update(dic[s]())
+        else:
+            raise KeyError(f"Index symbol '{s}' not found.")
+
+    return list(tickers)
 
 
 def get_name(index_symbol):
