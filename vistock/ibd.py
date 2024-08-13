@@ -124,6 +124,15 @@ def weighted_return(closes):
     recent quarter is given a weight of 40%, while each of the three preceding
     quarters are given a weight of 20%.
 
+    Here is the formula for calculating the return:
+
+    RS Return = 40% * P3 + 20% * P6 + 20% * P9 + 20% * P12
+    With
+    P3 = Performance over the last quarter (3 months)
+    P6 = Performance over the last two quarters (6 months)
+    P9 = Performance over the last three quarters (9 months)
+    P12 = Performance over the last four quarters (12 months)
+
     Args:
         closes (pd.Series): Closing prices of the stock/index.
 
