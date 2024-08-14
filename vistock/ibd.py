@@ -42,9 +42,9 @@ installed.
 For detailed information on each function, please refer to their individual
 docstrings.
 """
-__version__ = "1.2"
+__version__ = "1.3"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/07 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/14 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -75,7 +75,7 @@ TITLE_RS = "Relative Strength"
 # IBD RS (Relative Strength) Rating
 #------------------------------------------------------------------------------
 
-def relative_strength(closes, closes_ref):
+def relative_strength(closes, closes_ref, interval='1d'):
     """
     Calculate the relative strength of a stock compared to a reference index.
 
@@ -99,6 +99,8 @@ def relative_strength(closes, closes_ref):
     Args:
         closes (pd.Series): Closing prices of the stock.
         closes_ref (pd.Series): Closing prices of the reference index.
+        interval (str, optional): The frequency of the data points. Must be one
+            of '1d' for daily data or '1wk' for weekly data. Defaults to '1d'.
 
     Returns:
         pd.Series: Relative strength values for the stock.
@@ -108,13 +110,13 @@ def relative_strength(closes, closes_ref):
         >>> index_closes = pd.Series([1000, 1010, 1015, 1005, 1020])
         >>> rs = relative_strength(stock_closes, index_closes)
     """
-    ret_stock = weighted_return(closes)
-    ret_ref = weighted_return(closes_ref)
+    ret_stock = weighted_return(closes, interval)
+    ret_ref = weighted_return(closes_ref, interval)
     rs = (1 + ret_stock) / (1 + ret_ref) * 100
     return round(rs, 2)
 
 
-def weighted_return(closes):
+def weighted_return(closes, interval):
     """
     Calculate the performance of the last year, with the most recent quarter
     weighted double.
@@ -135,6 +137,8 @@ def weighted_return(closes):
 
     Args:
         closes (pd.Series): Closing prices of the stock/index.
+        interval (str, optional): The interval of the data (must be '1d' or
+            '1wk').
 
     Returns:
         pd.Series: Performance values of the stock/index.
@@ -143,14 +147,15 @@ def weighted_return(closes):
         >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
         >>> weighted_perf = weighted_return(closes)
     """
-    p1 = quarters_return(closes, 1) # performance over the last quarter
-    p2 = quarters_return(closes, 2) # performance over the last two quarters
-    p3 = quarters_return(closes, 3) # performance over the last three quarters
-    p4 = quarters_return(closes, 4) # performance over the last four quarters
+    # Calculate performances over the last quarters
+    p1 = quarters_return(closes, 1, interval) # over the last quarter
+    p2 = quarters_return(closes, 2, interval) # over the last two quarters
+    p3 = quarters_return(closes, 3, interval) # over the last three quarters
+    p4 = quarters_return(closes, 4, interval) # over the last four quarters
     return 0.4 * p1 + 0.2 * p2 + 0.2 * p3 + 0.2 * p4
 
 
-def quarters_return(closes, n):
+def quarters_return(closes, n, interval):
     """
     Calculate the return (percentage change) over the last n quarters.
 
@@ -161,6 +166,8 @@ def quarters_return(closes, n):
     Args:
         closes (pd.Series): Closing prices of the stock/index.
         n (int): Number of quarters to look back.
+        interval (str, optional): The frequency of the data points. Must be one
+            of '1d' for daily data or '1wk' for weekly data.
 
     Returns:
         pd.Series: the return (percentage change) over the last n quarters.
@@ -169,8 +176,16 @@ def quarters_return(closes, n):
         >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
         >>> quarterly_return = quarters_return(closes, 1)
     """
-    length = min(len(closes) - 1, n * int(252 / 4))
-    ret = closes.pct_change(periods=length)
+    if interval == '1d':
+        periods = n * 252//4    # 252 trading days in a year
+    elif interval == '1wk':
+        periods = n * 52//4     # 52 weeks in a year
+    else:
+        raise ValueError("Invalid interval. Use '1d' or '1wk'.")
+
+    periods = min(len(closes) - 1, periods)
+    ret = closes.pct_change(periods=periods)
+
     return ret.replace([np.inf, -np.inf], np.nan).fillna(0)
 
 
@@ -178,7 +193,7 @@ def quarters_return(closes, n):
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
-def rankings(tickers, ref_ticker='^GSPC', period='2y'):
+def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
@@ -194,6 +209,8 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y'):
             Defaults to '^GSPC' (S&P 500).
         period (str, optional): The period for which to fetch historical data.
             Defaults to '2y' (two years).
+        interval (str, optional): The frequency of the data points. Must be one
+            of '1d' for daily data or '1wk' for weekly data.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple of two Pandas DataFrames:
@@ -218,7 +235,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y'):
         >>> print(stock_rankings.head())
         >>> print(industry_rankings.head())
     """
-    def process_stocks(tickers, ref_ticker='^GSPC', period='2y'):
+    def process_stocks(tickers, ref_ticker, period, interval):
         """
         Processes stock data to extract relevant information for rankings.
 
@@ -234,12 +251,13 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y'):
                 - industries (dict): Dictionary containing industry-specific
                 data, such as RS values and tickers for each industry.
         """
-        df_ref = yf.Ticker(ref_ticker).history(period=period)
+        index = yf.Ticker(ref_ticker)
+        df_ref = index.history(period=period, interval=interval)
 
         data = []
         industries = {}
-        for ticker, stock, df in gen_stock_data(tickers, period):
-            rs_values = calculate_rs_values(df['Close'], df_ref['Close'])
+        for ticker, stock, df in gen_stock_data(tickers, period, interval):
+            rs_values = calc_rs_values(df['Close'], df_ref['Close'], interval)
             info = stock.info
             sector = info.get('sector', 'Unknown')
             industry = info.get('industry', 'Unknown')
@@ -254,20 +272,29 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y'):
         )
         return df_stocks, industries
 
-    def gen_stock_data(tickers, period):
+    def gen_stock_data(tickers, period, interval):
         """Generate stock data."""
         for ticker in tickers:
             stock = yf.Ticker(ticker)
-            df = stock.history(period=period)
-            if len(df) < 6 * 20:  # Ensure at least 6 months of data
+            df = stock.history(period=period, interval=interval)
+
+            # Ensure at least 6 months of data
+            if ((interval == '1d' and len(df) < 6 * 20)
+                or (interval == '1wk' and len(df) < 6 * 4)):
                 continue
+
             yield ticker, stock, df
 
-    def calculate_rs_values(prices_stock, prices_ref):
+    def calc_rs_values(prices_stock, prices_ref, interval):
         """Calculate RS values for a single ticker."""
-        rs_series = relative_strength(prices_stock, prices_ref)
+        rs_series = relative_strength(prices_stock, prices_ref, interval)
         rs_latest = rs_series.iloc[-1]
-        month = 20
+        if interval == '1d':
+            month = 20  # Approx. trading days in a month (daily data)
+        elif interval == '1wk':
+            month = 4   # Approx. trading weeks in a month (weekly data)
+        else:
+            raise ValueError("Invalid interval. Use '1d' or '1wk'.")
 
         return {
             "latest": rs_latest,
@@ -291,7 +318,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y'):
 
     #--------------------------------------------------------------------------
 
-    def calculate_percentiles(df):
+    def calc_percentiles(df):
         """Calculate percentiles for RS and its historical values."""
         df[TITLE_PERCENTILE] = pd.qcut(df[TITLE_RS], 100, labels=False,
                                        duplicates="drop")
@@ -357,13 +384,14 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y'):
                          key=lambda x: stock_rs[x], reverse=True)
         return ",".join(tickers)
 
-    df_stocks, industries = process_stocks(tickers, ref_ticker, period)
-    stock_rankings = rank_by_rs(calculate_percentiles(df_stocks))
+    df_stocks, industries = process_stocks(tickers, ref_ticker,
+                                           period, interval)
+    stock_rankings = rank_by_rs(calc_percentiles(df_stocks))
     stock_rs = dict(zip(stock_rankings[TITLE_TICKER],
                         stock_rankings[TITLE_RS]))
 
     industry_df = process_industries(industries, stock_rs)
-    industry_rankings = rank_by_rs(calculate_percentiles(industry_df))
+    industry_rankings = rank_by_rs(calc_percentiles(industry_df))
 
     return stock_rankings, industry_rankings
 
@@ -381,7 +409,7 @@ def main(min_percentile=80, out_dir='out'):
             Defaults to 'out'
     '''
     from stock_indices import get_sox_tickers
-    rank_stock, rank_indust = rankings(get_sox_tickers())
+    rank_stock, rank_indust = rankings(get_sox_tickers(), interval='1wk')
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
