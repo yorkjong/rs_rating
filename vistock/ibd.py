@@ -42,9 +42,9 @@ installed.
 For detailed information on each function, please refer to their individual
 docstrings.
 """
-__version__ = "1.3"
+__version__ = "1.4"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/14 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/15 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -100,7 +100,8 @@ def relative_strength(closes, closes_ref, interval='1d'):
         closes (pd.Series): Closing prices of the stock.
         closes_ref (pd.Series): Closing prices of the reference index.
         interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data or '1wk' for weekly data. Defaults to '1d'.
+            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
+            data. Defaults to '1d'.
 
     Returns:
         pd.Series: Relative strength values for the stock.
@@ -137,8 +138,9 @@ def weighted_return(closes, interval):
 
     Args:
         closes (pd.Series): Closing prices of the stock/index.
-        interval (str, optional): The interval of the data (must be '1d' or
-            '1wk').
+        interval (str, optional): The frequency of the data points. Must be one
+            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
+            data.
 
     Returns:
         pd.Series: Performance values of the stock/index.
@@ -167,7 +169,8 @@ def quarters_return(closes, n, interval):
         closes (pd.Series): Closing prices of the stock/index.
         n (int): Number of quarters to look back.
         interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data or '1wk' for weekly data.
+            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
+            data.
 
     Returns:
         pd.Series: the return (percentage change) over the last n quarters.
@@ -176,13 +179,12 @@ def quarters_return(closes, n, interval):
         >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
         >>> quarterly_return = quarters_return(closes, 1)
     """
-    if interval == '1d':
-        periods = n * 252//4    # 252 trading days in a year
-    elif interval == '1wk':
-        periods = n * 52//4     # 52 weeks in a year
-    else:
-        raise ValueError("Invalid interval. Use '1d' or '1wk'.")
-
+    unit_per_quarter = {
+        '1d': 252//4,   # 252 trading days in a year
+        '1wk': 52//4,   # 52 weeks in a year
+        '1mo': 12//4,   # 12 months in a year
+    }[interval]
+    periods = unit_per_quarter * n
     periods = min(len(closes) - 1, periods)
     ret = closes.pct_change(periods=periods)
 
@@ -210,7 +212,8 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
         period (str, optional): The period for which to fetch historical data.
             Defaults to '2y' (two years).
         interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data or '1wk' for weekly data.
+            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
+            data. Defaults to '1d'.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple of two Pandas DataFrames:
@@ -280,7 +283,8 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
 
             # Ensure at least 6 months of data
             if ((interval == '1d' and len(df) < 6 * 20)
-                or (interval == '1wk' and len(df) < 6 * 4)):
+                or (interval == '1wk' and len(df) < 6 * 4)
+                or (interval == '1mo' and len(df) < 6)):
                 continue
 
             yield ticker, stock, df
@@ -289,12 +293,11 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
         """Calculate RS values for a single ticker."""
         rs_series = relative_strength(prices_stock, prices_ref, interval)
         rs_latest = rs_series.iloc[-1]
-        if interval == '1d':
-            month = 20  # Approx. trading days in a month (daily data)
-        elif interval == '1wk':
-            month = 4   # Approx. trading weeks in a month (weekly data)
-        else:
-            raise ValueError("Invalid interval. Use '1d' or '1wk'.")
+        month = {
+            '1d': 20,   # Approx. trading days in a month (daily data)
+            '1wk': 4,   # Approx. trading weeks in a month (weekly data)
+            '1mo': 1,
+        }[interval]
 
         return {
             "latest": rs_latest,
@@ -409,7 +412,7 @@ def main(min_percentile=80, out_dir='out'):
             Defaults to 'out'
     '''
     from stock_indices import get_sox_tickers
-    rank_stock, rank_indust = rankings(get_sox_tickers(), interval='1wk')
+    rank_stock, rank_indust = rankings(get_sox_tickers(), interval='1mo')
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
