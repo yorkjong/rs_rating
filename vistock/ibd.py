@@ -42,7 +42,7 @@ installed.
 For detailed information on each function, please refer to their individual
 docstrings.
 """
-__version__ = "1.4"
+__version__ = "1.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/15 (last revision)"
 
@@ -179,13 +179,12 @@ def quarters_return(closes, n, interval):
         >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
         >>> quarterly_return = quarters_return(closes, 1)
     """
-    unit_per_quarter = {
+    quarter = {
         '1d': 252//4,   # 252 trading days in a year
         '1wk': 52//4,   # 52 weeks in a year
         '1mo': 12//4,   # 12 months in a year
     }[interval]
-    periods = unit_per_quarter * n
-    periods = min(len(closes) - 1, periods)
+    periods = min(len(closes) - 1, quarter * n)
     ret = closes.pct_change(periods=periods)
 
     return ret.replace([np.inf, -np.inf], np.nan).fillna(0)
@@ -412,7 +411,7 @@ def main(min_percentile=80, out_dir='out'):
             Defaults to 'out'
     '''
     from stock_indices import get_sox_tickers
-    rank_stock, rank_indust = rankings(get_sox_tickers(), interval='1mo')
+    rank_stock, rank_indust = rankings(get_sox_tickers(), interval='1d')
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
@@ -424,11 +423,9 @@ def main(min_percentile=80, out_dir='out'):
     print('\n\nIndustry Rankings:')
     print(rank_indust)
 
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
     # Save to CSV
     print("\n\n***")
+    os.makedirs(out_dir, exist_ok=True)
     for table, kind in zip([rank_stock, rank_indust],
                            ['stocks', 'industries']):
         filename = f'rs_{kind}.csv'
