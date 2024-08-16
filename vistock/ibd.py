@@ -42,13 +42,14 @@ installed.
 For detailed information on each function, please refer to their individual
 docstrings.
 """
-__version__ = "1.5"
+__version__ = "1.6"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/15 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/16 (last revision)"
 
 __all__ = [
     'relative_strength',
     'rankings',
+    'ma_window_size',
     'TITLE_PERCENTILE',
 ]
 
@@ -396,6 +397,46 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
     industry_rankings = rank_by_rs(calc_percentiles(industry_df))
 
     return stock_rankings, industry_rankings
+
+
+#------------------------------------------------------------------------------
+# Misc Help Functions
+#------------------------------------------------------------------------------
+
+def ma_window_size(interval, days):
+    """
+    Calculate moving average window size based on IBD (Investor's Business
+    Daily) convention.
+
+    This function adjusts the window size for weekly data to maintain
+    consistency with daily calculations.
+
+    Args:
+        interval (str): The data interval. Must be either '1d' for daily or
+            '1wk' for weekly.
+        days (int): Number of calendar days for the desired moving average
+            period.
+
+    Returns:
+        int: Calculated window size (number of data points) for the moving
+            average.
+
+    Raises:
+        ValueError: If an unsupported interval is provided (not '1d' or '1wk').
+
+    Examples:
+        >>> ma_window_size('1d', 50)
+        50
+        >>> ma_window_size('1wk', 50)
+        10
+    """
+    if interval == '1d':
+        return days
+    elif interval == '1wk':
+        return days // 5  # 1 week = 5 trading days
+    else:
+        raise ValueError("Unsupported interval")
+
 
 
 #------------------------------------------------------------------------------
