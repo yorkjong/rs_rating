@@ -15,6 +15,8 @@ Public Functions:
     reference index.
 - rankings: Generate comprehensive rankings for both individual stocks and
     industries.
+- ma_window_size: Calculate moving average window size based on the IBD
+    convention.
 
 Constants:
 - TITLE_PERCENTILE: Column name for the percentile ranking in the output
