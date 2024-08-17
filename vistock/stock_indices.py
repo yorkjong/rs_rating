@@ -41,6 +41,8 @@ import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 
+import tw
+
 
 def get_spx_tickers():
     """
@@ -183,6 +185,8 @@ def get_tickers(source):
         True
         >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
         True
+        >>> len(get_tickers('TWSE+TPEX')) >= 2000
+        True
         >>> get_tickers('^UNKNOWN')
         Traceback (most recent call last):
             ...
@@ -193,10 +197,15 @@ def get_tickers(source):
         '^DJI': get_djia_tickers,
         '^NDX': get_ndx_tickers,
         '^SOX': get_sox_tickers,
+        '^TWII': tw.get_twse_tickers,
         'SPX': get_spx_tickers,
         'DJIA': get_djia_tickers,
         'NDX': get_ndx_tickers,
         'SOX': get_sox_tickers,
+        'TWII': tw.get_twse_tickers,
+        'TWSE': tw.get_twse_tickers,
+        'TPEX': tw.get_tpex_tickers,
+        'ESB': tw.get_esb_tickers,
     }
 
     sources = [s.strip().upper() for s in source.split('+')]
@@ -231,6 +240,7 @@ def get_name(index_symbol):
             - '^SOX', 'SOX': PHLX Semiconductor Index
             - '^NYA', 'NYA': NYSE Composite
             - '^MID', 'MID': S&P MidCap 400
+            - '^TWII', 'TWII': Taiwan Weighted Index
 
     Returns:
         str: The name of the index corresponding to the provided symbol, or
@@ -251,18 +261,21 @@ def get_name(index_symbol):
         'Russell 2000'
         >>> get_name('^SOX')
         'PHLX Semiconductor Index'
+        >>> get_name('^TWII')
+        'Taiwan Weighted Index'
         >>> get_name('^HSI')
         'Unknown'
     """
     dic = {
         '^GSPC': 'S&P 500',
         '^DJI': 'Dow Jones Industrial Average',
-        '^IXIC': 'NASDAQ',
+        '^IXIC': 'NASDAQ',  # NASDAQ Composite
         '^NDX': 'NASDAQ 100',
         '^RUT': 'Russell 2000',
         '^SOX': 'PHLX Semiconductor Index',
         '^NYA': 'NYSE Composite',
         '^MID': 'S&P MidCap 400',
+        '^TWII': 'Taiwan Weighted Index',
         'SPX': 'S&P 500',
         'DJIA': 'Dow Jones Industrial Average',
         'NDX': 'NASDAQ 100',
@@ -270,6 +283,10 @@ def get_name(index_symbol):
         'RUT': 'Russell 2000',
         'NYA': 'NYSE Composite',
         'MID': 'S&P MidCap 400',
+        'TWII': 'Taiwan Weighted Index',
+        'TWSE': 'Taiwan Stock Exchange',
+        'TPEX': 'Taipei Exchange',
+        'ESB': 'Emerging Stock Boar',
     }
     return dic.get(index_symbol, 'Unknown')
 
