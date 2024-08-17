@@ -188,7 +188,7 @@ def quarters_return(closes, n, interval):
         '1mo': 12//4,   # 12 months in a year
     }[interval]
     periods = min(len(closes) - 1, quarter * n)
-    ret = closes.pct_change(periods=periods, fill_method='pad')
+    ret = closes.pct_change(periods=periods, fill_method=None)
 
     return ret.replace([np.inf, -np.inf], np.nan).fillna(0)
 
