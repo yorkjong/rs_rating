@@ -26,7 +26,7 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "1.5"
+__version__ = "1.6"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/08/08 (last revision)"
 
@@ -225,7 +225,8 @@ def get_name(index_symbol):
     Return the name of the index based on the provided symbol.
 
     Args:
-        index_symbol (str): The ticker symbol or common abbreviation for the index.
+        index_symbol (str): The ticker symbol or common abbreviation for the
+            index.
             - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX' for
               NASDAQ-100).
             - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
@@ -241,10 +242,17 @@ def get_name(index_symbol):
             - '^NYA', 'NYA': NYSE Composite
             - '^MID', 'MID': S&P MidCap 400
             - '^TWII', 'TWII': Taiwan Weighted Index
+            - '^STOXX50E': Euro Stoxx 50,
+            - '^FTSE': FTSE 100,
+            - '^GDAXI': DAX,
+            - '^FCHI': CAC 40,
+            - '^GSPTSE': S&P/TSX Composite,
+            - '^N225': Nikkei 225,
+            - '^HSI': Hang Seng Index,
 
     Returns:
-        str: The name of the index corresponding to the provided symbol, or
-            'Unknown' if the symbol is not found.
+        str: The name of the index if found.
+             If not found, returns the original index_symbol.
 
     Examples:
         >>> get_name('SPX')
@@ -264,12 +272,14 @@ def get_name(index_symbol):
         >>> get_name('^TWII')
         'Taiwan Weighted Index'
         >>> get_name('^HSI')
-        'Unknown'
+        'Hang Seng Index'
+        >>> get_name('AAPL')
+        'AAPL'
     """
     dic = {
         '^GSPC': 'S&P 500',
         '^DJI': 'Dow Jones Industrial Average',
-        '^IXIC': 'NASDAQ',  # NASDAQ Composite
+        '^IXIC': 'NASDAQ',                  # NASDAQ Composite
         '^NDX': 'NASDAQ 100',
         '^RUT': 'Russell 2000',
         '^SOX': 'PHLX Semiconductor Index',
@@ -287,8 +297,15 @@ def get_name(index_symbol):
         'TWSE': 'Taiwan Stock Exchange',
         'TPEX': 'Taipei Exchange',
         'ESB': 'Emerging Stock Boar',
+        '^STOXX50E': 'Euro Stoxx 50',       # Europe
+        '^FTSE': 'FTSE 100',                # London, UK
+        '^GDAXI': 'DAX',                    # Frankfurt, Germany
+        '^FCHI': 'CAC 40',                  # Paris, France
+        '^GSPTSE': 'S&P/TSX Composite',     # Canada
+        '^N225': 'Nikkei 225',              # Japan
+        '^HSI': 'Hang Seng Index',          # Hong Kong
     }
-    return dic.get(index_symbol, 'Unknown')
+    return dic.get(index_symbol, index_symbol)
 
 
 #------------------------------------------------------------------------------
