@@ -44,7 +44,7 @@ installed.
 For detailed information on each function, please refer to their individual
 docstrings.
 """
-__version__ = "1.9"
+__version__ = "2.0"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/18 (last revision)"
 
@@ -189,7 +189,7 @@ def quarters_return(closes, n, interval):
     }[interval]
     periods = min(len(closes) - 1, quarter * n)
 
-    ret = closes.fillna(method='ffill').pct_change(periods=periods)
+    ret = closes.ffill().pct_change(periods=periods)
     return ret.fillna(0)
 
 
