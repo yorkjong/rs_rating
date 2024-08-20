@@ -7,11 +7,15 @@ supports querying index tickers from specified sources and obtaining the name
 of an index based on its symbol.
 
 Main Functions:
+
 - get_tickers(source): Retrieve ticker symbols for a specified stock market
-    index source.
+  index source.
 - get_name(index_symbol): Retrieve the name of an index from its ticker symbol.
 
 Usage Examples:
+
+::
+
     from stock_indices import get_tickers, get_name
 
     # Get tickers for the S&P 500 index
@@ -123,6 +127,7 @@ def get_sox_tickers():
     Index).
 
     This function returns a manually maintained list of SOX tickers.
+
     Note: This list may not be up-to-date and requires periodic updates.
 
     Returns:
@@ -155,13 +160,15 @@ def get_tickers(source):
     Args:
         source (str): The ticker symbol or common abbreviation for the index
             or indices.
+
             - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX'
-                for NASDAQ-100).
+              for NASDAQ-100).
             - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
-                NASDAQ-100).
+              NASDAQ-100).
             - Multiple indices can be combined using '+' (e.g., '^GSPC+^NDX').
 
             Possible values include:
+
             - '^GSPC', 'SPX': S&P 500
             - '^DJI', 'DJIA': Dow Jones Industrial Average
             - '^NDX', 'NDX': NASDAQ-100
@@ -172,7 +179,7 @@ def get_tickers(source):
 
     Raises:
         KeyError: If the provided source is not recognized or does not
-            correspond to a known index.
+        correspond to a known index.
 
     Examples:
         >>> len(get_tickers('SPX')) >= 500
@@ -227,12 +234,14 @@ def get_name(index_symbol):
     Args:
         index_symbol (str): The ticker symbol or common abbreviation for the
             index.
+
             - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX' for
               NASDAQ-100).
             - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
               NASDAQ-100).
 
             Possible values include:
+
             - '^GSPC', 'SPX': S&P 500
             - '^DJI', 'DJIA': Dow Jones Industrial Average
             - '^IXIC': NASDAQ
@@ -252,7 +261,7 @@ def get_name(index_symbol):
 
     Returns:
         str: The name of the index if found.
-             If not found, returns the original index_symbol.
+        If not found, returns the original index_symbol.
 
     Examples:
         >>> get_name('SPX')

@@ -6,24 +6,30 @@ relative strength compared to a benchmark index, inspired by the Investor's
 Business Daily (IBD) methodology.
 
 Key Features:
+
 - Relative strength calculation
 - Stock and industry ranking generation
 - Percentile-based filtering of rankings
 
 Public Functions:
+
 - relative_strength: Calculate the relative strength of a stock compared to a
-    reference index.
+  reference index.
 - rankings: Generate comprehensive rankings for both individual stocks and
-    industries.
+  industries.
 - ma_window_size: Calculate moving average window size based on the IBD
-    convention.
+  convention.
 
 Constants:
+
 - TITLE_PERCENTILE: Column name for the percentile ranking in the output
                     DataFrames. Used for filtering results based on percentile
                     thresholds.
 
 Usage:
+
+::
+
     import ibd
 
     # Generate rankings for a list of stocks
@@ -35,17 +41,15 @@ Usage:
 
     # Filter rankings based on a minimum percentile
     min_percentile = 80
-    top_stocks = stock_rankings[
-        stock_rankings[ibd.TITLE_PERCENTILE] >= min_percentile]
+    top_stocks = stock_rankings[stock_rankings[
+                    ibd.TITLE_PERCENTILE] >= min_percentile]
 
 See Also:
+
 - `RS Rating <https://tw.tradingview.com/script/pziQwiT2/>`_
-- `Relative Strength (IBD Style)
-  <https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/>`_
-- `skyte/relative-strength/rs_ranking.py
-  <https://github.com/skyte/relative-strength/blob/main/rs_ranking.py>`_
-- `IBD Ratings
-  <https://www.investors.com/ibd-university/find-evaluate-stocks/exclusive-ratings/>`_
+- `Relative Strength (IBD Style) <https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/>`_
+- `skyte/relative-strength/rs_ranking.py <https://github.com/skyte/relative-strength/blob/main/rs_ranking.py>`_
+- `IBD Ratings <https://www.investors.com/ibd-university/find-evaluate-stocks/exclusive-ratings/>`_
 """
 __version__ = "2.0"
 __author__ = "York <york.jong@gmail.com>"
@@ -95,6 +99,8 @@ def relative_strength(closes, closes_ref, interval='1d'):
     the reference index's closing prices over the past year. The formula is as
     follows:
 
+    ::
+
         growth = a/b =  ((a - b) / b) + 1 = return + 1
         growth_rate = growth_stock / growth_index
         rating = growth_rate * 100
@@ -135,12 +141,12 @@ def weighted_return(closes, interval):
 
     Here is the formula for calculating the return:
 
-    RS Return = 40% * P3 + 20% * P6 + 20% * P9 + 20% * P12
-    With
-    P3 = Performance over the last quarter (3 months)
-    P6 = Performance over the last two quarters (6 months)
-    P9 = Performance over the last three quarters (9 months)
-    P12 = Performance over the last four quarters (12 months)
+        RS Return = 40% * P3 + 20% * P6 + 20% * P9 + 20% * P12
+        With
+        P3 = Performance over the last quarter (3 months)
+        P6 = Performance over the last two quarters (6 months)
+        P9 = Performance over the last three quarters (9 months)
+        P12 = Performance over the last four quarters (12 months)
 
     Args:
         closes (pd.Series): Closing prices of the stock/index.
@@ -222,20 +228,20 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple of two Pandas DataFrames:
-            1. Stock Rankings DataFrame:
-               - Columns: rank, ticker, sector, industry, RS (current),
-                 RS (1 month ago), RS (3 months ago), RS (6 months ago),
-                 percentile (current), percentile (1 month ago),
-                 percentile (3 months ago), percentile (6 months ago)
-               - Sorted by current RS in descending order
 
-            2. Industry Rankings DataFrame:
-               - Columns: rank, industry, sector, RS (current),
-                 RS (1 month ago), RS (3 months ago), RS (6 months ago),
-                 tickers (list of tickers in the industry),
-                 percentile (current), percentile (1 month ago),
-                 percentile (3 months ago), percentile (6 months ago)
-               - Sorted by current RS in descending order
+        1. Stock Rankings DataFrame:
+            - Columns: rank, ticker, sector, industry, RS (current),
+              RS (1 month ago), RS (3 months ago), RS (6 months ago),
+              percentile (current), percentile (1 month ago),
+              percentile (3 months ago), percentile (6 months ago)
+            - Sorted by current RS in descending order
+        2. Industry Rankings DataFrame:
+            - Columns: rank, industry, sector, RS (current),
+              RS (1 month ago), RS (3 months ago), RS (6 months ago),
+              tickers (list of tickers in the industry),
+              percentile (current), percentile (1 month ago),
+              percentile (3 months ago), percentile (6 months ago)
+            - Sorted by current RS in descending order
 
     Example:
         >>> tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN']
@@ -255,9 +261,9 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
         Returns:
             tuple: A tuple containing two elements:
                 - df_stocks (pd.DataFrame): DataFrame with stock information,
-                including ticker, sector, industry, and RS values.
+                  including ticker, sector, industry, and RS values.
                 - industries (dict): Dictionary containing industry-specific
-                data, such as RS values and tickers for each industry.
+                  data, such as RS values and tickers for each industry.
         """
         index = yf.Ticker(ref_ticker)
         df_ref = index.history(period=period, interval=interval)
@@ -359,7 +365,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
 
         Returns:
             pd.DataFrame: DataFrame with industry information, including
-                industry name, sector, average RS values, and a list of tickers.
+            industry name, sector, average RS values, and a list of tickers.
         """
         industry_data = [
             get_industry_row(info, stock_rs)
@@ -424,7 +430,7 @@ def ma_window_size(interval, days):
 
     Returns:
         int: Calculated window size (number of data points) for the moving
-            average.
+        average.
 
     Raises:
         ValueError: If an unsupported interval is provided (not '1d' or '1wk').
