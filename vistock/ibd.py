@@ -38,11 +38,14 @@ Usage:
     top_stocks = stock_rankings[
         stock_rankings[ibd.TITLE_PERCENTILE] >= min_percentile]
 
-Note: This module requires pandas, yfinance, and numpy libraries to be
-installed.
-
-For detailed information on each function, please refer to their individual
-docstrings.
+See Also:
+- `RS Rating <https://tw.tradingview.com/script/pziQwiT2/>`_
+- `Relative Strength (IBD Style)
+  <https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/>`_
+- `skyte/relative-strength/rs_ranking.py
+  <https://github.com/skyte/relative-strength/blob/main/rs_ranking.py>`_
+- `IBD Ratings
+  <https://www.investors.com/ibd-university/find-evaluate-stocks/exclusive-ratings/>`_
 """
 __version__ = "2.0"
 __author__ = "York <york.jong@gmail.com>"
