@@ -46,12 +46,19 @@ Usage:
 
 See Also:
 
-- `RS Rating <https://tw.tradingview.com/script/pziQwiT2/>`_
-- `Relative Strength (IBD Style) <https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/>`_
-- `skyte/relative-strength/rs_ranking.py <https://github.com/skyte/relative-strength/blob/main/rs_ranking.py>`_
-- `IBD Ratings <https://www.investors.com/ibd-university/find-evaluate-stocks/exclusive-ratings/>`_
+- `RS Rating — Fred6724的指標 — TradingView
+  <https://tw.tradingview.com/script/pziQwiT2/>`_
+- `Relative Strength (IBD Style) — Indicator by Skyte — TradingView
+  <https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/>`_
+
+  - `relative-strength/rs_ranking.py at main · skyte/relative-strength
+    <https://github.com/skyte/relative-strength/blob/main/rs_ranking.py>`_
+
+- `Exclusive IBD Ratings | Stock News & Stock Market Analysis - IBD
+  <https://www.investors.com/ibd-university/
+  find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.0"
+__version__ = "2.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/18 (last revision)"
 
