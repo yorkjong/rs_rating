@@ -217,12 +217,6 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
     results = []
     for ticker in tickers:
         rsm = rs_func(df[ticker], df[ticker_ref], window)
-        if rsm.isna().sum() > 0:
-            print(f'{ticker} RS contains NaN.')
-            continue
-        if np.isinf(rsm).sum() > 0:
-            print(f'{ticker} RS contains inf.')
-            continue
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -262,16 +256,27 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
     return ranking_df
 
 
-def main():
-    tickers = [
-        'AMD', 'ADI', 'AMAT', 'ASML', 'AZTA', 'AVGO', 'COHR', 'ENTG', 'GFS',
-        'INTC', 'IPGP', 'KLAC', 'LRCX', 'LSCC', 'MRVL', 'MCHP', 'MU', 'MPWR',
-        'NOVT', 'NVDA', 'NXPI', 'ON', 'QRVO', 'QCOM', 'SWKS', 'SYNA', 'TSM',
-        'TER', 'TXN', 'WOLF'
-    ]
+def main(period='2y', ma="EMA", out_dir='out'):
+    import os
+    from datetime import datetime
+    from vistock.stock_indices import get_tickers
 
-    rank = ranking(tickers, period='2y', interval='1wk', ma="EMA", window=52)
+    code = 'SPX+DJIA+NDX+SOX'
+    tickers = get_tickers(code)
+    remove_tickers = ['HBAN', 'SW', 'BRK.B', 'VLTO', 'ARM', 'SOLV', 'GEV', 'BF.B']
+    tickers = [t for t in tickers if t not in remove_tickers]
+
+    rank = ranking(tickers, period=period, interval='1wk', ma=ma, window=52)
     print(rank.head(10))
+
+    # Save to CSV
+    print("\n\n***")
+    os.makedirs(out_dir, exist_ok=True)
+    today = datetime.now().strftime('%Y%m%d')
+    filename = f'{code}_stocks_{period}_{ma}_{today}.csv'
+    rank.to_csv(os.path.join(out_dir, filename), index=False)
+    print(f'Your "{filename}" is in the "{out_dir}" folder.')
+    print("***\n")
 
 
 if __name__ == "__main__":
@@ -280,4 +285,3 @@ if __name__ == "__main__":
     start_time = time.time()
     main()
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
-
