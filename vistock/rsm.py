@@ -43,9 +43,9 @@ See Also
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.2"
+__version__ = "1.3"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/08/23 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/08/24 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -98,7 +98,8 @@ def mansfield_relative_strength(closes, closes_index, window):
     closes.ffill(inplace=True)
     closes_index.ffill(inplace=True)
     rsd = dorsey_relative_strength(closes, closes_index)
-    return ((rsd / simple_moving_average(rsd, window)) - 1) * 100
+    rsm = ((rsd / simple_moving_average(rsd, window)) - 1) * 100
+    return round(rsm, 2)
 
 
 def mansfield_relative_strength_with_ema(closes, closes_index, window,
@@ -144,7 +145,8 @@ def mansfield_relative_strength_with_ema(closes, closes_index, window,
     closes.ffill(inplace=True)
     closes_index.ffill(inplace=True)
     rsd = dorsey_relative_strength(closes, closes_index)
-    return ((rsd / exponential_moving_average(rsd, window, adjust)) - 1) * 100
+    rsm = ((rsd / exponential_moving_average(rsd, window, adjust)) - 1) * 100
+    return round(rsm, 2)
 
 
 def dorsey_relative_strength(closes, closes_index):
@@ -231,7 +233,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         # Construct DataFrame for current stock
         rank_df = pd.DataFrame({
             'Ticker': [ticker],
-            'Price': [df[ticker].iloc[-1]],
+            'Price': [round(df[ticker].iloc[-1], 2)],
             'Relative Strength': [rsm.iloc[-1]],
             '1 Month Ago': [rsm_1m],
             '3 Months Ago': [rsm_3m],
