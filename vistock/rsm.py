@@ -86,9 +86,9 @@ def mansfield_relative_strength(closes, closes_index, window):
     Examples
     --------
     >>> stock_closes = pd.Series([100, 105, 110],
-    ... index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
+    ...     index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
     >>> index_closes = pd.Series([2000, 2050, 2100],
-    ... index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
+    ...     index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
     >>> mansfield_relative_strength(stock_closes, index_closes, window=2)
     2024-01-01    5.000000
     2024-01-02    5.097847
@@ -132,11 +132,11 @@ def mansfield_relative_strength_with_ema(closes, closes_index, window,
     Examples
     --------
     >>> stock_closes = pd.Series([100, 105, 110],
-    ... index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
+    ...     index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
     >>> index_closes = pd.Series([2000, 2050, 2100],
-    ... index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
+    ...     index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
     >>> mansfield_relative_strength_with_ema(stock_closes, index_closes,
-    ... window=2)
+    ...     window=2)
     2024-01-01    5.000000
     2024-01-02    5.097847
     2024-01-03    5.238095
