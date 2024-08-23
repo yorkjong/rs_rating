@@ -7,8 +7,8 @@ to compute Dorsey Relative Strength (RSD), Mansfield Relative Strength (RSM)
 using both Simple Moving Average (SMA) and Exponential Moving Average (EMA),
 as well as functionality to rank stocks against a benchmark index.
 
-Functions
----------
+Functions:
+----------
 - dorsey_relative_strength(closes, closes_index): Computes Dorsey Relative
   Strength (RSD).
 - mansfield_relative_strength(closes, closes_index, window): Computes Mansfield
@@ -18,8 +18,8 @@ Functions
 - ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma='SMA',
   window=52): Ranks stocks based on their RSM.
 
-Examples
---------
+Examples:
+---------
 To calculate RSM for a list of stock tickers and rank them:
 
 >>> tickers = ['AAPL', 'MSFT', 'GOOGL']
@@ -33,8 +33,8 @@ To compute Mansfield Relative Strength using SMA for specific close prices:
 >>> rsm = mansfield_relative_strength(closes, closes_index, window=52)
 >>> print(rsm)
 
-See Also
---------
+See Also:
+---------
 - `Mansfield Relative Strength | ChartMill.com
   <https://www.chartmill.com/documentation/technical-analysis/indicators/
   35-Mansfield-Relative-Strength>`_
