@@ -6,13 +6,13 @@ relative strength compared to a benchmark index, inspired by the Investor's
 Business Daily (IBD) methodology.
 
 Key Features:
-
+-------------
 - Relative strength calculation
 - Stock and industry ranking generation
 - Percentile-based filtering of rankings
 
 Public Functions:
-
+-----------------
 - relative_strength: Calculate the relative strength of a stock compared to a
   reference index.
 - rankings: Generate comprehensive rankings for both individual stocks and
@@ -21,12 +21,13 @@ Public Functions:
   convention.
 
 Constants:
-
+----------
 - TITLE_PERCENTILE: Column name for the percentile ranking in the output
                     DataFrames. Used for filtering results based on percentile
                     thresholds.
 
 Usage:
+-----
 
 ::
 
@@ -45,7 +46,7 @@ Usage:
                     ibd.TITLE_PERCENTILE] >= min_percentile]
 
 See Also:
-
+---------
 - `RS Rating — Fred6724的指標 — TradingView
   <https://tw.tradingview.com/script/pziQwiT2/>`_
 - `Relative Strength (IBD Style) — Indicator by Skyte — TradingView

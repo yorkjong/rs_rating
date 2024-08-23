@@ -7,13 +7,13 @@ supports querying index tickers from specified sources and obtaining the name
 of an index based on its symbol.
 
 Main Functions:
-
+---------------
 - get_tickers(source): Retrieve ticker symbols for a specified stock market
   index source.
 - get_name(index_symbol): Retrieve the name of an index from its ticker symbol.
 
 Usage Examples:
-
+---------------
 ::
 
     from stock_indices import get_tickers, get_name
