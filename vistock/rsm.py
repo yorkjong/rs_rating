@@ -43,7 +43,7 @@ See Also
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.0"
+__version__ = "1.1"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/23 (last revision)"
 
@@ -227,6 +227,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         # Construct DataFrame for current stock
         rank_df = pd.DataFrame({
             'Ticker': [ticker],
+            'Price': [df[ticker]],
             'Relative Strength': [rsm.iloc[-1]],
             '1 Month Ago': [rsm_1m],
             '3 Months Ago': [rsm_3m],
