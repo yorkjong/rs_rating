@@ -54,6 +54,7 @@ __all__ = [
     'ranking',
 ]
 
+import numpy as np
 import pandas as pd
 import yfinance as yf
 
@@ -94,8 +95,8 @@ def mansfield_relative_strength(closes, closes_index, window):
     2024-01-03    5.238095
     dtype: float64
     """
-    closes = closes.ffill()
-    closes_index = closes_index.ffill()
+    closes.ffill(inplace=True)
+    closes_index.ffill(inplace=True)
     rsd = dorsey_relative_strength(closes, closes_index)
     return ((rsd / simple_moving_average(rsd, window)) - 1) * 100
 
@@ -140,8 +141,8 @@ def mansfield_relative_strength_with_ema(closes, closes_index, window,
     2024-01-03    5.238095
     dtype: float64
     """
-    closes = closes.ffill()
-    closes_index = closes_index.ffill()
+    closes.ffill(inplace=True)
+    closes_index.ffill(inplace=True)
     rsd = dorsey_relative_strength(closes, closes_index)
     return ((rsd / exponential_moving_average(rsd, window, adjust)) - 1) * 100
 
@@ -215,8 +216,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
 
     results = []
     for ticker in tickers:
-        rs = rs_func(df[ticker], df[ticker_ref], window)
-        rsm = pd.Series(rs, name=ticker)
+        rsm = rs_func(df[ticker], df[ticker_ref], window)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
