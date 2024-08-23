@@ -175,18 +175,18 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         List of stock tickers to rank.
 
     ticker_ref : str, optional
-        Ticker symbol of the benchmark.
+        Ticker symbol of the benchmark. Default to '^GSPC' (S&P 500)
 
     period : str, optional
         Period for historical data ('6mo', '1y', '2y', '5y', 'ytd', 'max').
-        Default to '2y'.
+        Default to '2y' (two years).
 
     interval : str, optional
         Interval for historical data ('1d', '1wk', '1mo').
-        Default to '1wk'.
+        Default to '1wk' (one week).
 
     window : int, optional
-        Window size for moving average calculation. Default to 20.
+        Window size for moving average calculation. Default to 52.
 
     ma : str, optional
         Moving average type ('SMA', 'EMA'). Default to 'SMA'.
