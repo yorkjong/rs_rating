@@ -248,7 +248,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
                   '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         ranking_df[rank_col] = ranking_df[rs_col].rank(
-                ascending=False, method='min').astype(int)
+                ascending=False, method='min').astype('Int64')
 
     # Sort by current rank
     ranking_df = ranking_df.sort_values(by='Rank')
