@@ -57,6 +57,8 @@ __all__ = [
 import pandas as pd
 import yfinance as yf
 
+from ta import simple_moving_average, exponential_moving_average
+
 
 def mansfield_relative_strength(closes, closes_index, window):
     """
@@ -96,7 +98,8 @@ def mansfield_relative_strength(closes, closes_index, window):
     return ((rsd / simple_moving_average(rsd, window)) - 1) * 100
 
 
-def mansfield_relative_strength_with_ema(closes, closes_index, window, adjust=False):
+def mansfield_relative_strength_with_ema(closes, closes_index, window,
+                                         adjust=False):
     """
     Calculate Mansfield Relative Strength (RSM) using an Exponential Moving
     Average (EMA) for the Dorsey Relative Strength.
@@ -158,51 +161,6 @@ def dorsey_relative_strength(closes, closes_index):
         Series containing the calculated Dorsey Relative Strength (RSD) values.
     """
     return (closes / closes_index) * 100
-
-
-def simple_moving_average(values, window):
-    """
-    Calculate Simple Moving Average (SMA) for given values and window size.
-
-    Parameters
-    ----------
-    values : pandas.Series
-        Series of values for which to calculate the SMA.
-
-    window : int
-        Number of periods over which to calculate the SMA.
-
-    Returns
-    -------
-    pandas.Series
-        Series containing the calculated Simple Moving Average (SMA) values.
-    """
-    return values.rolling(window=window).mean()
-
-
-def exponential_moving_average(values, window, adjust=False):
-    """
-    Calculate Exponential Moving Average (EMA) for given values and window size.
-
-    Parameters
-    ----------
-    values : pandas.Series
-        Series of values for which to calculate the EMA.
-
-    window : int
-        Number of periods over which to calculate the EMA.
-
-    adjust : bool, optional
-        Whether to adjust the EMA calculation (default is False).
-
-    Returns
-    -------
-    pandas.Series
-        Series containing the calculated Exponential Moving Average (EMA)
-        values.
-    """
-    return values.ewm(span=window, adjust=adjust).mean()
-
 
 
 def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
@@ -303,7 +261,7 @@ def main():
         'TER', 'TXN', 'WOLF'
     ]
 
-    rank = ranking(tickers, period='2y', interval='1wk', ma="SMA", window=52)
+    rank = ranking(tickers, period='2y', interval='1wk', ma="EMA", window=52)
     print(rank.head(10))
 
 
