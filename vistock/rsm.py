@@ -227,7 +227,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         # Construct DataFrame for current stock
         rank_df = pd.DataFrame({
             'Ticker': [ticker],
-            'Price': [df[ticker]],
+            'Price': [df[ticker].iloc[-1]],
             'Relative Strength': [rsm.iloc[-1]],
             '1 Month Ago': [rsm_1m],
             '3 Months Ago': [rsm_3m],
