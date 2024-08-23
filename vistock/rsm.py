@@ -57,7 +57,7 @@ __all__ = [
 import pandas as pd
 import yfinance as yf
 
-from ta import simple_moving_average, exponential_moving_average
+from .ta import simple_moving_average, exponential_moving_average
 
 
 def mansfield_relative_strength(closes, closes_index, window):
