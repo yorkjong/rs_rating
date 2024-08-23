@@ -43,7 +43,7 @@ See Also
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.1"
+__version__ = "1.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/23 (last revision)"
 
@@ -94,6 +94,8 @@ def mansfield_relative_strength(closes, closes_index, window):
     2024-01-03    5.238095
     dtype: float64
     """
+    closes = closes.ffill()
+    closes_index = closes_index.ffill()
     rsd = dorsey_relative_strength(closes, closes_index)
     return ((rsd / simple_moving_average(rsd, window)) - 1) * 100
 
@@ -138,6 +140,8 @@ def mansfield_relative_strength_with_ema(closes, closes_index, window,
     2024-01-03    5.238095
     dtype: float64
     """
+    closes = closes.ffill()
+    closes_index = closes_index.ffill()
     rsd = dorsey_relative_strength(closes, closes_index)
     return ((rsd / exponential_moving_average(rsd, window, adjust)) - 1) * 100
 
