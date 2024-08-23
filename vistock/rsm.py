@@ -217,6 +217,12 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
     results = []
     for ticker in tickers:
         rsm = rs_func(df[ticker], df[ticker_ref], window)
+        if rsm.isna().sum() > 0:
+            print(f'{ticker} RS contains NaN.')
+            continue
+        if np.isinf(rsm).sum() > 0:
+            print(f'{ticker} RS contains inf.')
+            continue
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
