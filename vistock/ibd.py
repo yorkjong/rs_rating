@@ -175,7 +175,7 @@ def weighted_return(closes, interval):
     p2 = quarters_return(closes, 2, interval) # over the last two quarters
     p3 = quarters_return(closes, 3, interval) # over the last three quarters
     p4 = quarters_return(closes, 4, interval) # over the last four quarters
-    return 0.4 * p1 + 0.2 * p2 + 0.2 * p3 + 0.2 * p4
+    return (2 * p1 + p2 + p3 + p4) / 5
 
 
 def quarters_return(closes, n, interval):
