@@ -30,15 +30,17 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "1.6"
+__version__ = "1.7"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/08/08 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/08/24 (last revision)"
 
 __all__ = [
     'get_tickers',
     'get_name',
+    'ticker_from_name',
 ]
 
+import functools
 from io import StringIO
 
 import requests
@@ -48,80 +50,67 @@ from bs4 import BeautifulSoup
 from . import tw
 
 
-def get_spx_tickers():
+def table_from_wikipedia(article, class_, id):
     """
-    Retrieve a list of tickers for companies in the SPX (S&P 500 index).
+    Fetches a table from a Wikipedia article and returns it as a pandas
+    DataFrame.
+
+    Args:
+        article (str): The name of the Wikipedia article.
+        class_ (str): The class attribute of the table to retrieve.
+        id (str): The id attribute of the table to retrieve.
 
     Returns:
-        list: A list of ticker symbols.
-
-    Examples:
-        >>> tickers = get_spx_tickers()
-        >>> len(tickers) >= 500
-        True
-        >>> 'AAPL' in tickers
-        True
-        >>> 'TSLA' in tickers
-        True
+        pandas.DataFrame: The retrieved table.
     """
-    url = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+    url = f"https://en.wikipedia.org/wiki/{article}"
     response = requests.get(url)
+    response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
-    table = soup.find('table', {'class': 'wikitable'})
-    df = pd.read_html(StringIO(str(table)))[0]
-    return df['Symbol'].tolist()
+    attrs = {}
+    if class_:
+        attrs['class'] = class_
+    if id:
+        attrs['id'] = id
+    tag = soup.find('table', attrs=attrs)
+    return pd.read_html(StringIO(str(tag)))[0]
 
 
-def get_ndx_tickers():
+def symbols_from_wikipedia_table(article,
+                                 class_='wikitable sortable',
+                                 id='constituents'):
     """
-    Retrieve a list of tickers for companies in the NDX (NASDAQ-100 Index).
+    Extracts stock symbols from a table in a Wikipedia article.
+
+    Args:
+        article (str): The name of the Wikipedia article.
+        class_ (str, optional): The class attribute of the table. Defaults to
+            'wikitable sortable'.
+        id (str, optional): The id attribute of the table. Defaults to
+            'constituents'.
 
     Returns:
-        list: A list of ticker symbols.
-
-    Examples:
-        >>> tickers = get_ndx_tickers()
-        >>> len(tickers) >= 100
-        True
-        >>> 'NVDA' in tickers
-        True
-        >>> 'TSLA' in tickers
-        True
+        list: A list of stock symbols.
     """
-    url = "https://en.wikipedia.org/wiki/Nasdaq-100"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    table = soup.find('table', {'id': 'constituents'})
-    df = pd.read_html(StringIO(str(table)))[0]
-    return df['Ticker'].tolist()
+    df = table_from_wikipedia(article, class_, id)
+    if 'Symbol' in df.columns:
+        return df['Symbol'].tolist()
+    elif 'Ticker' in df.columns:
+        return df['Ticker'].tolist()
+    return []
 
 
-def get_djia_tickers():
-    """
-    Retrieve a list of tickers for companies in the DJIA (Dow Jones Industrial
-    Average) index.
-
-    Returns:
-        list: A list of ticker symbols.
-
-    Examples:
-        >>> tickers = get_djia_tickers()
-        >>> len(tickers) == 30
-        True
-        >>> 'MSFT' in tickers
-        True
-        >>> 'AAPL' in tickers
-        True
-    """
-    url = "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    table = soup.find('table', {'class': 'wikitable', 'id': 'constituents'})
-    df = pd.read_html(StringIO(str(table)))[0]
-    return df['Symbol'].tolist()
+spx_tickers = functools.partial(
+        symbols_from_wikipedia_table, 'List_of_S%26P_500_companies')
+djia_tickers = functools.partial(
+        symbols_from_wikipedia_table, 'Dow_Jones_Industrial_Average')
+ndx_tickers = functools.partial(
+        symbols_from_wikipedia_table, 'Nasdaq-100')
+rui_tickers = functools.partial(
+        symbols_from_wikipedia_table, 'Russell_1000_Index', id=None)
 
 
-def get_sox_tickers():
+def sox_tickers():
     """
     Get a list of tickers for companies in the SOX (PHLX Semiconductor
     Index).
@@ -134,7 +123,7 @@ def get_sox_tickers():
         list: A list of SOX tickers.
 
     Examples:
-        >>> tickers = get_sox_tickers()
+        >>> tickers = sox_tickers()
         >>> len(tickers) == 30
         True
         >>> 'NVDA' in tickers
@@ -172,7 +161,11 @@ def get_tickers(source):
             - '^GSPC', 'SPX': S&P 500
             - '^DJI', 'DJIA': Dow Jones Industrial Average
             - '^NDX', 'NDX': NASDAQ-100
+            - '^RUI', 'RUI': Russell 1000
             - '^SOX', 'SOX': PHLX Semiconductor Index
+            - '^TWII' 'TWII', 'TWSE': Taiwan Weighted Index
+            - 'TPEX': Taipei Exchange
+            - 'ESB': Emerging Stock Board
 
     Returns:
         list: A list of tickers for the specified source.
@@ -188,6 +181,8 @@ def get_tickers(source):
         True
         >>> len(get_tickers('^NDX')) >= 100
         True
+        >>> len(get_tickers('^RUI')) >= 1000
+        True
         >>> 500 < len(get_tickers('^GSPC+^NDX')) < (500+100)
         True
         >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
@@ -200,15 +195,18 @@ def get_tickers(source):
         KeyError: "Index symbol '^UNKNOWN' not found."
     """
     dic = {
-        '^GSPC': get_spx_tickers,
-        '^DJI': get_djia_tickers,
-        '^NDX': get_ndx_tickers,
-        '^SOX': get_sox_tickers,
+        '^GSPC': spx_tickers,
+        '^DJI': djia_tickers,
+        '^NDX': ndx_tickers,
+        '^RUI': rui_tickers,
+        '^SOX': sox_tickers,
         '^TWII': tw.get_twse_tickers,
-        'SPX': get_spx_tickers,
-        'DJIA': get_djia_tickers,
-        'NDX': get_ndx_tickers,
-        'SOX': get_sox_tickers,
+        'SPX': spx_tickers,
+        'DJIA': djia_tickers,
+        'NDX': ndx_tickers,
+        'SOX': sox_tickers,
+        'RUI': rui_tickers,
+        'R1000': rui_tickers,
         'TWII': tw.get_twse_tickers,
         'TWSE': tw.get_twse_tickers,
         'TPEX': tw.get_tpex_tickers,
@@ -225,6 +223,48 @@ def get_tickers(source):
             raise KeyError(f"Index symbol '{s}' not found.")
 
     return list(tickers)
+
+
+def ticker_from_name(name):
+    """
+    Get ticker symbol from its name.
+
+    Args:
+        name (str): the long name of a ticker.
+
+    Returns:
+        str: the ticker symbol
+
+    Examples:
+    >>> ticker_from_name('S&P 500')
+    '^GSPC'
+    >>> ticker_from_name('Dow Jones Industrial Average')
+    '^DJI'
+    >>> ticker_from_name('NASDAQ 100')
+    '^NDX'
+    >>> ticker_from_name('Russell 1000')
+    '^RUI'
+    >>> ticker_from_name('Taiwan Weighted Index')
+    '^TWII'
+    """
+    dic = {
+        "S&P 500": "^GSPC",
+        "Dow Jones Industrial Average": "^DJI",
+        "NASDAQ 100": "^NDX",
+        'NASDAQ Composite': "^IXIC",
+        "Russell 1000": "^RUI",
+        "Russell 2000": "^RUT",
+        "PHLX Semiconductor Index": "^SOX",
+        "Taiwan Weighted Index": "^TWII",
+        'Euro Stoxx 50': '^STOXX50E',       # Europe
+        'FTSE 100': '^FTSE',                # London, UK
+        'DAX': '^GDAXI',                    # Frankfurt, Germany
+        'CAC 40': '^FCHI',                  # Paris, France
+        'S&P/TSX Composite': '^GSPTSE',     # Canada
+        'Nikkei 225': '^N225',              # Japan
+        'Hang Seng Index': '^HSI',          # Hong Kong
+    }
+    return dic[name]
 
 
 def get_name(index_symbol):
@@ -244,9 +284,10 @@ def get_name(index_symbol):
 
             - '^GSPC', 'SPX': S&P 500
             - '^DJI', 'DJIA': Dow Jones Industrial Average
-            - '^IXIC': NASDAQ
             - '^NDX', 'NDX': NASDAQ 100
-            - '^RUT', 'RUT': Russell 2000
+            - '^IXIC', 'COMP': NASDAQ Composite
+            - '^RUI', 'RUI', 'R1000': Russell 1000
+            - '^RUT', 'RUT', 'R2000': Russell 2000
             - '^SOX', 'SOX': PHLX Semiconductor Index
             - '^NYA', 'NYA': NYSE Composite
             - '^MID', 'MID': S&P MidCap 400
@@ -271,9 +312,11 @@ def get_name(index_symbol):
         >>> get_name('^DJI')
         'Dow Jones Industrial Average'
         >>> get_name('^IXIC')
-        'NASDAQ'
+        'NASDAQ Composite'
         >>> get_name('^NDX')
         'NASDAQ 100'
+        >>> get_name('^RUI')
+        'Russell 1000'
         >>> get_name('^RUT')
         'Russell 2000'
         >>> get_name('^SOX')
@@ -288,8 +331,9 @@ def get_name(index_symbol):
     dic = {
         '^GSPC': 'S&P 500',
         '^DJI': 'Dow Jones Industrial Average',
-        '^IXIC': 'NASDAQ',                  # NASDAQ Composite
         '^NDX': 'NASDAQ 100',
+        '^IXIC': 'NASDAQ Composite',
+        '^RUI': 'Russell 1000',
         '^RUT': 'Russell 2000',
         '^SOX': 'PHLX Semiconductor Index',
         '^NYA': 'NYSE Composite',
@@ -298,8 +342,12 @@ def get_name(index_symbol):
         'SPX': 'S&P 500',
         'DJIA': 'Dow Jones Industrial Average',
         'NDX': 'NASDAQ 100',
-        'SOX': 'PHLX Semiconductor Index',
+        'COMP': 'NASDAQ Composite',
+        'RUI': 'Russell 1000',
         'RUT': 'Russell 2000',
+        'R1000': 'Russell 1000',
+        'R2000': 'Russell 2000',
+        'SOX': 'PHLX Semiconductor Index',
         'NYA': 'NYSE Composite',
         'MID': 'S&P MidCap 400',
         'TWII': 'Taiwan Weighted Index',
