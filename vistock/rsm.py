@@ -43,7 +43,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.3"
+__version__ = "1.4"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/24 (last revision)"
 
@@ -226,18 +226,14 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         three_months_ago = end_date - pd.DateOffset(months=3)
         six_months_ago = end_date - pd.DateOffset(months=6)
 
-        rsm_1m = rsm[rsm.index <= one_month_ago].iloc[-1]
-        rsm_3m = rsm[rsm.index <= three_months_ago].iloc[-1]
-        rsm_6m = rsm[rsm.index <= six_months_ago].iloc[-1]
-
         # Construct DataFrame for current stock
         rank_df = pd.DataFrame({
             'Ticker': [ticker],
             'Price': [round(df[ticker].iloc[-1], 2)],
-            'Relative Strength': [rsm.iloc[-1]],
-            '1 Month Ago': [rsm_1m],
-            '3 Months Ago': [rsm_3m],
-            '6 Months Ago': [rsm_6m]
+            'Relative Strength': [rsm.asof(end_date)],
+            '1 Month Ago': [rsm.asof(one_month_ago)],
+            '3 Months Ago': [rsm.asof(three_months_ago)],
+            '6 Months Ago': [rsm.asof(six_months_ago)]
         })
         results.append(rank_df)
 
@@ -285,5 +281,6 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    main()
+    #main()
+    main(ma="SMA")
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
