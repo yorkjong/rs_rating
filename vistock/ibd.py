@@ -59,12 +59,13 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.4"
+__version__ = "2.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/24 (last revision)"
 
 __all__ = [
     'relative_strength',
+    'ranking',
     'rankings',
     'ma_window_size',
     'TITLE_PERCENTILE',
@@ -208,6 +209,78 @@ def quarters_return(closes, n, interval):
 
     ret = closes.ffill().pct_change(periods=periods)
     return ret.fillna(0)
+
+
+#------------------------------------------------------------------------------
+# IBD RS Ranking (with RS rating)
+#------------------------------------------------------------------------------
+
+def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
+    """
+    Rank stocks based on their IBD Relative Strength against an index
+    benchmark.
+
+    Parameters
+    ----------
+    tickers : list of str
+        List of stock tickers to rank.
+
+    ticker_ref : str, optional
+        Ticker symbol of the benchmark. Default to '^GSPC' (S&P 500)
+
+    period : str, optional
+        Period for historical data ('6mo', '1y', '2y', '5y', 'ytd', 'max').
+        Default to '2y' (two years).
+
+    interval : str, optional
+        Interval for historical data ('1d', '1wk', '1mo').
+        Default to '1wk' (one week).
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame containing the ranked stocks.
+    """
+    # Fetch data for stock and index
+    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df = df.xs('Close', level='Price', axis=1)
+
+    results = []
+    for ticker in tickers:
+        rs = relative_strength(df[ticker], df[ticker_ref], interval)
+
+        # Calculate RSM for different time periods
+        end_date = rs.index[-1]
+        one_month_ago = end_date - pd.DateOffset(months=1)
+        three_months_ago = end_date - pd.DateOffset(months=3)
+        six_months_ago = end_date - pd.DateOffset(months=6)
+
+        # Construct DataFrame for current stock
+        rank_df = pd.DataFrame({
+            'Ticker': [ticker],
+            'Price': [round(df[ticker].iloc[-1], 2)],
+            'Relative Strength': [rs.asof(end_date)],
+            '1 Month Ago': [rs.asof(one_month_ago)],
+            '3 Months Ago': [rs.asof(three_months_ago)],
+            '6 Months Ago': [rs.asof(six_months_ago)]
+        })
+        results.append(rank_df)
+
+    # Combine results into a single DataFrame
+    ranking_df = pd.concat(results, ignore_index=True)
+
+    # Rank based on Relative Strength
+    rank_columns = ['Rank', ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
+    rs_columns = ['Relative Strength',
+                  '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
+    for rank_col, rs_col in zip(rank_columns, rs_columns):
+        ranking_df[rank_col] = ranking_df[rs_col].rank(
+                ascending=False, method='min').astype('Int64')
+
+    # Sort by current rank
+    ranking_df = ranking_df.sort_values(by='Rank')
+
+    return ranking_df
 
 
 #------------------------------------------------------------------------------
@@ -461,6 +534,29 @@ def ma_window_size(interval, days):
 # Unit Test
 #------------------------------------------------------------------------------
 
+def test_ranking(period='2y', out_dir='out'):
+    import os
+    from datetime import datetime
+    from vistock.stock_indices import get_tickers
+
+    code = 'SPX+DJIA+NDX+SOX'
+    tickers = get_tickers(code)
+    remove_tickers = ['HBAN', 'SW', 'BRK.B', 'VLTO', 'ARM', 'SOLV', 'GEV', 'BF.B']
+    tickers = [t for t in tickers if t not in remove_tickers]
+
+    rank = ranking(tickers, period=period, interval='1wk')
+    print(rank.head(10))
+
+    # Save to CSV
+    print("\n\n***")
+    os.makedirs(out_dir, exist_ok=True)
+    today = datetime.now().strftime('%Y%m%d')
+    filename = f'{code}_stocks_{period}_ibd_{today}.csv'
+    rank.to_csv(os.path.join(out_dir, filename), index=False)
+    print(f'Your "{filename}" is in the "{out_dir}" folder.')
+    print("***\n")
+
+
 def test_rankings(min_percentile=80, out_dir='out'):
     '''
     Args:
@@ -497,6 +593,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    test_rankings()
+    test_ranking()
+    #test_rankings()
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
