@@ -374,9 +374,8 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
             df = stock.history(period=period, interval=interval)
 
             # Ensure at least 6 months of data
-            if ((interval == '1d' and len(df) < 6 * 20)
-                or (interval == '1wk' and len(df) < 6 * 4)
-                or (interval == '1mo' and len(df) < 6)):
+            month = { '1d': 20, '1wk': 4, '1mo': 1, }[interval]
+            if len(df) < 6 * month:
                 continue
 
             yield ticker, stock, df
