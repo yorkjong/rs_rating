@@ -157,18 +157,22 @@ def weighted_return(closes, interval):
         P9 = Performance over the last three quarters (9 months)
         P12 = Performance over the last four quarters (12 months)
 
-    Args:
-        closes (pd.Series): Closing prices of the stock/index.
-        interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
-            data.
+    Parameters
+    ----------
+        closes: pd.Series
+            Closing prices of the stock/index.
+        interval: str, optional
+            The frequency of the data points. Must be one of '1d' for daily
+            data, '1wk' for weekly data, or '1mo' for monthly data.
 
-    Returns:
+    Returns
+    -------
         pd.Series: Performance values of the stock/index.
 
-    Example:
-        >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
-        >>> weighted_perf = weighted_return(closes)
+    Example
+    -------
+    >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
+    >>> weighted_perf = weighted_return(closes)
     """
     # Calculate performances over the last quarters
     p1 = quarters_return(closes, 1, interval) # over the last quarter
@@ -240,6 +244,12 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
     -------
     pandas.DataFrame
         DataFrame containing the ranked stocks.
+
+    Example
+    -------
+    >>> tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN']
+    >>> stock_rankings  = ranking(tickers)
+    >>> print(stock_rankings.head())
     """
     # Fetch data for stock and index
     df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
@@ -526,7 +536,6 @@ def ma_window_size(interval, days):
         return days // 5  # 1 week = 5 trading days
     else:
         raise ValueError("Unsupported interval")
-
 
 
 #------------------------------------------------------------------------------
