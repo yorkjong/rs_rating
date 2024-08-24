@@ -59,9 +59,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.2"
+__version__ = "2.3"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/18 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/24 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -462,7 +462,7 @@ def ma_window_size(interval, days):
 # Unit Test
 #------------------------------------------------------------------------------
 
-def main(min_percentile=80, out_dir='out'):
+def test_rankings(min_percentile=80, out_dir='out'):
     '''
     Args:
         min_percentile (int, optional): The minimum percentile for a stock to be
@@ -470,8 +470,8 @@ def main(min_percentile=80, out_dir='out'):
         out_dir (str, optional): The output directory to store CSV tables.
             Defaults to 'out'
     '''
-    from .stock_indices import get_sox_tickers
-    rank_stock, rank_indust = rankings(get_sox_tickers(), interval='1d')
+    import vistock.stock_indices as si
+    rank_stock, rank_indust = rankings(si.get_tickers('SOX'), interval='1d')
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
@@ -498,6 +498,6 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    main()
+    test_rankings()
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
