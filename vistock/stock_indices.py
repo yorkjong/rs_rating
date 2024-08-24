@@ -11,6 +11,7 @@ Main Functions:
 - get_tickers(source): Retrieve ticker symbols for a specified stock market
   index source.
 - get_name(index_symbol): Retrieve the name of an index from its ticker symbol.
+- ticker_from_name(name): Get the ticker symbol of an index from its long name.
 
 Usage Examples:
 ---------------
@@ -30,7 +31,7 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "1.7"
+__version__ = "1.8"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/08/24 (last revision)"
 
@@ -227,7 +228,7 @@ def get_tickers(source):
 
 def ticker_from_name(name):
     """
-    Get ticker symbol from its name.
+    Get ticker symbol of an index from its long name.
 
     Args:
         name (str): the long name of a ticker.
