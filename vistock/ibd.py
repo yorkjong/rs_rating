@@ -59,7 +59,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.3"
+__version__ = "2.4"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/24 (last revision)"
 
@@ -311,18 +311,17 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
     def calc_rs_values(prices_stock, prices_ref, interval):
         """Calculate RS values for a single ticker."""
         rs_series = relative_strength(prices_stock, prices_ref, interval)
-        rs_latest = rs_series.iloc[-1]
-        month = {
-            '1d': 20,   # Approx. trading days in a month (daily data)
-            '1wk': 4,   # Approx. trading weeks in a month (weekly data)
-            '1mo': 1,
-        }[interval]
+
+        end_date = rs_series.index[-1]
+        one_month_ago = end_date - pd.DateOffset(months=1)
+        three_months_ago = end_date - pd.DateOffset(months=3)
+        six_months_ago = end_date - pd.DateOffset(months=6)
 
         return {
-            "latest": rs_latest,
-            "1m": rs_series.iloc[-month],
-            "3m": rs_series.iloc[-3*month],
-            "6m": rs_series.iloc[-6*month]
+            "latest": rs_series.asof(end_date),
+            "1m": rs_series.asof(one_month_ago),
+            "3m": rs_series.asof(three_months_ago),
+            "6m": rs_series.asof(six_months_ago)
         }
 
     def update_industry_data(industries, industry, sector, rs_values, ticker):
