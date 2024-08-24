@@ -214,7 +214,7 @@ def quarters_return(closes, n, interval):
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
-def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
+def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
@@ -226,7 +226,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
 
     Args:
         tickers (List[str]): A list of stock tickers to analyze.
-        ref_ticker (str, optional): The ticker symbol for the reference index.
+        ticker_ref (str, optional): The ticker symbol for the reference index.
             Defaults to '^GSPC' (S&P 500).
         period (str, optional): The period for which to fetch historical data.
             Defaults to '2y' (two years).
@@ -257,7 +257,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
         >>> print(stock_rankings.head())
         >>> print(industry_rankings.head())
     """
-    def process_stocks(tickers, ref_ticker, period, interval):
+    def process_stocks(tickers, ticker_ref, period, interval):
         """
         Processes stock data to extract relevant information for rankings.
 
@@ -273,7 +273,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
                 - industries (dict): Dictionary containing industry-specific
                   data, such as RS values and tickers for each industry.
         """
-        index = yf.Ticker(ref_ticker)
+        index = yf.Ticker(ticker_ref)
         df_ref = index.history(period=period, interval=interval)
 
         data = []
@@ -405,7 +405,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
                          key=lambda x: stock_rs[x], reverse=True)
         return ",".join(tickers)
 
-    df_stocks, industries = process_stocks(tickers, ref_ticker,
+    df_stocks, industries = process_stocks(tickers, ticker_ref,
                                            period, interval)
     stock_rankings = rank_by_rs(calc_percentiles(df_stocks))
     stock_rs = dict(zip(stock_rankings[TITLE_TICKER],
