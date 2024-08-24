@@ -47,8 +47,8 @@ Usage:
 
 See Also:
 ---------
-- `RS Rating — Fred6724的指標 — TradingView
-  <https://tw.tradingview.com/script/pziQwiT2/>`_
+- `RS Rating — Indicator by Fred6724 — tradingview
+  <https://www.tradingview.com/script/pziQwiT2/>`_
 - `Relative Strength (IBD Style) — Indicator by Skyte — TradingView
   <https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/>`_
 
