@@ -552,7 +552,7 @@ def test_ranking(period='2y', out_dir='out'):
     remove_tickers = ['HBAN', 'SW', 'BRK.B', 'VLTO', 'ARM', 'SOLV', 'GEV', 'BF.B']
     tickers = [t for t in tickers if t not in remove_tickers]
 
-    rank = ranking(tickers, period=period, interval='1wk')
+    rank = ranking(tickers, period=period, interval='1d')
     print(rank.head(10))
 
     # Save to CSV
