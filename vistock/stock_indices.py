@@ -22,7 +22,7 @@ Usage Examples:
     # Get tickers for the S&P 500 index
     spx_tickers = get_tickers('SPX')
 
-    # Get tickers for the Philadelphia Semiconductor Index
+    # Get tickers for the Philadelphia Semiconductor
     sox_tickers = get_tickers('SOX')
 
     # Get tickers for the SPX and the SOX
@@ -113,8 +113,7 @@ rui_tickers = functools.partial(
 
 def sox_tickers():
     """
-    Get a list of tickers for companies in the SOX (PHLX Semiconductor
-    Index).
+    Get a list of tickers for companies in the SOX (PHLX Semiconductor).
 
     This function returns a manually maintained list of SOX tickers.
 
@@ -163,7 +162,7 @@ def get_tickers(source):
             - '^DJI', 'DJIA': Dow Jones Industrial Average
             - '^NDX', 'NDX': NASDAQ-100
             - '^RUI', 'RUI': Russell 1000
-            - '^SOX', 'SOX': PHLX Semiconductor Index
+            - '^SOX', 'SOX': PHLX Semiconductor
             - '^TWII' 'TWII', 'TWSE': Taiwan Weighted Index
             - 'TPEX': Taipei Exchange
             - 'ESB': Emerging Stock Board
@@ -255,7 +254,7 @@ def ticker_from_name(name):
         'NASDAQ Composite': "^IXIC",
         "Russell 1000": "^RUI",
         "Russell 2000": "^RUT",
-        "PHLX Semiconductor Index": "^SOX",
+        "PHLX Semiconductor": "^SOX",
         "Taiwan Weighted Index": "^TWII",
         'Euro Stoxx 50': '^STOXX50E',       # Europe
         'FTSE 100': '^FTSE',                # London, UK
@@ -289,7 +288,7 @@ def get_name(index_symbol):
             - '^IXIC', 'COMP': NASDAQ Composite
             - '^RUI', 'RUI', 'R1000': Russell 1000
             - '^RUT', 'RUT', 'R2000': Russell 2000
-            - '^SOX', 'SOX': PHLX Semiconductor Index
+            - '^SOX', 'SOX': PHLX Semiconductor
             - '^NYA', 'NYA': NYSE Composite
             - '^MID', 'MID': S&P MidCap 400
             - '^TWII', 'TWII': Taiwan Weighted Index
@@ -321,7 +320,7 @@ def get_name(index_symbol):
         >>> get_name('^RUT')
         'Russell 2000'
         >>> get_name('^SOX')
-        'PHLX Semiconductor Index'
+        'PHLX Semiconductor'
         >>> get_name('^TWII')
         'Taiwan Weighted Index'
         >>> get_name('^HSI')
@@ -336,7 +335,7 @@ def get_name(index_symbol):
         '^IXIC': 'NASDAQ Composite',
         '^RUI': 'Russell 1000',
         '^RUT': 'Russell 2000',
-        '^SOX': 'PHLX Semiconductor Index',
+        '^SOX': 'PHLX Semiconductor',
         '^NYA': 'NYSE Composite',
         '^MID': 'S&P MidCap 400',
         '^TWII': 'Taiwan Weighted Index',
@@ -348,7 +347,7 @@ def get_name(index_symbol):
         'RUT': 'Russell 2000',
         'R1000': 'Russell 1000',
         'R2000': 'Russell 2000',
-        'SOX': 'PHLX Semiconductor Index',
+        'SOX': 'PHLX Semiconductor',
         'NYA': 'NYSE Composite',
         'MID': 'S&P MidCap 400',
         'TWII': 'Taiwan Weighted Index',
