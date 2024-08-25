@@ -31,9 +31,9 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "1.9"
+__version__ = "2.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/08/24 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/08/26 (last revision)"
 
 __all__ = [
     'get_tickers',
@@ -368,6 +368,8 @@ def get_name(index_symbol):
     if index_symbol in dic:
         return dic[index_symbol]
     try:
+        if tw.is_chinese(index_symbol[0]):
+            return index_symbol
         return yf.Ticker(index_symbol).info['longName']
     except:
         return index_symbol
