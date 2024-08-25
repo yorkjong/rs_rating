@@ -31,7 +31,7 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "1.8"
+__version__ = "1.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/08/24 (last revision)"
 
@@ -47,6 +47,7 @@ from io import StringIO
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+import yfinance as yf
 
 from . import tw
 
@@ -326,7 +327,9 @@ def get_name(index_symbol):
         >>> get_name('^HSI')
         'Hang Seng Index'
         >>> get_name('AAPL')
-        'AAPL'
+        'Apple Inc.'
+        >>> get_name('Unknown')
+        'Unknown'
     """
     dic = {
         '^GSPC': 'S&P 500',
@@ -362,7 +365,12 @@ def get_name(index_symbol):
         '^N225': 'Nikkei 225',              # Japan
         '^HSI': 'Hang Seng Index',          # Hong Kong
     }
-    return dic.get(index_symbol, index_symbol)
+    if index_symbol in dic:
+        return dic[index_symbol]
+    try:
+        return yf.Ticker(index_symbol).info['longName']
+    except:
+        return index_symbol
 
 
 #------------------------------------------------------------------------------
