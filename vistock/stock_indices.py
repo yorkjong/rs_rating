@@ -368,7 +368,7 @@ def get_name(index_symbol):
     if index_symbol in dic:
         return dic[index_symbol]
     try:
-        if tw.is_chinese(index_symbol):
+        if tw.is_chinese(index_symbol) or tw.is_taiwan_stock(index_symbol):
             return index_symbol
         return yf.Ticker(index_symbol).info['longName']
     except:
