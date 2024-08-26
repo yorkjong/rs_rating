@@ -59,7 +59,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.5"
+__version__ = "2.6"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/24 (last revision)"
 
@@ -77,6 +77,8 @@ import numpy as np
 import pandas as pd
 
 import yfinance as yf
+
+import vistock.yf_utils as yfu
 
 TITLE_RANK = "Rank"
 TITLE_TICKER = "Ticker"
@@ -255,6 +257,9 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
     df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
     df = df.xs('Close', level='Price', axis=1)
 
+    # Fetch info for stocks
+    info = yfu.download_tickers_info(tickers)
+
     results = []
     for ticker in tickers:
         rs = relative_strength(df[ticker], df[ticker_ref], interval)
@@ -269,6 +274,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
         rank_df = pd.DataFrame({
             'Ticker': [ticker],
             'Price': [round(df[ticker].iloc[-1], 2)],
+            'Sector': info['sector'][ticker],
+            'Industry': info['industry'][ticker],
             'Relative Strength': [rs.asof(end_date)],
             '1 Month Ago': [rs.asof(one_month_ago)],
             '3 Months Ago': [rs.asof(three_months_ago)],
