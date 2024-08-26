@@ -59,9 +59,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.6"
+__version__ = "2.7"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/24 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/26 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -363,16 +363,19 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
                 - industries (dict): Dictionary containing industry-specific
                   data, such as RS values and tickers for each industry.
         """
-        index = yf.Ticker(ticker_ref)
-        df_ref = index.history(period=period, interval=interval)
+        # Fetch data for stocks and index
+        df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+        df = df.xs('Close', level='Price', axis=1)
+
+        # Fetch info for stocks
+        info = yfu.download_tickers_info(tickers)
 
         data = []
         industries = {}
-        for ticker, stock, df in gen_stock_data(tickers, period, interval):
-            rs_values = calc_rs_values(df['Close'], df_ref['Close'], interval)
-            info = stock.info
-            sector = info.get('sector', 'Unknown')
-            industry = info.get('industry', 'Unknown')
+        for ticker in tickers:
+            rs_values = calc_rs_values(df[ticker], df[ticker_ref], interval)
+            sector = info['sector'][ticker]
+            industry = info['industry'][ticker]
 
             data.append((ticker, sector, industry, *rs_values.values()))
             update_industry_data(industries, industry, sector, rs_values, ticker)
@@ -383,19 +386,6 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
                      TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]
         )
         return df_stocks, industries
-
-    def gen_stock_data(tickers, period, interval):
-        """Generate stock data."""
-        for ticker in tickers:
-            stock = yf.Ticker(ticker)
-            df = stock.history(period=period, interval=interval)
-
-            # Ensure at least 6 months of data
-            month = { '1d': 20, '1wk': 4, '1mo': 1, }[interval]
-            if len(df) < 6 * month:
-                continue
-
-            yield ticker, stock, df
 
     def calc_rs_values(prices_stock, prices_ref, interval):
         """Calculate RS values for a single ticker."""
@@ -608,7 +598,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    test_ranking()
-    #test_rankings()
+    #test_ranking()
+    test_rankings()
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
