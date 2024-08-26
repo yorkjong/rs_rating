@@ -214,7 +214,7 @@ def quarters_return(closes, n, interval):
     }[interval]
     periods = min(len(closes) - 1, quarter * n)
 
-    ret = closes.ffill().pct_change(periods=periods)
+    ret = closes.ffill().pct_change(periods=periods, fill_method=None)
     return ret.fillna(0)
 
 
