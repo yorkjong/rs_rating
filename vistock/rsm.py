@@ -58,6 +58,7 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
+import vistock.yf_utils as yfu
 from .ta import simple_moving_average, exponential_moving_average
 
 
@@ -203,9 +204,12 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
     pandas.DataFrame
         DataFrame containing the ranked stocks.
     """
-    # Fetch data for stock and index
+    # Fetch data for stocks and index
     df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
     df = df.xs('Close', level='Price', axis=1)
+
+    # Fetch info for stocks
+    info = yfu.download_tickers_info(tickers)
 
     # Get the function to calculate relative strength
     try:
@@ -230,6 +234,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         rank_df = pd.DataFrame({
             'Ticker': [ticker],
             'Price': [round(df[ticker].iloc[-1], 2)],
+            'Sector': info['sector'][ticker],
+            'Industry': info['industry'][ticker],
             'Relative Strength': [rsm.asof(end_date)],
             '1 Month Ago': [rsm.asof(one_month_ago)],
             '3 Months Ago': [rsm.asof(three_months_ago)],
