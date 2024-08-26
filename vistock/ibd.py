@@ -59,7 +59,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.7"
+__version__ = "2.8"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/08/26 (last revision)"
 
@@ -90,6 +90,7 @@ TITLE_1M = "1 Month Ago"
 TITLE_3M = "3 Months Ago"
 TITLE_6M = "6 Months Ago"
 TITLE_RS = "Relative Strength"
+TITLE_PRICE = "Price"
 
 
 #------------------------------------------------------------------------------
@@ -374,15 +375,16 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
         industries = {}
         for ticker in tickers:
             rs_values = calc_rs_values(df[ticker], df[ticker_ref], interval)
+            price = round(df[ticker].iloc[-1], 2)
             sector = info['sector'][ticker]
             industry = info['industry'][ticker]
 
-            data.append((ticker, sector, industry, *rs_values.values()))
+            data.append((ticker, price, sector, industry, *rs_values.values()))
             update_industry_data(industries, industry, sector, rs_values, ticker)
 
         df_stocks = pd.DataFrame(
             data,
-            columns=[TITLE_TICKER, TITLE_SECTOR, TITLE_INDUSTRY,
+            columns=[TITLE_TICKER, TITLE_PRICE, TITLE_SECTOR, TITLE_INDUSTRY,
                      TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]
         )
         return df_stocks, industries
