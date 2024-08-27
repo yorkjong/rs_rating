@@ -15,7 +15,7 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> import yfinance as yf
 >>> from vistock.yf_utils import download_tickers_info
 >>> symbols = ['AAPL', 'MSFT', 'TSLA']
->>> info_df = download_tickers_info(symbols, max_workers=5, show_progress=False)
+>>> info_df = download_tickers_info(symbols, max_workers=5, progress=False)
 >>> isinstance(info_df, pd.DataFrame)
 True
 >>> 'AAPL' in info_df.index
@@ -25,7 +25,7 @@ True
 >>> info_df.loc['AAPL', 'longName']
 'Apple Inc.'
 """
-__version__ = "1.5"
+__version__ = "1.6"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/27 (last revision)"
 
@@ -40,7 +40,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pandas as pd
 
 
-def download_tickers_info(symbols, max_workers=8, show_progress=True):
+def download_tickers_info(symbols, max_workers=8, progress=True):
     """
     Download info for multiple tickers in parallel and return as a pandas
     DataFrame.
@@ -51,6 +51,8 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
         List of ticker symbols, e.g., ['AAPL', 'MSFT', 'TSLA']
     max_workers: int
         Maximum number of threads to use for parallel requests
+    progress: bool
+        Whether to show a progress bar
 
     Returns
     -------
@@ -60,8 +62,7 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
     Examples
     --------
     >>> symbols = ['AAPL', 'MSFT', 'TSLA', 'GOOG', 'AMZN']
-    >>> info_df = download_tickers_info(symbols, max_workers=5,
-    ...                                 show_progress=False)
+    >>> info_df = download_tickers_info(symbols, max_workers=5, progress=False)
     >>> info_df['longName']['AAPL']
     'Apple Inc.'
     """
@@ -119,7 +120,7 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
                 info['symbol'] = symbol # Add the symbol to the info dictionary
                 info_list.append(info)
                 iteration += 1
-                if show_progress:
+                if progress:
                     print_progress_bar(iteration, len(symbols))
             except Exception as e:
                 print(f"Error fetching info for {symbol}: {e}")
