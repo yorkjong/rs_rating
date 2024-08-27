@@ -25,9 +25,9 @@ True
 >>> info_df.loc['AAPL', 'longName']
 'Apple Inc.'
 """
-__version__ = "1.6"
+__version__ = "1.7"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/08/27 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/08/28 (last revision)"
 
 __all__ = [
     'download_tickers_info',
@@ -124,6 +124,8 @@ def download_tickers_info(symbols, max_workers=8, progress=True):
                     print_progress_bar(iteration, len(symbols))
             except Exception as e:
                 print(f"Error fetching info for {symbol}: {e}")
+        if progress:
+            sys.stdout.write('\n')
 
     # Convert the list of info dictionaries to a DataFrame
     info_df = pd.DataFrame(info_list)
