@@ -6,13 +6,13 @@ relative strength compared to a benchmark index, inspired by the Investor's
 Business Daily (IBD) methodology.
 
 Key Features:
-
+-------------
 - Relative strength calculation
 - Stock and industry ranking generation
 - Percentile-based filtering of rankings
 
 Public Functions:
-
+-----------------
 - relative_strength: Calculate the relative strength of a stock compared to a
   reference index.
 - rankings: Generate comprehensive rankings for both individual stocks and
@@ -21,12 +21,13 @@ Public Functions:
   convention.
 
 Constants:
-
+----------
 - TITLE_PERCENTILE: Column name for the percentile ranking in the output
                     DataFrames. Used for filtering results based on percentile
                     thresholds.
 
 Usage:
+------
 
 ::
 
@@ -45,9 +46,9 @@ Usage:
                     ibd.TITLE_PERCENTILE] >= min_percentile]
 
 See Also:
-
-- `RS Rating — Fred6724的指標 — TradingView
-  <https://tw.tradingview.com/script/pziQwiT2/>`_
+---------
+- `RS Rating — Indicator by Fred6724 — tradingview
+  <https://www.tradingview.com/script/pziQwiT2/>`_
 - `Relative Strength (IBD Style) — Indicator by Skyte — TradingView
   <https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/>`_
 
@@ -58,12 +59,13 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.2"
+__version__ = "2.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/18 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/08/26 (last revision)"
 
 __all__ = [
     'relative_strength',
+    'ranking',
     'rankings',
     'ma_window_size',
     'TITLE_PERCENTILE',
@@ -76,6 +78,8 @@ import pandas as pd
 
 import yfinance as yf
 
+import vistock.yf_utils as yfu
+
 TITLE_RANK = "Rank"
 TITLE_TICKER = "Ticker"
 TITLE_TICKERS = "Tickers"
@@ -86,6 +90,7 @@ TITLE_1M = "1 Month Ago"
 TITLE_3M = "3 Months Ago"
 TITLE_6M = "6 Months Ago"
 TITLE_RS = "Relative Strength"
+TITLE_PRICE = "Price"
 
 
 #------------------------------------------------------------------------------
@@ -155,25 +160,29 @@ def weighted_return(closes, interval):
         P9 = Performance over the last three quarters (9 months)
         P12 = Performance over the last four quarters (12 months)
 
-    Args:
-        closes (pd.Series): Closing prices of the stock/index.
-        interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
-            data.
+    Parameters
+    ----------
+        closes: pd.Series
+            Closing prices of the stock/index.
+        interval: str, optional
+            The frequency of the data points. Must be one of '1d' for daily
+            data, '1wk' for weekly data, or '1mo' for monthly data.
 
-    Returns:
+    Returns
+    -------
         pd.Series: Performance values of the stock/index.
 
-    Example:
-        >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
-        >>> weighted_perf = weighted_return(closes)
+    Example
+    -------
+    >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
+    >>> weighted_perf = weighted_return(closes)
     """
     # Calculate performances over the last quarters
     p1 = quarters_return(closes, 1, interval) # over the last quarter
     p2 = quarters_return(closes, 2, interval) # over the last two quarters
     p3 = quarters_return(closes, 3, interval) # over the last three quarters
     p4 = quarters_return(closes, 4, interval) # over the last four quarters
-    return 0.4 * p1 + 0.2 * p2 + 0.2 * p3 + 0.2 * p4
+    return (2 * p1 + p2 + p3 + p4) / 5
 
 
 def quarters_return(closes, n, interval):
@@ -205,15 +214,98 @@ def quarters_return(closes, n, interval):
     }[interval]
     periods = min(len(closes) - 1, quarter * n)
 
-    ret = closes.ffill().pct_change(periods=periods)
+    ret = closes.ffill().pct_change(periods=periods, fill_method=None)
     return ret.fillna(0)
+
+
+#------------------------------------------------------------------------------
+# IBD RS Ranking (with RS rating)
+#------------------------------------------------------------------------------
+
+def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
+    """
+    Rank stocks based on their IBD Relative Strength against an index
+    benchmark.
+
+    Parameters
+    ----------
+    tickers : list of str
+        List of stock tickers to rank.
+
+    ticker_ref : str, optional
+        Ticker symbol of the benchmark. Default to '^GSPC' (S&P 500)
+
+    period : str, optional
+        Period for historical data ('6mo', '1y', '2y', '5y', 'ytd', 'max').
+        Default to '2y' (two years).
+
+    interval : str, optional
+        Interval for historical data ('1d', '1wk', '1mo').
+        Default to '1wk' (one week).
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame containing the ranked stocks.
+
+    Example
+    -------
+    >>> tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN']
+    >>> stock_rankings  = ranking(tickers)
+    >>> print(stock_rankings.head())
+    """
+    # Fetch data for stock and index
+    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df = df.xs('Close', level='Price', axis=1)
+
+    # Fetch info for stocks
+    info = yfu.download_tickers_info(tickers)
+
+    results = []
+    for ticker in tickers:
+        rs = relative_strength(df[ticker], df[ticker_ref], interval)
+
+        # Calculate RSM for different time periods
+        end_date = rs.index[-1]
+        one_month_ago = end_date - pd.DateOffset(months=1)
+        three_months_ago = end_date - pd.DateOffset(months=3)
+        six_months_ago = end_date - pd.DateOffset(months=6)
+
+        # Construct DataFrame for current stock
+        rank_df = pd.DataFrame({
+            'Ticker': [ticker],
+            'Price': [round(df[ticker].iloc[-1], 2)],
+            'Sector': info['sector'][ticker],
+            'Industry': info['industry'][ticker],
+            'Relative Strength': [rs.asof(end_date)],
+            '1 Month Ago': [rs.asof(one_month_ago)],
+            '3 Months Ago': [rs.asof(three_months_ago)],
+            '6 Months Ago': [rs.asof(six_months_ago)]
+        })
+        results.append(rank_df)
+
+    # Combine results into a single DataFrame
+    ranking_df = pd.concat(results, ignore_index=True)
+
+    # Rank based on Relative Strength
+    rank_columns = ['Rank', ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
+    rs_columns = ['Relative Strength',
+                  '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
+    for rank_col, rs_col in zip(rank_columns, rs_columns):
+        ranking_df[rank_col] = ranking_df[rs_col].rank(
+                ascending=False, method='min').astype('Int64')
+
+    # Sort by current rank
+    ranking_df = ranking_df.sort_values(by='Rank')
+
+    return ranking_df
 
 
 #------------------------------------------------------------------------------
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
-def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
+def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
@@ -225,7 +317,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
 
     Args:
         tickers (List[str]): A list of stock tickers to analyze.
-        ref_ticker (str, optional): The ticker symbol for the reference index.
+        ticker_ref (str, optional): The ticker symbol for the reference index.
             Defaults to '^GSPC' (S&P 500).
         period (str, optional): The period for which to fetch historical data.
             Defaults to '2y' (two years).
@@ -256,7 +348,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
         >>> print(stock_rankings.head())
         >>> print(industry_rankings.head())
     """
-    def process_stocks(tickers, ref_ticker, period, interval):
+    def process_stocks(tickers, ticker_ref, period, interval):
         """
         Processes stock data to extract relevant information for rankings.
 
@@ -272,56 +364,45 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
                 - industries (dict): Dictionary containing industry-specific
                   data, such as RS values and tickers for each industry.
         """
-        index = yf.Ticker(ref_ticker)
-        df_ref = index.history(period=period, interval=interval)
+        # Fetch data for stocks and index
+        df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+        df = df.xs('Close', level='Price', axis=1)
+
+        # Fetch info for stocks
+        info = yfu.download_tickers_info(tickers)
 
         data = []
         industries = {}
-        for ticker, stock, df in gen_stock_data(tickers, period, interval):
-            rs_values = calc_rs_values(df['Close'], df_ref['Close'], interval)
-            info = stock.info
-            sector = info.get('sector', 'Unknown')
-            industry = info.get('industry', 'Unknown')
+        for ticker in tickers:
+            rs_values = calc_rs_values(df[ticker], df[ticker_ref], interval)
+            price = round(df[ticker].iloc[-1], 2)
+            sector = info['sector'][ticker]
+            industry = info['industry'][ticker]
 
-            data.append((ticker, sector, industry, *rs_values.values()))
+            data.append((ticker, price, sector, industry, *rs_values.values()))
             update_industry_data(industries, industry, sector, rs_values, ticker)
 
         df_stocks = pd.DataFrame(
             data,
-            columns=[TITLE_TICKER, TITLE_SECTOR, TITLE_INDUSTRY,
+            columns=[TITLE_TICKER, TITLE_PRICE, TITLE_SECTOR, TITLE_INDUSTRY,
                      TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]
         )
         return df_stocks, industries
 
-    def gen_stock_data(tickers, period, interval):
-        """Generate stock data."""
-        for ticker in tickers:
-            stock = yf.Ticker(ticker)
-            df = stock.history(period=period, interval=interval)
-
-            # Ensure at least 6 months of data
-            if ((interval == '1d' and len(df) < 6 * 20)
-                or (interval == '1wk' and len(df) < 6 * 4)
-                or (interval == '1mo' and len(df) < 6)):
-                continue
-
-            yield ticker, stock, df
-
     def calc_rs_values(prices_stock, prices_ref, interval):
         """Calculate RS values for a single ticker."""
         rs_series = relative_strength(prices_stock, prices_ref, interval)
-        rs_latest = rs_series.iloc[-1]
-        month = {
-            '1d': 20,   # Approx. trading days in a month (daily data)
-            '1wk': 4,   # Approx. trading weeks in a month (weekly data)
-            '1mo': 1,
-        }[interval]
+
+        end_date = rs_series.index[-1]
+        one_month_ago = end_date - pd.DateOffset(months=1)
+        three_months_ago = end_date - pd.DateOffset(months=3)
+        six_months_ago = end_date - pd.DateOffset(months=6)
 
         return {
-            "latest": rs_latest,
-            "1m": rs_series.iloc[-month],
-            "3m": rs_series.iloc[-3*month],
-            "6m": rs_series.iloc[-6*month]
+            "latest": rs_series.asof(end_date),
+            "1m": rs_series.asof(one_month_ago),
+            "3m": rs_series.asof(three_months_ago),
+            "6m": rs_series.asof(six_months_ago)
         }
 
     def update_industry_data(industries, industry, sector, rs_values, ticker):
@@ -405,7 +486,7 @@ def rankings(tickers, ref_ticker='^GSPC', period='2y', interval='1d'):
                          key=lambda x: stock_rs[x], reverse=True)
         return ",".join(tickers)
 
-    df_stocks, industries = process_stocks(tickers, ref_ticker,
+    df_stocks, industries = process_stocks(tickers, ticker_ref,
                                            period, interval)
     stock_rankings = rank_by_rs(calc_percentiles(df_stocks))
     stock_rs = dict(zip(stock_rankings[TITLE_TICKER],
@@ -456,12 +537,34 @@ def ma_window_size(interval, days):
         raise ValueError("Unsupported interval")
 
 
-
 #------------------------------------------------------------------------------
 # Unit Test
 #------------------------------------------------------------------------------
 
-def main(min_percentile=80, out_dir='out'):
+def test_ranking(period='2y', out_dir='out'):
+    import os
+    from datetime import datetime
+    from vistock.stock_indices import get_tickers
+
+    code = 'SPX+DJIA+NDX+SOX'
+    tickers = get_tickers(code)
+    remove_tickers = ['HBAN', 'SW', 'BRK.B', 'VLTO', 'ARM', 'SOLV', 'GEV', 'BF.B']
+    tickers = [t for t in tickers if t not in remove_tickers]
+
+    rank = ranking(tickers, period=period, interval='1d')
+    print(rank.head(10))
+
+    # Save to CSV
+    print("\n\n***")
+    os.makedirs(out_dir, exist_ok=True)
+    today = datetime.now().strftime('%Y%m%d')
+    filename = f'{code}_stocks_{period}_ibd_{today}.csv'
+    rank.to_csv(os.path.join(out_dir, filename), index=False)
+    print(f'Your "{filename}" is in the "{out_dir}" folder.')
+    print("***\n")
+
+
+def test_rankings(min_percentile=80, out_dir='out'):
     '''
     Args:
         min_percentile (int, optional): The minimum percentile for a stock to be
@@ -469,8 +572,8 @@ def main(min_percentile=80, out_dir='out'):
         out_dir (str, optional): The output directory to store CSV tables.
             Defaults to 'out'
     '''
-    from .stock_indices import get_sox_tickers
-    rank_stock, rank_indust = rankings(get_sox_tickers(), interval='1d')
+    import vistock.stock_indices as si
+    rank_stock, rank_indust = rankings(si.get_tickers('SOX'), interval='1d')
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
@@ -497,6 +600,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    main()
+    #test_ranking()
+    test_rankings()
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
