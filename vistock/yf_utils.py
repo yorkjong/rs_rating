@@ -81,6 +81,27 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
         ticker = yf.Ticker(symbol)
         return ticker.info
 
+    def print_progress_bar(iteration, total, length=48, fill='*'):
+        """Call in a loop to create a terminal progress bar with the percentage
+        in the middle.
+        """
+        percent = f"{100. * (iteration / total):2.0f}%"
+        percent_len = len(percent)
+
+        filled_length = int(length * iteration // total)
+        bar = fill * filled_length + ' ' * (length - filled_length)
+
+        # Calculate the start position to place the percentage in the middle
+        pos = (length - percent_len) // 2
+
+        # Replace part of the bar with the percentage string
+        bar_with_percent = bar[:pos] + percent + bar[pos + percent_len:]
+
+        # The \r moves the cursor back to the start of the line
+        sys.stdout.write(f'\r[{bar_with_percent}]  {iteration} of {total} '
+                         'info downloaded')
+        sys.stdout.flush()  # to ensure immediate display
+
     info_list = []
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -110,28 +131,6 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
     info_df.set_index('symbol', inplace=True)
 
     return info_df
-
-
-def print_progress_bar(iteration, total, length=48, fill='*'):
-    """Call in a loop to create a terminal progress bar with the percentage in
-    the middle.
-    """
-    percent = f"{100. * (iteration / total):2.0f}%"
-    percent_len = len(percent)
-
-    filled_length = int(length * iteration // total)
-    bar = fill * filled_length + ' ' * (length - filled_length)
-
-    # Calculate the start position to place the percentage in the middle
-    pos = (length - percent_len) // 2
-
-    # Replace part of the bar with the percentage string
-    bar_with_percent = bar[:pos] + percent + bar[pos + percent_len:]
-
-    # The \r moves the cursor back to the start of the line
-    sys.stdout.write(f'\r[{bar_with_percent}]  {iteration} of {total} '
-                     'info downloaded')
-    sys.stdout.flush()  # Flushes the output buffer to ensure immediate display
 
 
 if __name__ == "__main__":
