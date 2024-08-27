@@ -96,8 +96,8 @@ def mansfield_relative_strength(closes, closes_index, window):
     2024-01-03    5.238095
     dtype: float64
     """
-    closes.ffill(inplace=True)
-    closes_index.ffill(inplace=True)
+    closes = closes.ffill()
+    closes_index = closes_index.ffill()
     rsd = dorsey_relative_strength(closes, closes_index)
     rsm = ((rsd / simple_moving_average(rsd, window)) - 1) * 100
     return round(rsm, 2)
