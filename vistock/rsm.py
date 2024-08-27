@@ -230,8 +230,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         DataFrame containing the ranked stocks.
     """
     # Fetch data for stocks and index
-    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
-    df = df.xs('Close', level='Price', axis=1)
+    df_all = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df_ref = df_all.xs(ticker_ref, level='Ticker', axis=1)
 
     # Fetch info for stocks
     info = yfu.download_tickers_info(tickers)
@@ -247,7 +247,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
 
     results = []
     for ticker in tickers:
-        rsm = rs_func(df[ticker], df[ticker_ref], window)
+        df = df_all.xs(ticker, level='Ticker', axis=1)
+        rsm = rs_func(df['Close'], df_ref['Close'], window)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -256,20 +257,20 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         six_months_ago = end_date - pd.DateOffset(months=6)
 
         # Construct DataFrame for current stock
-        rank_df = pd.DataFrame({
-            'Ticker': [ticker],
-            'Price': [round(df[ticker].iloc[-1], 2)],
+        row = {
+            'Ticker': ticker,
             'Sector': info['sector'][ticker],
             'Industry': info['industry'][ticker],
-            'Relative Strength': [rsm.asof(end_date)],
-            '1 Month Ago': [rsm.asof(one_month_ago)],
-            '3 Months Ago': [rsm.asof(three_months_ago)],
-            '6 Months Ago': [rsm.asof(six_months_ago)]
-        })
-        results.append(rank_df)
+            'Relative Strength': rsm.asof(end_date),
+            '1 Month Ago': rsm.asof(one_month_ago),
+            '3 Months Ago': rsm.asof(three_months_ago),
+            '6 Months Ago': rsm.asof(six_months_ago),
+            'Price': round(df['Close'].iloc[-1], 2),
+        }
+        results.append(row)
 
     # Combine results into a single DataFrame
-    ranking_df = pd.concat(results, ignore_index=True)
+    ranking_df = pd.DataFrame(results)
 
     # Rank based on Relative Strength
     rank_columns = ['Rank', ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
