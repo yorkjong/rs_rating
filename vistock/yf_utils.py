@@ -25,13 +25,15 @@ True
 >>> info_df.loc['AAPL', 'longName']
 'Apple Inc.'
 """
-__version__ = "1.4"
+__version__ = "1.5"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/08/26 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/08/27 (last revision)"
 
 __all__ = [
     'download_tickers_info',
 ]
+
+import sys
 
 import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -80,9 +82,6 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
         return ticker.info
 
     info_list = []
-    if show_progress:
-        total_symbols = len(symbols)
-        progress_step = max(1, total_symbols//50)   # Ensure at least one step
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit fetch_info tasks for all symbols to the thread pool
@@ -90,7 +89,7 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
             executor.submit(fetch_info, symbol): symbol for symbol in symbols
         }
 
-        completed = 0
+        iteration = 0
 
         for future in as_completed(future_to_symbol):
             symbol = future_to_symbol[future]
@@ -98,13 +97,11 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
                 info = future.result()
                 info['symbol'] = symbol # Add the symbol to the info dictionary
                 info_list.append(info)
-                completed += 1
-                if show_progress and completed % progress_step == 0:
-                    print('.', end='', flush=True)  # Show the progress
+                iteration += 1
+                if show_progress:
+                    print_progress_bar(iteration, len(symbols))
             except Exception as e:
                 print(f"Error fetching info for {symbol}: {e}")
-        if show_progress:
-            print()
 
     # Convert the list of info dictionaries to a DataFrame
     info_df = pd.DataFrame(info_list)
@@ -113,6 +110,28 @@ def download_tickers_info(symbols, max_workers=8, show_progress=True):
     info_df.set_index('symbol', inplace=True)
 
     return info_df
+
+
+def print_progress_bar(iteration, total, length=48, fill='*'):
+    """Call in a loop to create a terminal progress bar with the percentage in
+    the middle.
+    """
+    percent = f"{100. * (iteration / total):2.0f}%"
+    percent_len = len(percent)
+
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + ' ' * (length - filled_length)
+
+    # Calculate the start position to place the percentage in the middle
+    pos = (length - percent_len) // 2
+
+    # Replace part of the bar with the percentage string
+    bar_with_percent = bar[:pos] + percent + bar[pos + percent_len:]
+
+    # The \r moves the cursor back to the start of the line
+    sys.stdout.write(f'\r[{bar_with_percent}]  {iteration} of {total} '
+                     'info downloaded')
+    sys.stdout.flush()  # Flushes the output buffer to ensure immediate display
 
 
 if __name__ == "__main__":
