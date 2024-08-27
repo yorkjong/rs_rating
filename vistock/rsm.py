@@ -171,6 +171,31 @@ def dorsey_relative_strength(closes, closes_index):
     return (closes / closes_index) * 100
 
 
+
+def move_columns_to_end(df, columns_to_move):
+    """
+    Move specified columns to the end of the DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame whose columns need to be reordered.
+
+    columns_to_move : list of str
+        List of column names to move to the end.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with specified columns moved to the end.
+    """
+    # Get the list of columns that are not in columns_to_move
+    cols = [col for col in df.columns if col not in columns_to_move] + columns_to_move
+    # Reorder DataFrame columns
+    df = df[cols]
+    return df
+
+
 def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
             window=52, ma="SMA"):
     """
