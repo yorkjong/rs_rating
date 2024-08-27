@@ -257,6 +257,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
     # Sort by current rank
     ranking_df = ranking_df.sort_values(by='Rank')
 
+    ranking_df = move_columns_to_end(ranking_df, ['Price'])
     return ranking_df
 
 
