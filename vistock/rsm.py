@@ -43,7 +43,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.5"
+__version__ = "1.6"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/30 (last revision)"
 
@@ -214,7 +214,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
         Default to '2y' (two years).
 
     interval : str, optional
-        Interval for historical data ('1d', '1wk', '1mo').
+        Interval for historical data ('1d', '1wk').
         Default to '1wk' (one week).
 
     ma : str, optional
@@ -247,9 +247,9 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     except KeyError:
         raise ValueError("Invalid moving average type. Must be 'SMA' or 'EMA'.")
     try:
-        rs_window = { '1d': 260, '1wk': 52, '1mo': 12 }[interval]
-        ma_window = { '1d': 150, '1wk': 30, '1mo': 8, }[interval]
-        vma_window = { '1d': 50, '1wk': 10, '1mo': 3, }[interval]
+        rs_window = { '1d': 260, '1wk': 52}[interval]
+        ma_window = { '1d': 150, '1wk': 30}[interval]
+        vma_window = { '1d': 50, '1wk': 10}[interval]
     except KeyError:
         raise ValueError("Invalid interval. " "Must be '1d', '1wk', or '1mo'.")
 
