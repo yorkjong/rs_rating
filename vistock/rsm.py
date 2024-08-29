@@ -43,9 +43,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.4"
+__version__ = "1.5"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/08/24 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/08/30 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -196,8 +196,7 @@ def move_columns_to_end(df, columns_to_move):
     return df
 
 
-def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
-            window=52, ma="SMA"):
+def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     """
     Rank stocks based on their Mansfield Relative Strength (RSM) against an
     index benchmark.
@@ -218,9 +217,6 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
         Interval for historical data ('1d', '1wk', '1mo').
         Default to '1wk' (one week).
 
-    window : int, optional
-        Window size for moving average calculation. Default to 52.
-
     ma : str, optional
         Moving average type ('SMA', 'EMA'). Default to 'SMA'.
 
@@ -236,22 +232,37 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
     # Fetch info for stocks
     info = yfu.download_tickers_info(tickers)
 
-    # Get the function to calculate relative strength
     try:
+        # Get the function to calculate relative strength
         rs_func = {
             'SMA': mansfield_relative_strength,
             'EMA': mansfield_relative_strength_with_ema,
         }[ma]
+
+        # Select the MA function based on the 'ma' parameter
+        ma_func = {
+            'SMA': simple_moving_average,
+            'EMA': exponential_moving_average,
+        }[ma]
     except KeyError:
         raise ValueError("Invalid moving average type. Must be 'SMA' or 'EMA'.")
+    try:
+        rs_window = { '1d': 260, '1wk': 52, '1mo': 12 }[interval]
+        ma_window = { '1d': 150, '1wk': 30, '1mo': 8, }[interval]
+        vma_window = { '1d': 50, '1wk': 10, '1mo': 3, }[interval]
+    except KeyError:
+        raise ValueError("Invalid interval. " "Must be '1d', '1wk', or '1mo'.")
 
     results = []
     for ticker in tickers:
         df = df_all.xs(ticker, level='Ticker', axis=1)
-        rsm = rs_func(df['Close'], df_ref['Close'], window)
+        rsm = rs_func(df['Close'], df_ref['Close'], rs_window)
+        price_div_ma = round(df['Close'] / ma_func(df['Close'], ma_window), 2)
+        vol_div_ma = round(df['Volume'] / ma_func(df['Volume'], vma_window), 2)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
+        one_week_ago = end_date - pd.DateOffset(weeks=1)
         one_month_ago = end_date - pd.DateOffset(months=1)
         three_months_ago = end_date - pd.DateOffset(months=3)
         six_months_ago = end_date - pd.DateOffset(months=6)
@@ -261,11 +272,14 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
             'Ticker': ticker,
             'Sector': info['sector'][ticker],
             'Industry': info['industry'][ticker],
-            'Relative Strength': rsm.asof(end_date),
+            'RS (%)': rsm.asof(end_date),
+            '1 Week Ago': rsm.asof(one_week_ago),
             '1 Month Ago': rsm.asof(one_month_ago),
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
             'Price': round(df['Close'].iloc[-1], 2),
+            'Price / MA': price_div_ma[-1],
+            'Volume / VMA': vol_div_ma[-1],
         }
         results.append(row)
 
@@ -273,17 +287,21 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk',
     ranking_df = pd.DataFrame(results)
 
     # Rank based on Relative Strength
-    rank_columns = ['Rank', ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
-    rs_columns = ['Relative Strength',
+    rank_columns = ['RS Rank (%)', ' 1 Week Ago',
+                    ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
+    rs_columns = ['RS (%)', '1 Week Ago',
                   '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
     for rank_col, rs_col in zip(rank_columns, rs_columns):
-        ranking_df[rank_col] = ranking_df[rs_col].rank(
-                ascending=False, method='min').astype('Int64')
+        rank_pct = ranking_df[rs_col].rank(pct=True)
+        ranking_df[rank_col] = round(rank_pct * 100, 2)
 
     # Sort by current rank
-    ranking_df = ranking_df.sort_values(by='Rank')
+    ranking_df = ranking_df.sort_values(by='RS Rank (%)', ascending=False)
 
-    ranking_df = move_columns_to_end(ranking_df, ['Price'])
+    ranking_df = move_columns_to_end(
+        ranking_df,
+        ['Price', 'Price / MA', 'Volume / VMA']
+    )
     return ranking_df
 
 
@@ -293,11 +311,10 @@ def main(period='2y', ma="EMA", out_dir='out'):
     from vistock.stock_indices import get_tickers
 
     code = 'SPX+DJIA+NDX+SOX'
+    code = 'SOX'
     tickers = get_tickers(code)
-    remove_tickers = ['HBAN', 'SW', 'BRK.B', 'VLTO', 'ARM', 'SOLV', 'GEV', 'BF.B']
-    tickers = [t for t in tickers if t not in remove_tickers]
 
-    rank = ranking(tickers, period=period, interval='1wk', ma=ma, window=52)
+    rank = ranking(tickers, period=period, interval='1wk', ma=ma)
     print(rank.head(10))
 
     # Save to CSV
