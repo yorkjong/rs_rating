@@ -6,8 +6,10 @@ stock data using the Yahoo Finance API via the `yfinance` library.
 
 Functions
 ---------
+- download_quarterly_financials: Downloads the quarterly financials for multiple
+  stocks and returns the specified fields.
 - download_tickers_info: Download and return financial information for multiple
-  tickers in parallel.
+  stocks in parallel.
 
 Example
 -------
@@ -16,7 +18,10 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> import yfinance as yf
 >>> from vistock.yf_utils import download_tickers_info
 >>> symbols = ['AAPL', 'MSFT', 'TSLA']
->>> info = download_tickers_info(symbols, max_workers=5, progress=False)
+    >>> info = download_tickers_info(symbols) # doctest: +NORMALIZE_WHITESPACE
+    ...                                       # doctest: +ELLIPSIS
+    [...**********************100%**********************]
+    3 of 3 info downloaded
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
@@ -63,7 +68,7 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
     --------
     >>> symbols = ['AAPL', 'MSFT', 'TSLA', 'GOOG', 'AMZN']
     >>> financials = download_quarterly_financials(symbols)
-    ...            # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+    ...                             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
     [...*******************100%**********************]
       5 of 5 financials downloaded
     >>> financials['AAPL']['Basic EPS']
