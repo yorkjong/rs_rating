@@ -12,9 +12,7 @@ Functions:
 - dorsey_relative_strength(closes, closes_index): Computes Dorsey Relative
   Strength (RSD).
 - mansfield_relative_strength(closes, closes_index, window): Computes Mansfield
-  Relative Strength (RSM) using SMA.
-- mansfield_relative_strength_with_ema(closes, closes_index, window, adjust):
-  Computes RSM using EMA.
+  Relative Strength (RSM)
 - ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma='SMA',
   window=52): Ranks stocks based on their RSM.
 
@@ -49,7 +47,6 @@ __date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
-    'mansfield_relative_strength_with_ema',
     'dorsey_relative_strength',
     'ranking',
 ]
@@ -62,28 +59,30 @@ import vistock.yf_utils as yfu
 from .ta import simple_moving_average, exponential_moving_average
 
 
-def mansfield_relative_strength(closes, closes_index, window):
+def mansfield_relative_strength(closes, closes_index, window, ma='SMA'):
     """
     Calculate Mansfield Relative Strength (RSM) for given close prices, index
-    close prices, and window size using a Simple Moving Average (SMA).
+    close prices, and window size using a given moving average method ('SMA'
+    or 'EMA').
 
     Parameters
     ----------
     closes : pandas.Series
         Series of closing prices for the stock.
-
     closes_index : pandas.Series
         Series of closing prices for the benchmark index.
-
     window : int
         Window size for calculating the Simple Moving Average of the Dorsey
         Relative Strength.
+    ma : str, optional
+        Moving average type ('SMA', 'EMA'). Default to 'SMA'.
 
     Returns
     -------
     pandas.Series
         Series containing the calculated Mansfield Relative Strength (RSM)
-        values with SMA.
+        values with given moving average method.
+
     Examples
     --------
     >>> stock_closes = pd.Series([100, 105, 110],
@@ -95,58 +94,26 @@ def mansfield_relative_strength(closes, closes_index, window):
     2024-01-02    5.097847
     2024-01-03    5.238095
     dtype: float64
-    """
-    closes = closes.ffill()
-    closes_index = closes_index.ffill()
-    rsd = dorsey_relative_strength(closes, closes_index)
-    rsm = ((rsd / simple_moving_average(rsd, window)) - 1) * 100
-    return round(rsm, 2)
-
-
-def mansfield_relative_strength_with_ema(closes, closes_index, window,
-                                         adjust=False):
-    """
-    Calculate Mansfield Relative Strength (RSM) using an Exponential Moving
-    Average (EMA) for the Dorsey Relative Strength.
-
-    Parameters
-    ----------
-    closes : pandas.Series
-        Series of closing prices for the stock.
-
-    closes_index : pandas.Series
-        Series of closing prices for the benchmark index.
-
-    window : int
-        Number of periods over which to calculate the Exponential Moving Average
-        of the Dorsey Relative Strength.
-
-    adjust : bool, optional
-        Whether to adjust the EMA calculation (default is False).
-
-    Returns
-    -------
-    pandas.Series
-        Series containing the calculated Mansfield Relative Strength (RSM)
-        values with EMA.
-
-    Examples
-    --------
-    >>> stock_closes = pd.Series([100, 105, 110],
-    ...     index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
-    >>> index_closes = pd.Series([2000, 2050, 2100],
-    ...     index=pd.date_range(start='2024-01-01', periods=3, freq='D'))
     >>> mansfield_relative_strength_with_ema(stock_closes, index_closes,
-    ...     window=2)
+    ...     window=2, ma='EMA')
     2024-01-01    5.000000
     2024-01-02    5.097847
     2024-01-03    5.238095
     dtype: float64
     """
-    closes.ffill(inplace=True)
-    closes_index.ffill(inplace=True)
+    # Select the MA function based on the 'ma' parameter
+    try:
+        ma_func = {
+            'SMA': simple_moving_average,
+            'EMA': exponential_moving_average,
+        }[ma]
+    except KeyError:
+        raise ValueError("Invalid ma type. Must be 'SMA' or 'EMA'.")
+
+    closes = closes.ffill()
+    closes_index = closes_index.ffill()
     rsd = dorsey_relative_strength(closes, closes_index)
-    rsm = ((rsd / exponential_moving_average(rsd, window, adjust)) - 1) * 100
+    rsm = ((rsd / ma_func(rsd, window)) - 1) * 100
     return round(rsm, 2)
 
 
@@ -232,20 +199,16 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     # Fetch info for stocks
     info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
 
+    # Select the MA function based on the 'ma' parameter
     try:
-        # Get the function to calculate relative strength
-        rs_func = {
-            'SMA': mansfield_relative_strength,
-            'EMA': mansfield_relative_strength_with_ema,
-        }[ma]
-
-        # Select the MA function based on the 'ma' parameter
         ma_func = {
             'SMA': simple_moving_average,
             'EMA': exponential_moving_average,
         }[ma]
     except KeyError:
         raise ValueError("Invalid moving average type. Must be 'SMA' or 'EMA'.")
+
+    # Set moving average windows based on the interval
     try:
         rs_win = { '1d': 252, '1wk': 52}[interval]
         ma_wins = { '1d': [50, 150], '1wk': [10, 30]}[interval]
@@ -257,7 +220,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     price_div_ma = {}
     for ticker in tickers:
         df = df_all.xs(ticker, level='Ticker', axis=1)
-        rsm = rs_func(df['Close'], df_ref['Close'], rs_win)
+        rsm = mansfield_relative_strength(df['Close'], df_ref['Close'],
+                                          rs_win, ma=ma)
         for win in ma_wins:
             price_div_ma[f'{win}'] = round(df['Close'] /
                                            ma_func(df['Close'], win), 2)
