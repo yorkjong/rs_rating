@@ -20,7 +20,7 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "1.8"
+__version__ = "1.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/30 (last revision)"
 
@@ -62,7 +62,10 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
     Examples
     --------
     >>> symbols = ['AAPL', 'MSFT', 'TSLA', 'GOOG', 'AMZN']
-    >>> financials = download_quarterly_financials(symbols, progress=False)
+    >>> financials = download_quarterly_financials(symbols)
+    ...            # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+    [...*******************100%**********************]
+      5 of 5 financials downloaded
     >>> financials['AAPL']['Basic EPS']
     2022-12-31     NaN
     2023-03-31     NaN
@@ -156,7 +159,9 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
     Examples
     --------
     >>> symbols = ['AAPL', 'MSFT', 'TSLA', 'GOOG', 'AMZN']
-    >>> info = download_tickers_info(symbols, max_workers=5, progress=False)
+    >>> info = download_tickers_info(symbols) # doctest: +NORMALIZE_WHITESPACE
+    ...                                       # doctest: +ELLIPSIS
+    [...*******************100%**********************]  5 of 5 info downloaded
     >>> info['AAPL']['longName']
     'Apple Inc.'
     """
