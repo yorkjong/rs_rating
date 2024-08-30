@@ -43,7 +43,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.6"
+__version__ = "1.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/30 (last revision)"
 
@@ -230,7 +230,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     df_ref = df_all.xs(ticker_ref, level='Ticker', axis=1)
 
     # Fetch info for stocks
-    info = yfu.download_tickers_info(tickers)
+    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
 
     try:
         # Get the function to calculate relative strength
@@ -270,8 +270,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
         # Construct DataFrame for current stock
         row = {
             'Ticker': ticker,
-            'Sector': info['sector'][ticker],
-            'Industry': info['industry'][ticker],
+            'Sector': info[ticker]['sector'],
+            'Industry': info[ticker]['industry'],
             'RS (%)': rsm.asof(end_date),
             '1 Week Ago': rsm.asof(one_week_ago),
             '1 Month Ago': rsm.asof(one_month_ago),

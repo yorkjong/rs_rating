@@ -6,7 +6,8 @@ stock data using the Yahoo Finance API via the `yfinance` library.
 
 Functions
 ---------
-- download_tickers_info: Download and return financial information for multiple tickers in parallel.
+- download_tickers_info: Download and return financial information for multiple
+  tickers in parallel.
 
 Example
 -------
@@ -15,19 +16,13 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> import yfinance as yf
 >>> from vistock.yf_utils import download_tickers_info
 >>> symbols = ['AAPL', 'MSFT', 'TSLA']
->>> info_df = download_tickers_info(symbols, max_workers=5, progress=False)
->>> isinstance(info_df, pd.DataFrame)
-True
->>> 'AAPL' in info_df.index
-True
->>> 'longName' in info_df.columns
-True
->>> info_df.loc['AAPL', 'longName']
+>>> info = download_tickers_info(symbols, max_workers=5, progress=False)
+>>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "1.7"
+__version__ = "1.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/08/28 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/08/30 (last revision)"
 
 __all__ = [
     'download_tickers_info',
@@ -40,15 +35,17 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pandas as pd
 
 
-def download_tickers_info(symbols, max_workers=8, progress=True):
+def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
     """
-    Download info for multiple tickers in parallel and return as a pandas
-    DataFrame.
+    Downloads the basic information of multiple stocks and returns the
+    specified fields.
 
     Parameters
     ----------
     symbols: list of str
         List of ticker symbols, e.g., ['AAPL', 'MSFT', 'TSLA']
+    fields: list, optional
+        List of fields to return. If None, all fields will be returned.
     max_workers: int
         Maximum number of threads to use for parallel requests
     progress: bool
@@ -56,14 +53,15 @@ def download_tickers_info(symbols, max_workers=8, progress=True):
 
     Returns
     -------
-    pandas.DataFrame
-        pandas DataFrame containing the info for all tickers
+    dict:
+        A dictionary where each key is a stock ticker, and the value is a
+        dictionary of the specified fields.
 
     Examples
     --------
     >>> symbols = ['AAPL', 'MSFT', 'TSLA', 'GOOG', 'AMZN']
-    >>> info_df = download_tickers_info(symbols, max_workers=5, progress=False)
-    >>> info_df['longName']['AAPL']
+    >>> info = download_tickers_info(symbols, max_workers=5, progress=False)
+    >>> info['AAPL']['longName']
     'Apple Inc.'
     """
     def fetch_info(symbol):
@@ -79,8 +77,12 @@ def download_tickers_info(symbols, max_workers=8, progress=True):
         dict
             Dictionary containing the ticker's info
         """
-        ticker = yf.Ticker(symbol)
-        return ticker.info
+        try:
+            stock = yf.Ticker(symbol)
+            return stock.info
+        except Exception as e:
+            print(f"Error fetching data for {symbol}: {e}")
+            return {}
 
     def print_progress_bar(iteration, total, length=48, fill='*'):
         """Call in a loop to create a terminal progress bar with the percentage
@@ -103,7 +105,7 @@ def download_tickers_info(symbols, max_workers=8, progress=True):
                          'info downloaded')
         sys.stdout.flush()  # to ensure immediate display
 
-    info_list = []
+    info_dict = {}
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         # Submit fetch_info tasks for all symbols to the thread pool
@@ -116,9 +118,8 @@ def download_tickers_info(symbols, max_workers=8, progress=True):
         for future in as_completed(future_to_symbol):
             symbol = future_to_symbol[future]
             try:
-                info = future.result()
-                info['symbol'] = symbol # Add the symbol to the info dictionary
-                info_list.append(info)
+                info = future.result()  # Blocking call, waits for the result
+                info_dict[symbol] = info
                 iteration += 1
                 if progress:
                     print_progress_bar(iteration, len(symbols))
@@ -127,13 +128,7 @@ def download_tickers_info(symbols, max_workers=8, progress=True):
         if progress:
             sys.stdout.write('\n')
 
-    # Convert the list of info dictionaries to a DataFrame
-    info_df = pd.DataFrame(info_list)
-
-    # Set 'symbol' column as the index of the DataFrame
-    info_df.set_index('symbol', inplace=True)
-
-    return info_df
+    return info_dict
 
 
 if __name__ == "__main__":
