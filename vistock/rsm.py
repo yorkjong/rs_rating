@@ -43,9 +43,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.7"
+__version__ = "1.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/08/30 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -247,18 +247,21 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     except KeyError:
         raise ValueError("Invalid moving average type. Must be 'SMA' or 'EMA'.")
     try:
-        rs_window = { '1d': 260, '1wk': 52}[interval]
-        ma_window = { '1d': 150, '1wk': 30}[interval]
-        vma_window = { '1d': 50, '1wk': 10}[interval]
+        rs_win = { '1d': 252, '1wk': 52}[interval]
+        ma_wins = { '1d': [50, 150], '1wk': [10, 30]}[interval]
+        vma_win = { '1d': 50, '1wk': 10}[interval]
     except KeyError:
-        raise ValueError("Invalid interval. " "Must be '1d', '1wk', or '1mo'.")
+        raise ValueError("Invalid interval. " "Must be '1d', or '1wk'.")
 
     results = []
+    price_div_ma = {}
     for ticker in tickers:
         df = df_all.xs(ticker, level='Ticker', axis=1)
-        rsm = rs_func(df['Close'], df_ref['Close'], rs_window)
-        price_div_ma = round(df['Close'] / ma_func(df['Close'], ma_window), 2)
-        vol_div_ma = round(df['Volume'] / ma_func(df['Volume'], vma_window), 2)
+        rsm = rs_func(df['Close'], df_ref['Close'], rs_win)
+        for win in ma_wins:
+            price_div_ma[f'{win}'] = round(df['Close'] /
+                                           ma_func(df['Close'], win), 2)
+        vol_div_vma = round(df['Volume'] / ma_func(df['Volume'], vma_win), 2)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -278,8 +281,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
             'Price': round(df['Close'].iloc[-1], 2),
-            'Price / MA': price_div_ma[-1],
-            'Volume / VMA': vol_div_ma[-1],
+            **{f'Price / MA{w}': price_div_ma[f'{w}'][-1] for w in ma_wins},
+            f'Volume / VMA{vma_win}': vol_div_vma[-1],
         }
         results.append(row)
 
@@ -300,7 +303,11 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
 
     ranking_df = move_columns_to_end(
         ranking_df,
-        ['Price', 'Price / MA', 'Volume / VMA']
+        [
+            'Price',
+            *[f'Price / MA{w}' for w in ma_wins],
+            f'Volume / VMA{vma_win}',
+         ],
     )
     return ranking_df
 
