@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "1.8"
+__version__ = "1.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -58,6 +58,10 @@ import yfinance as yf
 import vistock.yf_utils as yfu
 from .ta import simple_moving_average, exponential_moving_average
 
+
+#------------------------------------------------------------------------------
+# Relative (Price) Stength
+#------------------------------------------------------------------------------
 
 def mansfield_relative_strength(closes, closes_index, window, ma='SMA'):
     """
@@ -137,31 +141,68 @@ def dorsey_relative_strength(closes, closes_index):
     """
     return (closes / closes_index) * 100
 
+#------------------------------------------------------------------------------
+# Relative EPS Strength
+#------------------------------------------------------------------------------
 
-
-def move_columns_to_end(df, columns_to_move):
+def relative_eps_strength(epses, epses_index):
+    """Calculate Mansfield Relative EPS Strength (RESM)
     """
-    Move specified columns to the end of the DataFrame.
+    length = min(len(epses), len(epses_index))
+    epses = epses.ffill()[-length:]
+    epses_index = pd.Series(epses_index).ffill()[-length:]
+    resd =  epses.values / epses_index.values
+
+    ma_resd = moving_average(resd, 4)
+    # Ensure shapes match by aligning lengths
+    if len(ma_resd) < len(resd):
+        # Align lengths by adjusting resd
+        resd_aligned = resd[-len(ma_resd):]
+    else:
+        resd_aligned = resd
+
+    resm = (resd_aligned / ma_resd - 1) * 100
+    return np.round(resm, 2)
+
+
+def moving_average(data, window_size, min_periods=1):
+    """
+    Calculate the moving average of a given data with a specified window size
+    and min_periods.
 
     Parameters
     ----------
-    df : pandas.DataFrame
-        The DataFrame whose columns need to be reordered.
-
-    columns_to_move : list of str
-        List of column names to move to the end.
+    data : numpy.ndarray
+        The input data array.
+    window_size : int
+        The size of the moving window.
+    min_periods : int
+        The minimum number of observations in the window required to have a
+        value.
 
     Returns
     -------
-    pandas.DataFrame
-        DataFrame with specified columns moved to the end.
+    numpy.ndarray
+        The moving average of the data.
     """
-    # Get the list of columns that are not in columns_to_move
-    cols = [col for col in df.columns if col not in columns_to_move] + columns_to_move
-    # Reorder DataFrame columns
-    df = df[cols]
-    return df
+    if min_periods > window_size:
+        raise ValueError("min_periods cannot be greater than window_size")
 
+    # Calculate the moving average using convolution
+    weights = np.ones(window_size) / window_size
+    avg = np.convolve(data, weights, mode='valid')
+
+    # Calculate the count of valid observations in each window
+    valid_count = np.convolve(np.ones_like(data), np.ones(window_size), mode='valid')
+
+    # Apply min_periods condition
+    avg = np.where(valid_count >= min_periods, avg, np.nan)
+
+    return avg
+
+#------------------------------------------------------------------------------
+# Ranking
+#------------------------------------------------------------------------------
 
 def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     """
@@ -192,13 +233,6 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     pandas.DataFrame
         DataFrame containing the ranked stocks.
     """
-    # Fetch data for stocks and index
-    df_all = yf.download([ticker_ref] + tickers, period=period, interval=interval)
-    df_ref = df_all.xs(ticker_ref, level='Ticker', axis=1)
-
-    # Fetch info for stocks
-    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
-
     # Select the MA function based on the 'ma' parameter
     try:
         ma_func = {
@@ -216,6 +250,22 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     except KeyError:
         raise ValueError("Invalid interval. " "Must be '1d', or '1wk'.")
 
+    # Fetch data for stocks and index
+    df_all = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df_ref = df_all.xs(ticker_ref, level='Ticker', axis=1)
+
+    # Fetch info for stocks
+    info = yfu.download_tickers_info(
+        tickers,
+        ['sector', 'industry', 'marketCap', 'trailingEps', 'forwardEps']
+    )
+    # Fetch financials data for stocks
+    financials = yfu.download_quarterly_financials(tickers, ['Basic EPS'])
+
+    epses_index = yfu.calc_weighted_average_eps(financials, info)
+    print(financials['NVDA']['Basic EPS'])
+    print(epses_index)
+
     results = []
     price_div_ma = {}
     for ticker in tickers:
@@ -226,6 +276,9 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
             price_div_ma[f'{win}'] = round(df['Close'] /
                                            ma_func(df['Close'], win), 2)
         vol_div_vma = round(df['Volume'] / ma_func(df['Volume'], vma_win), 2)
+
+        epses = financials[ticker]['Basic EPS']
+        eps_strength = relative_eps_strength(epses, epses_index)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -247,6 +300,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
             'Price': round(df['Close'].iloc[-1], 2),
             **{f'Price / MA{w}': price_div_ma[f'{w}'][-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma[-1],
+            'EPS Strength': eps_strength[-1],
         }
         results.append(row)
 
@@ -271,10 +325,38 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
             'Price',
             *[f'Price / MA{w}' for w in ma_wins],
             f'Volume / VMA{vma_win}',
-         ],
+            'EPS Strength',
+        ],
     )
     return ranking_df
 
+
+def move_columns_to_end(df, columns_to_move):
+    """
+    Move specified columns to the end of the DataFrame.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        The DataFrame whose columns need to be reordered.
+
+    columns_to_move : list of str
+        List of column names to move to the end.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame with specified columns moved to the end.
+    """
+    # Get the list of columns that are not in columns_to_move
+    cols = [col for col in df.columns if col not in columns_to_move] + columns_to_move
+    # Reorder DataFrame columns
+    df = df[cols]
+    return df
+
+#------------------------------------------------------------------------------
+# Unit Test
+#------------------------------------------------------------------------------
 
 def main(period='2y', ma="EMA", out_dir='out'):
     import os
