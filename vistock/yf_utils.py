@@ -25,20 +25,94 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "1.9"
+__version__ = "2.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/08/30 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
 
 __all__ = [
+    'calc_weighted_average_eps',
     'download_quarterly_financials',
     'download_tickers_info',
 ]
 
 import sys
-
-import yfinance as yf
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import numpy as np
 import pandas as pd
+import yfinance as yf
+
+
+def calc_weighted_average_eps(financials, tickers_info):
+    """
+    Calculate the market-cap-weighted average EPS (Earnings Per Share) for all
+    stock symbols in the provided data using NumPy for numerical calculations.
+
+    Parameters
+    ----------
+    financials : dict
+        A dictionary where each key is a stock ticker and the value is a
+        DataFrame of the ticker's quarterly financials.
+    tickers_info : dict
+        A dictionary where each key is a stock ticker and the value is a
+        dictionary of the ticker's info, including market cap.
+
+    Returns
+    -------
+    numpy.ndarray
+        The market-cap-weighted average EPS over the specified number of
+        quarters.
+
+    Examples
+    --------
+    >>> tickers = ['AAPL', 'MSFT', 'GOOG']
+    >>> financials = download_quarterly_financials(tickers, ['Basic EPS'])
+    ...                             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
+    [...**********************100%**********************]
+    3 of 3 financials downloaded
+    >>> tickers_info = {
+    ...     'AAPL': {'marketCap': 2500000000},
+    ...     'MSFT': {'marketCap': 2000000000},
+    ...     'GOOG': {'marketCap': 1800000000},
+    ... }
+    >>> eps_avg = calc_weighted_average_eps(financials, tickers_info)
+    >>> type(eps_avg)
+    <class 'numpy.ndarray'>
+    """
+    # Initialize lists to store EPS and market cap data
+    eps_list = []
+    market_caps = []
+
+    for symbol, financial_df in financials.items():
+        # Retrieve the market cap for each symbol
+        market_cap = tickers_info.get(symbol, {}).get('marketCap', 0)
+        market_caps.append(market_cap)
+
+        if financial_df is not None and 'Basic EPS' in financial_df.columns:
+            eps = financial_df['Basic EPS'].values
+            eps_list.append(eps)
+        else:
+            print(f"Warning: No EPS data available for {symbol}.")
+            eps_list.append(np.zeros(7)) # Assuming there are 7 quarters
+
+    # Ensure all EPS arrays have the same length. Use NaN for padding.
+    max_length = max(len(eps) for eps in eps_list)
+    eps_array = np.full((len(eps_list), max_length), np.nan)
+
+    for i, eps in enumerate(eps_list):
+        eps_array[i, :len(eps)] = eps
+
+    # Convert market caps to a NumPy array
+    market_caps = np.array(market_caps)
+
+    # Calculate weighted EPS using broadcasting
+    weighted_eps = eps_array * market_caps[:, np.newaxis]
+
+    # Calculate weighted average EPS
+    total_market_cap = market_caps.sum()
+    weighted_avg_eps = np.nansum(weighted_eps, axis=0) / total_market_cap
+
+    return weighted_avg_eps
 
 
 def download_quarterly_financials(symbols, fields=None, max_workers=8,
@@ -127,6 +201,7 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
                     financials_dict[symbol] = financials
                 else:
                     financials_dict[symbol] = None
+
                 iteration += 1
                 if progress:
                     print_progress_bar(iteration, len(symbols),
