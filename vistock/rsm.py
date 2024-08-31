@@ -41,9 +41,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.5"
+__version__ = "2.6"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/09/01 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -177,15 +177,15 @@ def eps_relative_strength(epses, epses_index):
     epses_index = epses_index.ffill()[-length:]
 
     # Calculate Dorsey Relative Strength (RSD)
-    rsd = epses.values / epses_index.values
+    rsd =  pd.Series(epses.values / epses_index.values, index=epses.index)
 
     # Calculate Simple Moving Average (SMA) of RSD
-    ma_rsd = simple_moving_average(pd.Series(rsd), 4).values
+    ma_rsd = simple_moving_average(rsd, 4)
 
     # Calculate Mansfield Relative Strength (RSM)
     rsm = (rsd / ma_rsd - 1) * 100
 
-    return pd.Series(np.round(rsm, 2), index=epses.index)
+    return round(rsm, 2)
 
 #------------------------------------------------------------------------------
 # Ranking
@@ -248,6 +248,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     # Fetch data for stocks and index
     df_all = yf.download([ticker_ref] + tickers, period=period, interval=interval)
     df_ref = df_all.xs(ticker_ref, level='Ticker', axis=1)
+    print("Num of downloaded stocks: "
+          f"{len(df_all.columns.get_level_values('Ticker').unique())}")
 
     # Fetch financials data for stocks
     financials = yfu.download_quarterly_financials(tickers, ['Basic EPS'])
