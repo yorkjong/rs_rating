@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.0"
+__version__ = "2.1"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -146,17 +146,46 @@ def dorsey_relative_strength(closes, closes_index):
 #------------------------------------------------------------------------------
 
 def eps_relative_strength(epses, epses_index):
-    """Calculate EPS' Mansfield Relative Strength
+    """Calculate EPS' Mansfield Relative Strength.
+
+    This function computes the Mansfield Relative Strength of EPS compared to
+    a benchmark index.  It first calculates the Dorsey Relative Strength, then
+    smooths it with a moving average, and finally normalizes it to provide the
+    Mansfield Relative Strength measure.
+
+    Parameters
+    ----------
+    epses : pd.Series
+        A series of EPS values for a stock.
+    epses_index : pd.Series or array-like
+        A series or array of EPS values for the benchmark index.
+
+    Returns
+    -------
+    pd.Series
+        A series containing the Mansfield Relative Strength of EPS.
     """
+    # Ensure inputs are pandas Series
+    if not isinstance(epses, pd.Series):
+        epses = pd.Series(epses)
+    if not isinstance(epses_index, pd.Series):
+        epses_index = pd.Series(epses_index)
+
+    # Align and forward fill data
     length = min(len(epses), len(epses_index))
     epses = epses.ffill()[-length:]
-    epses_index = pd.Series(epses_index).ffill()[-length:]
-    rsd =  epses.values / epses_index.values   # Dorsey Relative EPS Strength
+    epses_index = epses_index.ffill()[-length:]
+
+    # Calculate Dorsey Relative Strength (RSD)
+    rsd = epses.values / epses_index.values
+
+    # Calculate Simple Moving Average (SMA) of RSD
     ma_rsd = simple_moving_average(pd.Series(rsd), 4).values
 
+    # Calculate Mansfield Relative Strength (RSM)
     rsm = (rsd / ma_rsd - 1) * 100
-    return np.round(rsm, 2)
 
+    return pd.Series(np.round(rsm, 2), index=epses.index)
 
 #------------------------------------------------------------------------------
 # Ranking
