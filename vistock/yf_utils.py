@@ -354,6 +354,10 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
             info = yf.Ticker(symbol).info
             if fields is None:
                 return info
+            if 'symbol' not in info or info['symbol'] != symbol:
+                return {}
+            if 'quoteType' not in info:
+                return {}
 
             inf = {}
             # Filter info dictionary to include only requested fields
@@ -368,7 +372,6 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
                         inf[key] = ''
                     else:
                         print(f"Error fetching data for {symbol}: {e}")
-                    continue
         except Exception as e:
             print(f"Error fetching data for {symbol}: {e}")
         return inf
@@ -387,7 +390,8 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
             symbol = future_to_symbol[future]
             try:
                 info = future.result()  # Blocking call, waits for the result
-                info_dict[symbol] = info
+                if info:
+                    info_dict[symbol] = info
 
                 if progress:
                     iteration += 1
