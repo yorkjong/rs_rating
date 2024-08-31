@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.1"
+__version__ = "2.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -244,12 +244,13 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     # Fetch info for stocks
     info = yfu.download_tickers_info(
         tickers,
-        ['sector', 'industry', 'marketCap', 'trailingEps', 'forwardEps']
+        ['sector', 'industry', 'marketCap', 'previousClose']
     )
     # Fetch financials data for stocks
     financials = yfu.download_quarterly_financials(tickers, ['Basic EPS'])
 
-    epses_index = yfu.calc_weighted_average_eps(financials, info)
+    #epses_index = yfu.calc_cap_weighted_average_eps(financials, info)
+    epses_index = yfu.calc_share_weighted_average_eps(financials, info)
     print(financials['NVDA']['Basic EPS'])
     print(epses_index)
 
@@ -353,7 +354,7 @@ def main(period='2y', ma="EMA", out_dir='out'):
     from vistock.stock_indices import get_tickers
 
     code = 'SPX+DJIA+NDX+SOX'
-    code = 'SOX'
+    #code = 'SOX'
     tickers = get_tickers(code)
 
     rank = ranking(tickers, period=period, interval='1wk', ma=ma)
