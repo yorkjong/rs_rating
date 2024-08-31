@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.4"
+__version__ = "2.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -266,7 +266,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
                                            ma_func(df['Close'], win), 2)
         vol_div_vma = round(df['Volume'] / ma_func(df['Volume'], vma_win), 2)
 
-        if financials[ticker] is None:
+        if ticker not in financials:
             eps_rs = pd.Series([np.NaN])
         else:
             epses = financials[ticker]['Basic EPS']
@@ -282,8 +282,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
         # Construct DataFrame for current stock
         row = {
             'Ticker': ticker,
-            'Sector': info[ticker].get('sector', 'Unknown'),
-            'Industry': info[ticker].get('industry', 'Unknown'),
+            'Sector': info[ticker]['sector'],
+            'Industry': info[ticker]['industry'],
             'RS (%)': rsm.asof(end_date),
             '1 Week Ago': rsm.asof(one_week_ago),
             '1 Month Ago': rsm.asof(one_month_ago),
