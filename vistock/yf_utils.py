@@ -25,7 +25,7 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.3"
+__version__ = "2.4"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -300,9 +300,6 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
                                        suffix='financials downloaded')
             except Exception as e:
                 print(f"Error fetching financials for {symbol}: {e}")
-        if progress:
-            sys.stdout.write('\n')
-            sys.stdout.flush()
 
     return financials_dict
 
@@ -373,15 +370,13 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
             try:
                 info = future.result()  # Blocking call, waits for the result
                 info_dict[symbol] = info
+
                 if progress:
                     iteration += 1
                     print_progress_bar(iteration, len(symbols),
                                        suffix='info downloaded')
             except Exception as e:
                 print(f"Error fetching info for {symbol}: {e}")
-        if progress:
-            sys.stdout.write('\n')
-            sys.stdout.flush()
 
     return info_dict
 
@@ -413,7 +408,7 @@ def print_progress_bar(iteration, total, length=48, fill='*', suffix=''):
     >>> print_progress_bar(3, 10, length=30) # doctest: +NORMALIZE_WHITESPACE
     [*********    30%              ]  3 of 10
     """
-    percent = f"{100. * (iteration / total):2.0f}%"
+    percent = f"{100. * (iteration / total):3.0f}%"
     percent_len = len(percent)
 
     filled_length = int(length * iteration // total)
@@ -429,6 +424,11 @@ def print_progress_bar(iteration, total, length=48, fill='*', suffix=''):
     sys.stdout.write(f'\r[{bar_with_percent}]  {iteration} of {total}'
                      f' {suffix}')
     sys.stdout.flush()  # to ensure immediate display
+
+    if iteration == total:
+        sys.stdout.write('\n')
+        sys.stdout.flush()
+
 
 #------------------------------------------------------------------------------
 # Unit Test
