@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.3"
+__version__ = "2.4"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -237,28 +237,27 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     except KeyError:
         raise ValueError("Invalid interval. " "Must be '1d', or '1wk'.")
 
+    # Fetch info for stocks
+    info = yfu.download_tickers_info(
+        tickers,
+        ['quoteType', 'previousClose', 'marketCap', 'sector', 'industry']
+    )
+    tickers = [t for t in tickers if t in info]
+    tickers = [t for t in tickers if info[t]['quoteType'] == 'EQUITY']
+
     # Fetch data for stocks and index
     df_all = yf.download([ticker_ref] + tickers, period=period, interval=interval)
     df_ref = df_all.xs(ticker_ref, level='Ticker', axis=1)
 
-    # Fetch info for stocks
-    info = yfu.download_tickers_info(
-        tickers,
-        ['sector', 'industry', 'marketCap', 'previousClose']
-    )
     # Fetch financials data for stocks
     financials = yfu.download_quarterly_financials(tickers, ['Basic EPS'])
 
     #epses_index = yfu.calc_cap_weighted_average_eps(financials, info)
     epses_index = yfu.calc_share_weighted_average_eps(financials, info)
-    #print(epses_index)
-    #print(financials['NVDA']['Basic EPS'])
 
     results = []
     price_div_ma = {}
     for ticker in tickers:
-        if ticker not in financials:
-            continue
         df = df_all.xs(ticker, level='Ticker', axis=1)
         rsm = mansfield_relative_strength(df['Close'], df_ref['Close'],
                                           rs_win, ma=ma)
@@ -267,8 +266,11 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
                                            ma_func(df['Close'], win), 2)
         vol_div_vma = round(df['Volume'] / ma_func(df['Volume'], vma_win), 2)
 
-        epses = financials[ticker]['Basic EPS']
-        eps_rs = eps_relative_strength(epses, epses_index)
+        if financials[ticker] is None:
+            eps_rs = pd.Series([np.NaN])
+        else:
+            epses = financials[ticker]['Basic EPS']
+            eps_rs = eps_relative_strength(epses, epses_index)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -280,8 +282,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
         # Construct DataFrame for current stock
         row = {
             'Ticker': ticker,
-            'Sector': info[ticker]['sector'],
-            'Industry': info[ticker]['industry'],
+            'Sector': info[ticker].get('sector', 'Unknown'),
+            'Industry': info[ticker].get('industry', 'Unknown'),
             'RS (%)': rsm.asof(end_date),
             '1 Week Ago': rsm.asof(one_week_ago),
             '1 Month Ago': rsm.asof(one_month_ago),
