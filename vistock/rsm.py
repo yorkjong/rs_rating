@@ -227,6 +227,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     results = []
     price_div_ma = {}
     for ticker in tickers:
+        if ticker not in financials:
+            continue
         df = df_all.xs(ticker, level='Ticker', axis=1)
         rsm = mansfield_relative_strength(df['Close'], df_ref['Close'],
                                           rs_win, ma=ma)
