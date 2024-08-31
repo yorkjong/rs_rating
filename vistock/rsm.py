@@ -251,8 +251,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
 
     #epses_index = yfu.calc_cap_weighted_average_eps(financials, info)
     epses_index = yfu.calc_share_weighted_average_eps(financials, info)
-    print(financials['NVDA']['Basic EPS'])
-    print(epses_index)
+    #print(epses_index)
+    #print(financials['NVDA']['Basic EPS'])
 
     results = []
     price_div_ma = {}
@@ -354,7 +354,8 @@ def main(period='2y', ma="EMA", out_dir='out'):
     from vistock.stock_indices import get_tickers
 
     code = 'SPX+DJIA+NDX+SOX'
-    #code = 'SOX'
+    code = 'SOX'
+    #code = 'SPX+DJIA+NDX+RUI+SOX'
     tickers = get_tickers(code)
 
     rank = ranking(tickers, period=period, interval='1wk', ma=ma)
