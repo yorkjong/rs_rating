@@ -269,7 +269,11 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
         try:
             # Fetch the quarterly financials and transpose the DataFrame
             financials = yf.Ticker(symbol).quarterly_financials.T
-            return financials.sort_index(ascending=True)
+            financials = financials.sort_index(ascending=True)
+            if fields:
+                # Filter DataFrame to include only specified fields
+                financials = financials[fields]
+            return financials
         except Exception as e:
             print(f"Error fetching financials for {symbol}: {e}")
             return None
@@ -289,9 +293,6 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
             symbol = future_to_symbol[future]
             try:
                 financials = future.result()  # Blocking call, waits for the result
-                if fields:
-                    # Filter DataFrame to include only specified fields
-                    financials = financials[fields]
                 financials_dict[symbol] = financials
 
                 if progress:
