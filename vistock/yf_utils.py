@@ -25,7 +25,7 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.4"
+__version__ = "2.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -351,13 +351,20 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
         """
         try:
             info = yf.Ticker(symbol).info
-            if fields:
-                # Filter info dictionary to include only requested fields
-                info = {key: info[key] for key in fields}
-            return info
+            if fields is None:
+                return info
+
+            inf = {}
+            # Filter info dictionary to include only requested fields
+            for key in fields:
+                try:
+                    inf[key] = info[key]
+                except KeyError as e:
+                    print(f"Error fetching data for {symbol}: {e}")
+                    continue
         except Exception as e:
             print(f"Error fetching data for {symbol}: {e}")
-            return {}
+        return inf
 
     info_dict = {}
 
