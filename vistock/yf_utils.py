@@ -25,12 +25,13 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.2"
+__version__ = "2.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
 
 __all__ = [
-    'calc_weighted_average_eps',
+    'calc_cap_weighted_average_eps',
+    'calc_share_weighted_average_eps',
     'download_quarterly_financials',
     'download_tickers_info',
 ]
@@ -42,8 +43,11 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
+#------------------------------------------------------------------------------
+# Weighted Average EPS
+#------------------------------------------------------------------------------
 
-def calc_weighted_average_eps(financials, tickers_info):
+def calc_cap_weighted_average_eps(financials, tickers_info):
     """
     Calculate the market-cap-weighted average EPS (Earnings Per Share) for all
     stock symbols in the provided data using NumPy for numerical calculations.
@@ -126,6 +130,86 @@ def calc_weighted_average_eps(financials, tickers_info):
 
     return weighted_avg_eps
 
+
+def calc_share_weighted_average_eps(financials, tickers_info):
+    """
+    Calculate the share-weighted average EPS (Earnings Per Share) for all
+    stock symbols in the provided data using NumPy for numerical calculations.
+
+    Parameters
+    ----------
+    financials : dict
+        A dictionary where each key is a stock ticker and the value is a
+        DataFrame of the ticker's quarterly financials.
+    tickers_info : dict
+        A dictionary where each key is a stock ticker and the value is a
+        dictionary of the ticker's info, including market cap and previous
+        close price.
+
+    Returns
+    -------
+    numpy.ndarray
+        The share-weighted average EPS over the specified number of
+        quarters.
+    """
+    # Initialize lists to store EPS, shares outstanding, and market cap data
+    eps_list = []
+    shares_outstanding = []
+
+    for symbol, financial_df in financials.items():
+        # Retrieve the previous close price and market cap for each symbol
+        previous_close = tickers_info.get(symbol, {}).get('previousClose', 0)
+        market_cap = tickers_info.get(symbol, {}).get('marketCap', 0)
+
+        if previous_close > 0:
+            # Calculate shares outstanding
+            shares = market_cap / previous_close
+        else:
+            shares = 0
+
+        if (shares > 0 and financial_df is not None
+                       and 'Basic EPS' in financial_df.columns):
+            # Apply forward fill to fill missing EPS values
+            eps = financial_df['Basic EPS'].ffill().values
+            eps_list.append(eps)
+            shares_outstanding.append(shares)
+        else:
+            print("Warning: No valid EPS or "
+                  f"share data available for {symbol}.")
+
+    if not eps_list:
+        print("No valid EPS data found for any symbol.")
+        return np.array([])
+
+    # Ensure all EPS arrays have the same length. Use NaN for padding.
+    max_length = max(len(eps) for eps in eps_list)
+    eps_array = np.full((len(eps_list), max_length), np.nan)
+
+    # Fill EPS data right-aligned
+    for i, eps in enumerate(eps_list):
+        eps_array[i, -len(eps):] = eps  # Right-align the data
+
+    # Convert shares outstanding to a NumPy array
+    shares_outstanding = np.array(shares_outstanding)
+
+    # Calculate weighted EPS using broadcasting
+    weighted_eps = eps_array * shares_outstanding[:, np.newaxis]
+
+    # Calculate weighted average EPS
+    total_shares = shares_outstanding.sum()
+    if total_shares == 0:
+        print("Total shares outstanding is zero. "
+              "Cannot calculate weighted average EPS.")
+        return np.array([])
+
+    weighted_avg_eps = np.nansum(weighted_eps, axis=0) / total_shares
+
+    return weighted_avg_eps
+
+
+#------------------------------------------------------------------------------
+# Stock Data Downloading
+#------------------------------------------------------------------------------
 
 def download_quarterly_financials(symbols, fields=None, max_workers=8,
                                   progress=True):
@@ -346,6 +430,9 @@ def print_progress_bar(iteration, total, length=48, fill='*', suffix=''):
                      f' {suffix}')
     sys.stdout.flush()  # to ensure immediate display
 
+#------------------------------------------------------------------------------
+# Unit Test
+#------------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import doctest, time
