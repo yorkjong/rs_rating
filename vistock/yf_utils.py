@@ -25,9 +25,9 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.6"
+__version__ = "2.7"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/09/01 (last revision)"
 
 __all__ = [
     'calc_cap_weighted_average_eps',
@@ -361,7 +361,13 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
                 try:
                     inf[key] = info[key]
                 except KeyError as e:
-                    print(f"Error fetching data for {symbol}: {e}")
+                    if key in ['previousClose', 'marketCap',
+                               'trailingEps', 'forwardEps']:
+                        inf[key] = np.NaN
+                    elif key in ['sector', 'industry']:
+                        inf[key] = ''
+                    else:
+                        print(f"Error fetching data for {symbol}: {e}")
                     continue
         except Exception as e:
             print(f"Error fetching data for {symbol}: {e}")
