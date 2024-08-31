@@ -204,12 +204,14 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
 
                 iteration += 1
                 if progress:
+                    iteration += 1
                     print_progress_bar(iteration, len(symbols),
                                        suffix='financials downloaded')
             except Exception as e:
                 print(f"Error fetching financials for {symbol}: {e}")
         if progress:
             sys.stdout.write('\n')
+            sys.stdout.flush()
 
     return financials_dict
 
@@ -280,14 +282,15 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
             try:
                 info = future.result()  # Blocking call, waits for the result
                 info_dict[symbol] = info
-                iteration += 1
                 if progress:
+                    iteration += 1
                     print_progress_bar(iteration, len(symbols),
                                        suffix='info downloaded')
             except Exception as e:
                 print(f"Error fetching info for {symbol}: {e}")
         if progress:
             sys.stdout.write('\n')
+            sys.stdout.flush()
 
     return info_dict
 
