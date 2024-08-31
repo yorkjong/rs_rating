@@ -25,7 +25,7 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.5"
+__version__ = "2.6"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -276,7 +276,7 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
             return financials
         except Exception as e:
             print(f"Error fetching financials for {symbol}: {e}")
-            return None
+            return pd.DataFrame()
 
     financials_dict = {}
 
@@ -293,7 +293,8 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
             symbol = future_to_symbol[future]
             try:
                 financials = future.result()  # Blocking call, waits for the result
-                financials_dict[symbol] = financials
+                if not financials.empty:
+                    financials_dict[symbol] = financials
 
                 if progress:
                     iteration += 1
