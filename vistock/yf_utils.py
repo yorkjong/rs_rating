@@ -183,9 +183,8 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
             DataFrame containing the ticker's quarterly financials
         """
         try:
-            stock = yf.Ticker(symbol)
             # Fetch the quarterly financials and transpose the DataFrame
-            financials = stock.quarterly_financials.T
+            financials = yf.Ticker(symbol).quarterly_financials.T
             return financials.sort_index(ascending=True)
         except Exception as e:
             print(f"Error fetching financials for {symbol}: {e}")
