@@ -350,8 +350,11 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
             Dictionary containing the ticker's info
         """
         try:
-            stock = yf.Ticker(symbol)
-            return stock.info
+            info = yf.Ticker(symbol).info
+            if fields:
+                # Filter info dictionary to include only requested fields
+                info = {key: info[key] for key in fields}
+            return info
         except Exception as e:
             print(f"Error fetching data for {symbol}: {e}")
             return {}
