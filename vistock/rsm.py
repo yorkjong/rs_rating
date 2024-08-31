@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.2"
+__version__ = "2.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -288,9 +288,10 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
             'Price': round(df['Close'].iloc[-1], 2),
-            **{f'Price / MA{w}': price_div_ma[f'{w}'][-1] for w in ma_wins},
-            f'Volume / VMA{vma_win}': vol_div_vma[-1],
-            'EPS RS (%)': eps_rs[-1],
+            **{f'Price / MA{w}': price_div_ma[f'{w}'].iloc[-1]
+               for w in ma_wins},
+            f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
+            'EPS RS (%)': eps_rs.iloc[-1],
         }
         results.append(row)
 
