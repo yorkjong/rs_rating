@@ -25,7 +25,7 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.1"
+__version__ = "2.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -86,21 +86,28 @@ def calc_weighted_average_eps(financials, tickers_info):
     for symbol, financial_df in financials.items():
         # Retrieve the market cap for each symbol
         market_cap = tickers_info.get(symbol, {}).get('marketCap', 0)
-        market_caps.append(market_cap)
 
-        if financial_df is not None and 'Basic EPS' in financial_df.columns:
-            eps = financial_df['Basic EPS'].values
+        if (market_cap > 0 and financial_df is not None
+                           and 'Basic EPS' in financial_df.columns):
+            # Apply forward fill to fill missing EPS values
+            eps = financial_df['Basic EPS'].ffill().values
             eps_list.append(eps)
+            market_caps.append(market_cap)
         else:
-            print(f"Warning: No EPS data available for {symbol}.")
-            eps_list.append(np.zeros(7)) # Assuming there are 7 quarters
+            print("Warning: No valid EPS or "
+                  f"market cap data available for {symbol}.")
+
+    if not eps_list:
+        print("No valid EPS data found for any symbol.")
+        return np.array([])
 
     # Ensure all EPS arrays have the same length. Use NaN for padding.
     max_length = max(len(eps) for eps in eps_list)
     eps_array = np.full((len(eps_list), max_length), np.nan)
 
+    # Fill EPS data right-aligned
     for i, eps in enumerate(eps_list):
-        eps_array[i, :len(eps)] = eps
+        eps_array[i, -len(eps):] = eps  # Right-align the data
 
     # Convert market caps to a NumPy array
     market_caps = np.array(market_caps)
@@ -110,6 +117,11 @@ def calc_weighted_average_eps(financials, tickers_info):
 
     # Calculate weighted average EPS
     total_market_cap = market_caps.sum()
+    if total_market_cap == 0:
+        print("Total market cap is zero. "
+              "Cannot calculate weighted average EPS.")
+        return np.array([])
+
     weighted_avg_eps = np.nansum(weighted_eps, axis=0) / total_market_cap
 
     return weighted_avg_eps
