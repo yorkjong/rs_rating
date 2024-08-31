@@ -25,7 +25,7 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.0"
+__version__ = "2.1"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/08/31 (last revision)"
 
@@ -194,15 +194,11 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
             symbol = future_to_symbol[future]
             try:
                 financials = future.result()  # Blocking call, waits for the result
-                if financials is not None:
-                    if fields:
-                        # Filter DataFrame to include only specified fields
-                        financials = financials[fields]
-                    financials_dict[symbol] = financials
-                else:
-                    financials_dict[symbol] = None
+                if fields:
+                    # Filter DataFrame to include only specified fields
+                    financials = financials[fields]
+                financials_dict[symbol] = financials
 
-                iteration += 1
                 if progress:
                     iteration += 1
                     print_progress_bar(iteration, len(symbols),
