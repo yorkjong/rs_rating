@@ -344,7 +344,8 @@ def move_columns_to_end(df, columns_to_move):
         DataFrame with specified columns moved to the end.
     """
     # Get the list of columns that are not in columns_to_move
-    cols = [col for col in df.columns if col not in columns_to_move] + columns_to_move
+    cols = [col for col in df.columns if col not in columns_to_move]
+    cols += columns_to_move
     # Reorder DataFrame columns
     df = df[cols]
     return df
