@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.8"
+__version__ = "2.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/02 (last revision)"
 
@@ -146,20 +146,25 @@ def dorsey_relative_strength(closes, closes_index):
 #------------------------------------------------------------------------------
 
 def eps_relative_strength(epses, epses_index):
-    """Calculate EPS' Mansfield Relative Strength.
+    """Calculate the modified Mansfield Relative Strength of EPS relative to
+    a benchmark index.
+
+    This function computes the Mansfield Relative Strength of EPS by comparing
+    each EPS to the average EPS over the last four quarters, and calculates the
+    relative strength.
 
     Parameters
     ----------
     epses : pd.Series
         A series of EPS values for a stock.
-    epses_index : pd.Series or array-like
-        A series or array of EPS values for the benchmark index.
+    epses_index : pd.Series
+        A series of EPS values for the benchmark index.
 
     Returns
     -------
     pd.Series
-        A series containing the Mansfield Relative Strength of EPS.
-        NaN for periods where EPS or index EPS are negative.
+        A series containing the modified Mansfield Relative Strength (RSM) of
+        EPS.
     """
     # Ensure inputs are pandas Series
     if not isinstance(epses, pd.Series):
@@ -172,18 +177,19 @@ def eps_relative_strength(epses, epses_index):
     epses = epses.ffill()[-length:]
     epses_index = epses_index.ffill()[-length:]
 
-    # Replace negative values with NaN
-    epses[epses < 0] = float('nan')
-    epses_index[epses_index < 0] = float('nan')
+    # Calculate the four-quarter moving average
+    avg_epses = simple_moving_average(epses, 4)
+    avg_epses_index = simple_moving_average(epses_index, 4)
 
-    # Calculate Dorsey Relative Strength (RSD)
-    rsd = pd.Series(epses.values / epses_index.values, index=epses.index)
+    # Calculate change ratio relative to the four-quarter average
+    epses_change = (epses - avg_epses) / avg_epses
+    epses_index_change = (epses_index - avg_epses_index) / avg_epses_index
 
-    # Calculate Simple Moving Average (SMA) of RSD
-    ma_rsd = simple_moving_average(rsd, 4)
+    # Calculate Relative Strength (RSM) and convert to percentage
+    rsm_values = (epses_change.values - epses_index_change.values) * 100
 
-    # Calculate Mansfield Relative Strength (RSM)
-    rsm = (rsd / ma_rsd - 1) * 100
+    # Return result as a Series with the original index
+    rsm = pd.Series(rsm_values, index=epses.index)
 
     return round(rsm, 2)
 
