@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.6"
+__version__ = "2.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/01 (last revision)"
 
@@ -258,14 +258,13 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     epses_index = yfu.calc_share_weighted_average_eps(financials, info)
 
     results = []
-    price_div_ma = {}
+    price_ma = {}
     for ticker in tickers:
         df = df_all.xs(ticker, level='Ticker', axis=1)
         rsm = mansfield_relative_strength(df['Close'], df_ref['Close'],
                                           rs_win, ma=ma)
         for win in ma_wins:
-            price_div_ma[f'{win}'] = round(df['Close'] /
-                                           ma_func(df['Close'], win), 2)
+            price_ma[f'{win}'] = round(ma_func(df['Close'], win), 2)
         vol_div_vma = round(df['Volume'] / ma_func(df['Volume'], vma_win), 2)
 
         if ticker not in financials:
@@ -292,8 +291,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
             'Price': round(df['Close'].iloc[-1], 2),
-            **{f'Price / MA{w}': price_div_ma[f'{w}'].iloc[-1]
-               for w in ma_wins},
+            **{f'MA{w}': price_ma[f'{w}'].iloc[-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
             'EPS RS (%)': eps_rs.iloc[-1],
         }
@@ -318,7 +316,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
         ranking_df,
         [
             'Price',
-            *[f'Price / MA{w}' for w in ma_wins],
+            *[f'MA{w}' for w in ma_wins],
             f'Volume / VMA{vma_win}',
             'EPS RS (%)',
         ],
