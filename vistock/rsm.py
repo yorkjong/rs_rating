@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.9"
+__version__ = "3.0"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/02 (last revision)"
 
@@ -180,6 +180,10 @@ def eps_relative_strength(epses, epses_index):
     # Calculate the four-quarter moving average
     avg_epses = simple_moving_average(epses, 4)
     avg_epses_index = simple_moving_average(epses_index, 4)
+
+    # Handle zero moving averages to prevent division by zero
+    avg_epses = avg_epses.replace(0, np.nan)
+    avg_epses_index = avg_epses_index.replace(0, np.nan)
 
     # Calculate change ratio relative to the four-quarter average
     epses_change = (epses - avg_epses) / avg_epses
