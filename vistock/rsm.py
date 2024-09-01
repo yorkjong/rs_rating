@@ -41,9 +41,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "2.7"
+__version__ = "2.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/09/01 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/09/02 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -148,11 +148,6 @@ def dorsey_relative_strength(closes, closes_index):
 def eps_relative_strength(epses, epses_index):
     """Calculate EPS' Mansfield Relative Strength.
 
-    This function computes the Mansfield Relative Strength of EPS compared to
-    a benchmark index.  It first calculates the Dorsey Relative Strength, then
-    smooths it with a moving average, and finally normalizes it to provide the
-    Mansfield Relative Strength measure.
-
     Parameters
     ----------
     epses : pd.Series
@@ -164,6 +159,7 @@ def eps_relative_strength(epses, epses_index):
     -------
     pd.Series
         A series containing the Mansfield Relative Strength of EPS.
+        NaN for periods where EPS or index EPS are negative.
     """
     # Ensure inputs are pandas Series
     if not isinstance(epses, pd.Series):
@@ -176,8 +172,12 @@ def eps_relative_strength(epses, epses_index):
     epses = epses.ffill()[-length:]
     epses_index = epses_index.ffill()[-length:]
 
+    # Replace negative values with NaN
+    epses[epses < 0] = float('nan')
+    epses_index[epses_index < 0] = float('nan')
+
     # Calculate Dorsey Relative Strength (RSD)
-    rsd =  pd.Series(epses.values / epses_index.values, index=epses.index)
+    rsd = pd.Series(epses.values / epses_index.values, index=epses.index)
 
     # Calculate Simple Moving Average (SMA) of RSD
     ma_rsd = simple_moving_average(rsd, 4)
@@ -186,6 +186,7 @@ def eps_relative_strength(epses, epses_index):
     rsm = (rsd / ma_rsd - 1) * 100
 
     return round(rsm, 2)
+
 
 #------------------------------------------------------------------------------
 # Ranking
