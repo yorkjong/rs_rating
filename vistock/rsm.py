@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.2"
+__version__ = "3.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/02 (last revision)"
 
@@ -269,11 +269,12 @@ def ranking(tickers, ticker_ref='^GSPC',
           f"{len(df_all.columns.get_level_values('Ticker').unique())}")
 
     # Fetch financials data for stocks
-    financials = yfu.download_financials(tickers, ['Basic EPS'])
+    financials = yfu.download_financials(tickers, ['Basic EPS',
+                                                   'Operating Revenue'])
 
-    #epses_index = yfu.calc_cap_weighted_metric(financials, info, 'Basic EPS')
     epses_index = yfu.calc_share_weighted_metric(financials, info, 'Basic EPS')
-
+    revs_index = yfu.calc_cap_weighted_metric(financials, info,
+                                              'Operating Revenue')
     results = []
     price_ma = {}
     for ticker in tickers:
@@ -285,10 +286,12 @@ def ranking(tickers, ticker_ref='^GSPC',
         vol_div_vma = round(df['Volume'] / ma_func(df['Volume'], vma_win), 2)
 
         if ticker not in financials:
-            eps_rs = pd.Series([np.NaN])
+            eps_rs = rev_rs = pd.Series([np.NaN])
         else:
             epses = financials[ticker]['Basic EPS']
             eps_rs = relative_strength_vs_benchmark(epses, epses_index)
+            revs = financials[ticker]['Operating Revenue']
+            rev_rs = relative_strength_vs_benchmark(revs, revs_index)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -311,6 +314,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             **{f'MA{w}': price_ma[f'{w}'].iloc[-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
             'EPS RS (%)': eps_rs.iloc[-1],
+            'Rev RS (%)': rev_rs.iloc[-1],
         }
         results.append(row)
 
@@ -336,6 +340,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             *[f'MA{w}' for w in ma_wins],
             f'Volume / VMA{vma_win}',
             'EPS RS (%)',
+            'Rev RS (%)',
         ],
     )
     return ranking_df
