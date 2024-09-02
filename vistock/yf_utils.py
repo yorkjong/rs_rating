@@ -49,8 +49,8 @@ import yfinance as yf
 
 def calc_cap_weighted_eps(financials, tickers_info):
     """
-    Calculate the market-cap-weighted average EPS (Earnings Per Share) for all
-    stock symbols in the provided data using NumPy for numerical calculations.
+    Calculate the market-cap-weighted average Earnings Per Share (EPS) for all
+    stock symbols in the provided dataset using NumPy.
 
     Parameters
     ----------
@@ -133,8 +133,8 @@ def calc_cap_weighted_eps(financials, tickers_info):
 
 def calc_share_weighted_eps(financials, tickers_info):
     """
-    Calculate the share-weighted average EPS (Earnings Per Share) for all
-    stock symbols in the provided data using NumPy for numerical calculations.
+    Calculate the share-weighted average Earnings Per Share (EPS) for all
+    stock symbols in the provided dataset using NumPy.
 
     Parameters
     ----------
