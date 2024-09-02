@@ -173,8 +173,10 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
         benchmark index.
     """
     # Ensure inputs are pandas Series
-    metric_series = pd.Series(metric_series)
-    bench_series = pd.Series(bench_series)
+    if not isinstance(metric_series, pd.Series):
+        metric_series = pd.Series(metric_series)
+    if not isinstance(bench_series, pd.Series):
+        bench_series = pd.Series(bench_series)
 
     # Align and forward fill data
     length = min(len(metric_series), len(bench_series))
