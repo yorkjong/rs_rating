@@ -266,7 +266,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
           f"{len(df_all.columns.get_level_values('Ticker').unique())}")
 
     # Fetch financials data for stocks
-    financials = yfu.download_quarterly_financials(tickers, ['Basic EPS'])
+    financials = yfu.download_financials(tickers, ['Basic EPS'])
 
     #epses_index = yfu.calc_cap_weighted_eps(financials, info)
     epses_index = yfu.calc_share_weighted_eps(financials, info)

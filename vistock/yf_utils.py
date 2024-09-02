@@ -25,14 +25,14 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.7"
+__version__ = "2.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/09/01 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/09/02 (last revision)"
 
 __all__ = [
     'calc_cap_weighted_eps',
     'calc_share_weighted_eps',
-    'download_quarterly_financials',
+    'download_financials',
     'download_tickers_info',
 ]
 
@@ -70,7 +70,7 @@ def calc_cap_weighted_eps(financials, tickers_info):
     Examples
     --------
     >>> tickers = ['AAPL', 'MSFT', 'GOOG']
-    >>> financials = download_quarterly_financials(tickers, ['Basic EPS'])
+    >>> financials = download_financials(tickers, ['Basic EPS'])
     ...                             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
     [...**********************100%**********************]
     3 of 3 financials downloaded
@@ -213,22 +213,26 @@ def calc_share_weighted_eps(financials, tickers_info):
 # Stock Data Downloading
 #------------------------------------------------------------------------------
 
-def download_quarterly_financials(symbols, fields=None, max_workers=8,
-                                  progress=True):
+def download_financials(symbols, fields=None, frequency='quarterly',
+                        max_workers=8, progress=True):
     """
-    Downloads the quarterly financials of multiple stocks and returns the
-    specified fields.
+    Downloads the financials (quarterly or annual) of multiple stocks and
+    returns the specified fields.
 
     Parameters
     ----------
     symbols: list of str
-        List of ticker symbols, e.g., ['AAPL', 'MSFT', 'TSLA']
+        List of ticker symbols, e.g., ['AAPL', 'MSFT', 'TSLA'].
     fields: list, optional
         List of fields to return. If None, all fields will be returned.
-    max_workers: int
-        Maximum number of threads to use for parallel requests
-    progress: bool
-        Whether to show a progress bar
+        Defaults to None.
+    frequency: str, optional
+        The frequency of the financial data to fetch. Options are 'quarterly'
+        or 'annual'. Defaults to 'quarterly'.
+    max_workers: int, optional
+        Maximum number of threads to use for parallel requests. Defaults to 8.
+    progress: bool, optional
+        Whether to show a progress bar. Defaults to True.
 
     Returns
     -------
@@ -239,41 +243,43 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
     Examples
     --------
     >>> symbols = ['AAPL', 'MSFT', 'TSLA', 'GOOG', 'AMZN']
-    >>> financials = download_quarterly_financials(symbols)
+    >>> financials = download_financials(symbols, frequency='annual')
     ...                             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
     [...*******************100%**********************]
       5 of 5 financials downloaded
-    >>> financials['AAPL']['Basic EPS']
-    2022-12-31     NaN
-    2023-03-31     NaN
-    2023-06-30    1.27
-    2023-09-30    1.47
-    2023-12-31    2.19
-    2024-03-31    1.53
-    2024-06-30     1.4
-    Name: Basic EPS, dtype: object
+    >>> epses = financials['AAPL']['Basic EPS']
+    >>> type(epses)
+    <class 'pandas.core.series.Series'>
+    >>> len(epses) >= 4
+    True
     """
-    def fetch_financials(symbol):
+    def fetch_financials(symbol, frequency):
         """
-        Fetch the quarterly financials for a single ticker symbol using
-        yfinance.
+        Fetch the financials for a single ticker symbol using yfinance.
 
         Parameters
         ----------
         symbol: str
             Ticker symbol as a string
+        frequency: str
+            The frequency of the financial data ('quarterly' or 'annual').
 
         Returns
         -------
         DataFrame
-            DataFrame containing the ticker's quarterly financials
+            DataFrame containing the ticker's financials
         """
         try:
-            # Fetch the quarterly financials and transpose the DataFrame
-            financials = yf.Ticker(symbol).quarterly_financials.T
+            ticker = yf.Ticker(symbol)
+            if frequency == 'quarterly':
+                financials = ticker.quarterly_financials.T
+            elif frequency == 'annual':
+                financials = ticker.financials.T
+            else:
+                raise ValueError("Frequency must be 'quarterly' or 'annual'.")
+
             financials = financials.sort_index(ascending=True)
             if fields:
-                # Filter DataFrame to include only specified fields
                 financials = financials[fields]
             return financials
         except Exception as e:
@@ -283,10 +289,9 @@ def download_quarterly_financials(symbols, fields=None, max_workers=8,
     financials_dict = {}
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Submit fetch_financials tasks for all symbols to the thread pool
         future_to_symbol = {
-            executor.submit(fetch_financials, symbol):
-            symbol for symbol in symbols
+            executor.submit(fetch_financials, symbol, frequency): symbol
+                            for symbol in symbols
         }
 
         iteration = 0
