@@ -269,7 +269,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
     financials = yfu.download_financials(tickers, ['Basic EPS'])
 
     #epses_index = yfu.calc_cap_weighted_metric(financials, info, 'Basic EPS')
-    epses_index = yfu.calc_share_weighted_eps(financials, info)
+    epses_index = yfu.calc_share_weighted_metric(financials, info, 'Basic EPS')
 
     results = []
     price_ma = {}
