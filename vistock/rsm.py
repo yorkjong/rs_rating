@@ -156,11 +156,13 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
 
     Parameters
     ----------
-    metric_series : pd.Series
-        A series of financial metric values for a stock.
-    bench_series : pd.Series
-        A series of financial metric values for the benchmark index.
-    window : int, optional
+    metric_series: pd.Series or array-like
+        A series or array-like object of financial metric values for a stock.
+        This will be converted to a pandas Series.
+    bench_series: pd.Series or array-like
+        A series or array-like object of financial metric values for the
+        benchmark index. This will be converted to a pandas Series.
+    window: int, optional
         The number of periods over which to calculate the moving average (
         default is 4).
 
@@ -171,10 +173,8 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
         benchmark index.
     """
     # Ensure inputs are pandas Series
-    if not isinstance(metric_series, pd.Series):
-        metric_series = pd.Series(metric_series)
-    if not isinstance(bench_series, pd.Series):
-        bench_series = pd.Series(bench_series)
+    metric_series = pd.Series(metric_series)
+    bench_series = pd.Series(bench_series)
 
     # Align and forward fill data
     length = min(len(metric_series), len(bench_series))
@@ -205,7 +205,8 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
 # Ranking
 #------------------------------------------------------------------------------
 
-def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
+def ranking(tickers, ticker_ref='^GSPC',
+            period='2y', interval='1wk', ma="SMA"):
     """
     Rank stocks based on their Mansfield Relative Strength (RSM) against an
     index benchmark.
