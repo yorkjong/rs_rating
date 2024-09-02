@@ -79,9 +79,11 @@ def calc_cap_weighted_eps(financials, tickers_info):
     ...     'MSFT': {'marketCap': 2000000000},
     ...     'GOOG': {'marketCap': 1800000000},
     ... }
-    >>> eps_avg = calc_weighted_average_eps(financials, tickers_info)
-    >>> type(eps_avg)
+    >>> epses = calc_cap_weighted_eps(financials, tickers_info)
+    >>> type(epses)
     <class 'numpy.ndarray'>
+    >>> epses.shape
+    (7,)
     """
     # Initialize lists to store EPS and market cap data
     eps_list = []
