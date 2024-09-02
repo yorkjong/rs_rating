@@ -30,8 +30,8 @@ __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/09/01 (last revision)"
 
 __all__ = [
-    'calc_cap_weighted_average_eps',
-    'calc_share_weighted_average_eps',
+    'calc_cap_weighted_eps',
+    'calc_share_weighted_eps',
     'download_quarterly_financials',
     'download_tickers_info',
 ]
@@ -47,7 +47,7 @@ import yfinance as yf
 # Weighted Average EPS
 #------------------------------------------------------------------------------
 
-def calc_cap_weighted_average_eps(financials, tickers_info):
+def calc_cap_weighted_eps(financials, tickers_info):
     """
     Calculate the market-cap-weighted average EPS (Earnings Per Share) for all
     stock symbols in the provided data using NumPy for numerical calculations.
@@ -131,7 +131,7 @@ def calc_cap_weighted_average_eps(financials, tickers_info):
     return weighted_avg_eps
 
 
-def calc_share_weighted_average_eps(financials, tickers_info):
+def calc_share_weighted_eps(financials, tickers_info):
     """
     Calculate the share-weighted average EPS (Earnings Per Share) for all
     stock symbols in the provided data using NumPy for numerical calculations.
