@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.1"
+__version__ = "3.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/02 (last revision)"
 
@@ -145,55 +145,55 @@ def dorsey_relative_strength(closes, closes_index):
 # EPS Relative Strength
 #------------------------------------------------------------------------------
 
-def eps_relative_strength(epses, epses_index):
-    """Calculate the modified Mansfield Relative Strength of EPS relative to
-    a benchmark index.
+def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
+    """
+    Calculate the relative strength of a financial metric relative to a
+    benchmark index.
 
-    This function computes the Mansfield Relative Strength of EPS by comparing
-    each EPS to the average EPS over the last four quarters, and calculates the
-    relative strength.
+    This function computes the relative strength of a financial metric by
+    comparing each value to the average over a specified window, and calculates
+    the relative strength.
 
     Parameters
     ----------
-    epses : pd.Series
-        A series of EPS values for a stock.
-    epses_index : pd.Series
-        A series of EPS values for the benchmark index.
+    metric_series : pd.Series
+        A series of financial metric values for a stock.
+    bench_series : pd.Series
+        A series of financial metric values for the benchmark index.
+    window : int, optional
+        The number of periods over which to calculate the moving average (
+        default is 4).
 
     Returns
     -------
     pd.Series
-        A series containing the modified Mansfield Relative Strength (RSM) of
-        EPS.
+        A series containing the relative strength of the metric compared to the
+        benchmark index.
     """
     # Ensure inputs are pandas Series
-    if not isinstance(epses, pd.Series):
-        epses = pd.Series(epses)
-    if not isinstance(epses_index, pd.Series):
-        epses_index = pd.Series(epses_index)
+    if not isinstance(metric_series, pd.Series):
+        metric_series = pd.Series(metric_series)
+    if not isinstance(bench_series, pd.Series):
+        bench_series = pd.Series(bench_series)
 
     # Align and forward fill data
-    length = min(len(epses), len(epses_index))
-    epses = epses.ffill()[-length:]
-    epses_index = epses_index.ffill()[-length:]
+    length = min(len(metric_series), len(bench_series))
+    metric_series = metric_series.ffill()[-length:]
+    bench_series = bench_series.ffill()[-length:]
 
-    # Calculate the four-quarter moving average
-    avg_epses = simple_moving_average(epses, 4)
-    avg_epses_index = simple_moving_average(epses_index, 4)
+    # Calculate the moving average
+    avg_metric = metric_series.rolling(window=window, min_periods=1).mean()
+    avg_bench = bench_series.rolling(window=window, min_periods=1).mean()
 
-    # Handle division by zero and negative values
-    #avg_epses = avg_epses.replace(0, np.nan)  # Avoid division by zero
-    #avg_epses_index = avg_epses_index.replace(0, np.nan)
+    # Calculate percentage change relative to the moving average
+    metric_change = (metric_series - avg_metric) / np.abs(avg_metric)
+    bench_change = (bench_series - avg_bench) / np.abs(avg_bench)
 
-    # Calculate percentage change relative to the four-quarter average
-    epses_change = (epses - avg_epses) / np.abs(avg_epses)
-    epses_index_change = (epses_index - avg_epses_index) / np.abs(avg_epses_index)
-
-    # Calculate Relative Strength (RSM) and convert to percentage
-    rsm_values = (epses_change.values - epses_index_change.values) * 100
+    # Calculate Relative Strength and convert to percentage
+    rsm_values = (metric_change.values - bench_change.values) * 100
 
     # Return result as a Series with the original index
-    rsm = pd.Series(rsm_values, index=epses.index)
+    rsm = pd.Series(rsm_values, index=metric_series.index)
 
     # Replace inf and -inf with NaN
     rsm = rsm.replace([np.inf, -np.inf], np.nan)
@@ -285,7 +285,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1wk', ma="SMA"):
             eps_rs = pd.Series([np.NaN])
         else:
             epses = financials[ticker]['Basic EPS']
-            eps_rs = eps_relative_strength(epses, epses_index)
+            eps_rs = relative_strength_vs_benchmark(epses, epses_index)
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
