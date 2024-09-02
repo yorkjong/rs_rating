@@ -181,10 +181,6 @@ def eps_relative_strength(epses, epses_index):
     avg_epses = simple_moving_average(epses, 4)
     avg_epses_index = simple_moving_average(epses_index, 4)
 
-    # Handle zero moving averages to prevent division by zero
-    avg_epses = avg_epses.replace(0, np.nan)
-    avg_epses_index = avg_epses_index.replace(0, np.nan)
-
     # Calculate change ratio relative to the four-quarter average
     epses_change = (epses - avg_epses) / avg_epses
     epses_index_change = (epses_index - avg_epses_index) / avg_epses_index
@@ -194,6 +190,9 @@ def eps_relative_strength(epses, epses_index):
 
     # Return result as a Series with the original index
     rsm = pd.Series(rsm_values, index=epses.index)
+
+    # Replace inf and -inf with NaN
+    rsm = rsm.replace([np.inf, -np.inf], np.nan)
 
     return round(rsm, 2)
 
