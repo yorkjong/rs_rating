@@ -271,11 +271,12 @@ def download_financials(symbols, fields=None, frequency='quarterly',
         """
         try:
             ticker = yf.Ticker(symbol)
-            if frequency == 'quarterly':
-                financials = ticker.quarterly_financials.T
-            elif frequency == 'annual':
-                financials = ticker.financials.T
-            else:
+            try:
+                financials = {
+                    'quarterly': ticker.quarterly_financials.T,
+                    'annual': ticker.financials.T,
+                }[frequency]
+            except KeyError:
                 raise ValueError("Frequency must be 'quarterly' or 'annual'.")
 
             financials = financials.sort_index(ascending=True)
