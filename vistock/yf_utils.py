@@ -25,12 +25,12 @@ Here's a basic example of how to use the `download_tickers_info` function:
 >>> info['AAPL']['longName']
 'Apple Inc.'
 """
-__version__ = "2.8"
+__version__ = "2.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/09/02 (last revision)"
 
 __all__ = [
-    'calc_cap_weighted_eps',
+    'calc_cap_weighted_metric',
     'calc_share_weighted_eps',
     'download_financials',
     'download_tickers_info',
@@ -47,10 +47,12 @@ import yfinance as yf
 # Weighted Average EPS
 #------------------------------------------------------------------------------
 
-def calc_cap_weighted_eps(financials, tickers_info):
+import numpy as np
+
+def calc_cap_weighted_metric(financials, tickers_info, metric):
     """
-    Calculate the market-cap-weighted average Earnings Per Share (EPS) for all
-    stock symbols in the provided dataset using NumPy.
+    Calculate the market-cap-weighted average of a specified financial metric
+    for all stock symbols in the provided dataset using NumPy.
 
     Parameters
     ----------
@@ -60,12 +62,15 @@ def calc_cap_weighted_eps(financials, tickers_info):
     tickers_info : dict
         A dictionary where each key is a stock ticker and the value is a
         dictionary of the ticker's info, including market cap.
+    metric : str
+        The name of the financial metric to calculate (e.g., 'Basic EPS',
+        'Total Revenue', 'Operating Revenue').
 
     Returns
     -------
     numpy.ndarray
-        The market-cap-weighted average EPS over the specified number of
-        quarters.
+        The market-cap-weighted average of the specified metric over the
+        specified number of quarters (or years).
 
     Examples
     --------
@@ -79,14 +84,14 @@ def calc_cap_weighted_eps(financials, tickers_info):
     ...     'MSFT': {'marketCap': 2000000000},
     ...     'GOOG': {'marketCap': 1800000000},
     ... }
-    >>> epses = calc_cap_weighted_eps(financials, tickers_info)
+    >>> epses = calc_cap_weighted_metric(financials, tickers_info, 'Basic EPS')
     >>> type(epses)
     <class 'numpy.ndarray'>
     >>> epses.shape
     (7,)
     """
-    # Initialize lists to store EPS and market cap data
-    eps_list = []
+    # Initialize lists to store metric and market cap data
+    metric_list = []
     market_caps = []
 
     for symbol, financial_df in financials.items():
@@ -94,43 +99,43 @@ def calc_cap_weighted_eps(financials, tickers_info):
         market_cap = tickers_info.get(symbol, {}).get('marketCap', 0)
 
         if (market_cap > 0 and financial_df is not None
-                           and 'Basic EPS' in financial_df.columns):
-            # Apply forward fill to fill missing EPS values
-            eps = financial_df['Basic EPS'].ffill().values
-            eps_list.append(eps)
+                           and metric in financial_df.columns):
+            # Apply forward fill to fill missing metric values
+            metric_data = financial_df[metric].ffill().values
+            metric_list.append(metric_data)
             market_caps.append(market_cap)
         else:
-            print("Warning: No valid EPS or "
+            print("Warning: No valid metric or "
                   f"market cap data available for {symbol}.")
 
-    if not eps_list:
-        print("No valid EPS data found for any symbol.")
+    if not metric_list:
+        print("No valid metric data found for any symbol.")
         return np.array([])
 
-    # Ensure all EPS arrays have the same length. Use NaN for padding.
-    max_length = max(len(eps) for eps in eps_list)
-    eps_array = np.full((len(eps_list), max_length), np.nan)
+    # Ensure all metric arrays have the same length. Use NaN for padding.
+    max_length = max(len(data) for data in metric_list)
+    metric_array = np.full((len(metric_list), max_length), np.nan)
 
-    # Fill EPS data right-aligned
-    for i, eps in enumerate(eps_list):
-        eps_array[i, -len(eps):] = eps  # Right-align the data
+    # Fill metric data right-aligned
+    for i, data in enumerate(metric_list):
+        metric_array[i, -len(data):] = data  # Right-align the data
 
     # Convert market caps to a NumPy array
     market_caps = np.array(market_caps)
 
-    # Calculate weighted EPS using broadcasting
-    weighted_eps = eps_array * market_caps[:, np.newaxis]
+    # Calculate weighted metric using broadcasting
+    weighted_metric = metric_array * market_caps[:, np.newaxis]
 
-    # Calculate weighted average EPS
+    # Calculate weighted average metric
     total_market_cap = market_caps.sum()
     if total_market_cap == 0:
         print("Total market cap is zero. "
-              "Cannot calculate weighted average EPS.")
+              "Cannot calculate weighted average metric.")
         return np.array([])
 
-    weighted_avg_eps = np.nansum(weighted_eps, axis=0) / total_market_cap
+    weighted_avg_metric = np.nansum(weighted_metric, axis=0) / total_market_cap
 
-    return weighted_avg_eps
+    return weighted_avg_metric
 
 
 def calc_share_weighted_eps(financials, tickers_info):
