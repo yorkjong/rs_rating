@@ -3,27 +3,6 @@ Utility functions for working with Yahoo Finance data.
 
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
-
-Functions
----------
-- download_quarterly_financials: Downloads the quarterly financials for multiple
-  stocks and returns the specified fields.
-- download_tickers_info: Download and return financial information for multiple
-  stocks in parallel.
-
-Example
--------
-Here's a basic example of how to use the `download_tickers_info` function:
-
->>> import yfinance as yf
->>> from vistock.yf_utils import download_tickers_info
->>> symbols = ['AAPL', 'MSFT', 'TSLA']
-    >>> info = download_tickers_info(symbols) # doctest: +NORMALIZE_WHITESPACE
-    ...                                       # doctest: +ELLIPSIS
-    [...**********************100%**********************]
-    3 of 3 info downloaded
->>> info['AAPL']['longName']
-'Apple Inc.'
 """
 __version__ = "3.0"
 __author__ = "York <york.jong@gmail.com>"
