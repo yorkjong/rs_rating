@@ -4,13 +4,14 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.0"
+__version__ = "3.1"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/09/02 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/09/07 (last revision)"
 
 __all__ = [
     'calc_cap_weighted_metric',
     'calc_share_weighted_metric',
+    'fetch_financials',
     'download_financials',
     'download_tickers_info',
 ]
@@ -219,6 +220,44 @@ def calc_share_weighted_metric(financials, tickers_info, metric):
 # Stock Data Downloading
 #------------------------------------------------------------------------------
 
+def fetch_financials(symbol, fields=None, frequency='quarterly'):
+    """
+    Fetch the financials for a single ticker symbol using yfinance.
+
+    Parameters
+    ----------
+    symbol: str
+        Ticker symbol as a string
+    fields: list, optional
+        List of fields to return. If None, all fields will be returned.
+        Defaults to None.
+    frequency: str
+        The frequency of the financial data ('quarterly' or 'annual').
+
+    Returns
+    -------
+    DataFrame
+        DataFrame containing the ticker's financials
+    """
+    try:
+        ticker = yf.Ticker(symbol)
+        try:
+            financials = {
+                'quarterly': ticker.quarterly_financials.T,
+                'annual': ticker.financials.T,
+            }[frequency]
+        except KeyError:
+            raise ValueError("Frequency must be 'quarterly' or 'annual'.")
+
+        financials = financials.sort_index(ascending=True)
+        if fields:
+            financials = financials[fields]
+        return financials
+    except Exception as e:
+        print(f"Error fetching financials for {symbol}: {e}")
+        return pd.DataFrame()
+
+
 def download_financials(symbols, fields=None, frequency='quarterly',
                         max_workers=8, progress=True):
     """
@@ -259,46 +298,12 @@ def download_financials(symbols, fields=None, frequency='quarterly',
     >>> len(epses) >= 4
     True
     """
-    def fetch_financials(symbol, frequency):
-        """
-        Fetch the financials for a single ticker symbol using yfinance.
-
-        Parameters
-        ----------
-        symbol: str
-            Ticker symbol as a string
-        frequency: str
-            The frequency of the financial data ('quarterly' or 'annual').
-
-        Returns
-        -------
-        DataFrame
-            DataFrame containing the ticker's financials
-        """
-        try:
-            ticker = yf.Ticker(symbol)
-            try:
-                financials = {
-                    'quarterly': ticker.quarterly_financials.T,
-                    'annual': ticker.financials.T,
-                }[frequency]
-            except KeyError:
-                raise ValueError("Frequency must be 'quarterly' or 'annual'.")
-
-            financials = financials.sort_index(ascending=True)
-            if fields:
-                financials = financials[fields]
-            return financials
-        except Exception as e:
-            print(f"Error fetching financials for {symbol}: {e}")
-            return pd.DataFrame()
-
     financials_dict = {}
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         future_to_symbol = {
-            executor.submit(fetch_financials, symbol, frequency): symbol
-                            for symbol in symbols
+            executor.submit(fetch_financials, symbol, fields, frequency):
+            symbol for symbol in symbols
         }
 
         iteration = 0
