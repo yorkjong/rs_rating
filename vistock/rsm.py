@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.4"
+__version__ = "3.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/07 (last revision)"
 
@@ -188,8 +188,8 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
     avg_bench = bench_series.rolling(window=window, min_periods=1).mean()
 
     # Calculate percentage change relative to the moving average
-    metric_change = (metric_series - avg_metric) / np.abs(avg_metric)
-    bench_change = (bench_series - avg_bench) / np.abs(avg_bench)
+    metric_change = (metric_series - avg_metric) / (np.abs(avg_metric) + 1e-8)
+    bench_change = (bench_series - avg_bench) / (np.abs(avg_bench) + 1e-8)
 
     # Calculate Relative Strength and convert to percentage
     rsm_values = (metric_change.values - bench_change.values) * 100
@@ -275,6 +275,7 @@ def ranking(tickers, ticker_ref='^GSPC',
     epses_index = yfu.calc_share_weighted_metric(financials, info, 'Basic EPS')
     revs_index = yfu.calc_cap_weighted_metric(financials, info,
                                               'Operating Revenue')
+    print(epses_index)
     results = []
     price_ma = {}
     for ticker in tickers:
