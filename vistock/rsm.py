@@ -41,9 +41,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.3"
+__version__ = "3.4"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/09/02 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/09/07 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -178,10 +178,10 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
     if not isinstance(bench_series, pd.Series):
         bench_series = pd.Series(bench_series)
 
-    # Align and forward fill data
+    # Align and interpolate missing data
     length = min(len(metric_series), len(bench_series))
-    metric_series = metric_series.ffill()[-length:]
-    bench_series = bench_series.ffill()[-length:]
+    metric_series = metric_series.interpolate(method='linear')[-length:]
+    bench_series = bench_series.interpolate(method='linear')[-length:]
 
     # Calculate the moving average
     avg_metric = metric_series.rolling(window=window, min_periods=1).mean()
