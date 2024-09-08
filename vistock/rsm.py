@@ -118,7 +118,7 @@ def mansfield_relative_strength(closes, closes_index, window, ma='SMA'):
     closes_index = closes_index.ffill()
     rsd = dorsey_relative_strength(closes, closes_index)
     rsm = ((rsd / ma_func(rsd, window)) - 1) * 100
-    return round(rsm, 2)
+    return rsm.round(2)
 
 
 def dorsey_relative_strength(closes, closes_index):
@@ -287,8 +287,8 @@ def ranking(tickers, ticker_ref='^GSPC',
         rsm = mansfield_relative_strength(df['Close'], df_ref['Close'],
                                           rs_win, ma=ma)
         for win in ma_wins:
-            price_ma[f'{win}'] = round(ma_func(df['Close'], win), 2)
-        vol_div_vma = round(df['Volume'] / ma_func(df['Volume'], vma_win), 2)
+            price_ma[f'{win}'] = ma_func(df['Close'], win).round(2)
+        vol_div_vma = (df['Volume'] / ma_func(df['Volume'], vma_win)).round(2)
 
         if ticker not in financials:
             eps_rs = rev_rs = pd.Series([np.NaN])
@@ -315,7 +315,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             '1 Month Ago': rsm.asof(one_month_ago),
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
-            'Price': round(df['Close'].iloc[-1], 2),
+            'Price': df['Close'].iloc[-1].round(2),
             **{f'MA{w}': price_ma[f'{w}'].iloc[-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
             'EPS RS (%)': eps_rs.iloc[-1],
@@ -333,7 +333,7 @@ def ranking(tickers, ticker_ref='^GSPC',
                   '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)
-        ranking_df[rank_col] = round(rank_pct * 100, 2)
+        ranking_df[rank_col] = (rank_pct * 100).round(2)
 
     # Sort by current rank
     ranking_df = ranking_df.sort_values(by='RS Rank (%)', ascending=False)
