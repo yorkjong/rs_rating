@@ -4,7 +4,7 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.2"
+__version__ = "3.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/09/08 (last revision)"
 
@@ -291,13 +291,14 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
             for key in fields:
                 try:
                     inf[key] = info[key]
-                except KeyError as e:
-                    if key in ['previousClose', 'trailingEps', 'forwardEps'
-                               'marketCap', 'sharesOutstanding']:
-                        inf[key] = np.NaN
-                    elif key in ['sector', 'industry']:
-                        inf[key] = ''
+                except KeyError:
+                    # Handle missing keys by defaulting based on expected type
+                    if isinstance(info.get(key, None), (int, float)):
+                        inf[key] = np.NaN  # Default for numeric fields
+                    elif isinstance(info.get(key, None), str):
+                        inf[key] = ''  # Default for string fields
                     else:
+                        inf[key] = None  # Default for other data types
                         print(f"Error fetching data for {symbol}: {e}")
         except Exception as e:
             print(f"Error fetching data for {symbol}: {e}")
