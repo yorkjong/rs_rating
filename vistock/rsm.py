@@ -282,7 +282,8 @@ def ranking(tickers, ticker_ref='^GSPC',
                                            'Basic EPS', 'sharesOutstanding')
     revs_index = yfu.calc_weighted_metric(financials, info,
                                           'Operating Revenue', 'marketCap')
-    print(epses_index)
+    #print(epses_index)
+
     results = []
     price_ma = {}
     for ticker in tickers:
