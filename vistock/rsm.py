@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.9"
+__version__ = "4.0"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/08 (last revision)"
 
@@ -307,6 +307,7 @@ def ranking(tickers, ticker_ref='^GSPC',
         one_month_ago = end_date - pd.DateOffset(months=1)
         three_months_ago = end_date - pd.DateOffset(months=3)
         six_months_ago = end_date - pd.DateOffset(months=6)
+        nine_months_ago = end_date - pd.DateOffset(months=9)
 
         # Construct DataFrame for current stock
         row = {
@@ -318,6 +319,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             '1 Month Ago': rsm.asof(one_month_ago),
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
+            '9 Months Ago': rsm.asof(nine_months_ago),
             'Price': info[ticker]['previousClose'],
             **{f'MA{w}': price_ma[f'{w}'].iloc[-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
@@ -325,7 +327,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': rev_rs.iloc[-1],
             'TTM RPS': info[ticker]['revenuePerShare'],
-            'TTM PE': info[ticker]['trailingPE'],
+            'TTM PE': round(info[ticker]['trailingPE'], 2),
         }
         results.append(row)
 
@@ -333,10 +335,8 @@ def ranking(tickers, ticker_ref='^GSPC',
     ranking_df = pd.DataFrame(results)
 
     # Rank based on Relative Strength
-    rank_columns = ['RS Rank (%)', ' 1 Week Ago',
-                    ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
-    rs_columns = ['RS (%)', '1 Week Ago',
-                  '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
+    rank_columns = ['RS Rank (%)', ' 3 Months Ago']
+    rs_columns = ['RS (%)', '3 Months Ago']
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)
         ranking_df[rank_col] = (rank_pct * 100).round(2)
