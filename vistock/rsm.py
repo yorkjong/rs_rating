@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.7"
+__version__ = "3.8"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/08 (last revision)"
 
@@ -261,7 +261,8 @@ def ranking(tickers, ticker_ref='^GSPC',
     # Fetch info for stocks
     info = yfu.download_tickers_info(
         tickers,
-        ['quoteType', 'previousClose', 'marketCap', 'sector', 'industry']
+        ['quoteType', 'previousClose',
+         'marketCap', 'sharesOutstanding', 'sector', 'industry']
     )
     tickers = [t for t in tickers if t in info]
     tickers = [t for t in tickers if info[t]['quoteType'] == 'EQUITY']
@@ -276,9 +277,10 @@ def ranking(tickers, ticker_ref='^GSPC',
     financials = yfu.download_financials(tickers, ['Basic EPS',
                                                    'Operating Revenue'])
 
-    epses_index = yfu.calc_share_weighted_metric(financials, info, 'Basic EPS')
-    revs_index = yfu.calc_cap_weighted_metric(financials, info,
-                                              'Operating Revenue')
+    epses_index = yfu.calc_weighted_metric(financials, info,
+                                           'Basic EPS', 'sharesOutstanding')
+    revs_index = yfu.calc_weighted_metric(financials, info,
+                                          'Operating Revenue', 'marketCap')
     print(epses_index)
     results = []
     price_ma = {}

@@ -4,13 +4,12 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.1"
+__version__ = "3.2"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/09/07 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/09/08 (last revision)"
 
 __all__ = [
-    'calc_cap_weighted_metric',
-    'calc_share_weighted_metric',
+    'calc_weighted_metric',
     'fetch_financials',
     'download_financials',
     'download_tickers_info',
@@ -24,15 +23,14 @@ import pandas as pd
 import yfinance as yf
 
 #------------------------------------------------------------------------------
-# Weighted Average EPS
+# Weighted Average Metric (e.g., EPS, Revenue)
 #------------------------------------------------------------------------------
 
-import numpy as np
-
-def calc_cap_weighted_metric(financials, tickers_info, metric):
+def calc_weighted_metric(financials, tickers_info, metric, weight_field):
     """
-    Calculate the market-cap-weighted average of a specified financial metric
-    for all stock symbols in the provided dataset using NumPy.
+    Calculate the weighted average of a specified financial metric for all stock
+    symbols in the provided dataset using NumPy. The weights can be based on any
+    specified field (e.g., market capitalization or shares outstanding).
 
     Parameters
     ----------
@@ -41,105 +39,19 @@ def calc_cap_weighted_metric(financials, tickers_info, metric):
         DataFrame of the ticker's quarterly financials.
     tickers_info : dict
         A dictionary where each key is a stock ticker and the value is a
-        dictionary of the ticker's info, including market cap.
+        dictionary of the ticker's info, including market cap, shares
+        outstanding, etc.
     metric : str
         The name of the financial metric to calculate (e.g., 'Basic EPS',
         'Total Revenue', 'Operating Revenue').
+    weight_field : str
+        The field name to use for weighting (e.g., 'marketCap',
+        'sharesOutstanding').
 
     Returns
     -------
     numpy.ndarray
-        The market-cap-weighted average of the specified metric over the
-        specified number of quarters (or years).
-
-    Examples
-    --------
-    >>> tickers = ['AAPL', 'MSFT', 'GOOG']
-    >>> financials = download_financials(tickers, ['Basic EPS'])
-    ...                             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS
-    [...**********************100%**********************]
-    3 of 3 financials downloaded
-    >>> tickers_info = {
-    ...     'AAPL': {'marketCap': 2500000000},
-    ...     'MSFT': {'marketCap': 2000000000},
-    ...     'GOOG': {'marketCap': 1800000000},
-    ... }
-    >>> epses = calc_cap_weighted_metric(financials, tickers_info, 'Basic EPS')
-    >>> type(epses)
-    <class 'numpy.ndarray'>
-    >>> epses.shape
-    (7,)
-    """
-    # Initialize lists to store metric and market cap data
-    metric_list = []
-    market_caps = []
-
-    for symbol, financial_df in financials.items():
-        # Retrieve the market cap for each symbol
-        market_cap = tickers_info.get(symbol, {}).get('marketCap', 0)
-
-        if (market_cap > 0 and financial_df is not None
-                           and metric in financial_df.columns):
-            # Apply forward fill to fill missing metric values
-            metric_data = financial_df[metric].ffill().values
-            metric_list.append(metric_data)
-            market_caps.append(market_cap)
-        else:
-            print("Warning: No valid metric or "
-                  f"market cap data available for {symbol}.")
-
-    if not metric_list:
-        print("No valid metric data found for any symbol.")
-        return np.array([])
-
-    # Ensure all metric arrays have the same length. Use NaN for padding.
-    max_length = max(len(data) for data in metric_list)
-    metric_array = np.full((len(metric_list), max_length), np.nan)
-
-    # Fill metric data right-aligned
-    for i, data in enumerate(metric_list):
-        metric_array[i, -len(data):] = data  # Right-align the data
-
-    # Convert market caps to a NumPy array
-    market_caps = np.array(market_caps)
-
-    # Calculate weighted metric using broadcasting
-    weighted_metric = metric_array * market_caps[:, np.newaxis]
-
-    # Calculate weighted average metric
-    total_market_cap = market_caps.sum()
-    if total_market_cap == 0:
-        print("Total market cap is zero. "
-              "Cannot calculate weighted average metric.")
-        return np.array([])
-
-    weighted_avg_metric = np.nansum(weighted_metric, axis=0) / total_market_cap
-
-    return weighted_avg_metric
-
-
-def calc_share_weighted_metric(financials, tickers_info, metric):
-    """
-    Calculate the share-weighted average of a specified financial metric for
-    all stock symbols in the provided dataset using NumPy.
-
-    Parameters
-    ----------
-    financials : dict
-        A dictionary where each key is a stock ticker and the value is a
-        DataFrame of the ticker's quarterly financials.
-    tickers_info : dict
-        A dictionary where each key is a stock ticker and the value is a
-        dictionary of the ticker's info, including market cap and previous
-        close price.
-    metric : str
-        The name of the financial metric to calculate (e.g., 'Basic EPS',
-        'Total Revenue', 'Operating Revenue').
-
-    Returns
-    -------
-    numpy.ndarray
-        The share-weighted average of the specified metric over the specified
+        The weighted average of the specified metric over the specified
         number of quarters (or years).
 
     Examples
@@ -150,41 +62,37 @@ def calc_share_weighted_metric(financials, tickers_info, metric):
     [...**********************100%**********************]
     3 of 3 financials downloaded
     >>> tickers_info = {
-    ...     'AAPL': {'previousClose': 150, 'marketCap': 2500000000},
-    ...     'MSFT': {'previousClose': 300, 'marketCap': 2000000000},
-    ...     'GOOG': {'previousClose': 2800, 'marketCap': 1800000000},
+    ...     'AAPL': {'marketCap': 3357369434112,
+    ...              'sharesOutstanding': 15204100096},
+    ...     'MSFT': {'marketCap': 2985852141568,
+    ...              'sharesOutstanding': 7433039872},
+    ...     'GOOG': {'marketCap': 1864140193792,
+    ...              'sharesOutstanding': 5584999936},
     ... }
-    >>> weighted_eps = calc_share_weighted_metric(financials, tickers_info,
-    ...                                           'Basic EPS')
+    >>> weighted_eps = calc_weighted_metric(financials, tickers_info,
+    ...                                     'Basic EPS', 'sharesOutstanding')
     >>> type(weighted_eps)
     <class 'numpy.ndarray'>
     >>> weighted_eps.shape
     (7,)
     """
-    # Initialize lists to store metric, shares outstanding data
+    # Initialize lists to store metric and weight data
     metric_list = []
-    shares_outstanding = []
+    weights = []
 
     for symbol, financial_df in financials.items():
-        # Retrieve the previous close price and market cap for each symbol
-        previous_close = tickers_info.get(symbol, {}).get('previousClose', 0)
-        market_cap = tickers_info.get(symbol, {}).get('marketCap', 0)
+        # Retrieve the weight based on the provided weight field
+        weight = tickers_info.get(symbol, {}).get(weight_field, 0)
 
-        if previous_close > 0:
-            # Calculate shares outstanding
-            shares = market_cap / previous_close
-        else:
-            shares = 0
-
-        if (shares > 0 and financial_df is not None
+        if (weight > 0 and financial_df is not None
                        and metric in financial_df.columns):
             # Apply forward fill to fill missing metric values
             metric_data = financial_df[metric].ffill().values
             metric_list.append(metric_data)
-            shares_outstanding.append(shares)
+            weights.append(weight)
         else:
             print("Warning: No valid metric or "
-                  f"share data available for {symbol}.")
+                  f"weight data available for {symbol}.")
 
     if not metric_list:
         print("No valid metric data found for any symbol.")
@@ -198,20 +106,20 @@ def calc_share_weighted_metric(financials, tickers_info, metric):
     for i, data in enumerate(metric_list):
         metric_array[i, -len(data):] = data  # Right-align the data
 
-    # Convert shares outstanding to a NumPy array
-    shares_outstanding = np.array(shares_outstanding)
+    # Convert weights to a NumPy array
+    weights = np.array(weights)
 
     # Calculate weighted metric using broadcasting
-    weighted_metric = metric_array * shares_outstanding[:, np.newaxis]
+    weighted_metric = metric_array * weights[:, np.newaxis]
 
     # Calculate weighted average metric
-    total_shares = shares_outstanding.sum()
-    if total_shares == 0:
-        print("Total shares outstanding is zero. "
+    total_weight = weights.sum()
+    if total_weight == 0:
+        print("Total weight is zero. "
               "Cannot calculate weighted average metric.")
         return np.array([])
 
-    weighted_avg_metric = np.nansum(weighted_metric, axis=0) / total_shares
+    weighted_avg_metric = np.nansum(weighted_metric, axis=0) / total_weight
 
     return weighted_avg_metric
 
@@ -384,8 +292,8 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
                 try:
                     inf[key] = info[key]
                 except KeyError as e:
-                    if key in ['previousClose', 'marketCap',
-                               'trailingEps', 'forwardEps']:
+                    if key in ['previousClose', 'trailingEps', 'forwardEps'
+                               'marketCap', 'sharesOutstanding']:
                         inf[key] = np.NaN
                     elif key in ['sector', 'industry']:
                         inf[key] = ''
