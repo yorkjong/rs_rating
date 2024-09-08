@@ -4,7 +4,7 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.5"
+__version__ = "3.6"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/09/09 (last revision)"
 
@@ -155,24 +155,31 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
                 'annual': ticker.financials.T,
             }[frequency]
         except KeyError:
-            raise ValueError("Frequency must be 'quarterly' or 'annual'.")
+            raise ValueError("\nFrequency must be 'quarterly' or 'annual'.")
 
         financials = financials.sort_index(ascending=True)
+
         if fields:
             # Check for missing fields and keep only those that exist
             missing_fields = [field for field in fields
                               if field not in financials.columns]
             if missing_fields:
-                print("Warning: The following fields are missing "
-                      f"and will be excluded: {', '.join(missing_fields)}")
-            # Filter financials to include only existing fields
-            financials = financials[[field for field in fields
-                                     if field in financials.columns]]
+                print(f"\nWarning:{symbol}: Missing fields: "
+                      f"{str(missing_fields)} will be filled with NaN.")
+
+            # Ensure all requested fields are present,
+            # adding NaNs for missing fields
+            for field in fields:
+                if field not in financials.columns:
+                    financials[field] = np.NaN
+
+            # Filter financials to include only requested fields
+            financials = financials[fields]
 
         return financials
 
     except Exception as e:
-        print(f"Error fetching financials for {symbol}: {e}")
+        print(f"\nError fetching financials for {symbol}: {e}")
         return pd.DataFrame()
 
 
@@ -310,9 +317,9 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
                         inf[key] = ''  # Default for string fields
                     else:
                         inf[key] = None  # Default for other data types
-                        print(f"Error fetching data for {symbol}: {e}")
+                        print(f"\nError fetching data for {symbol}: {e}")
         except Exception as e:
-            print(f"Error fetching data for {symbol}: {e}")
+            print(f"\nError fetching data for {symbol}: {e}")
         return inf
 
     info_dict = {}

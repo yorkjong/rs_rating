@@ -41,9 +41,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "4.1"
+__version__ = "4.2"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/09/08 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/09/09 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -293,13 +293,10 @@ def ranking(tickers, ticker_ref='^GSPC',
             price_ma[f'{win}'] = ma_func(df['Close'], win).round(2)
         vol_div_vma = (df['Volume'] / ma_func(df['Volume'], vma_win)).round(2)
 
-        if ticker not in financials:
-            eps_rs = rev_rs = pd.Series([np.NaN])
-        else:
-            epses = financials[ticker]['Basic EPS']
-            eps_rs = relative_strength_vs_benchmark(epses, epses_index)
-            revs = financials[ticker]['Operating Revenue']
-            rev_rs = relative_strength_vs_benchmark(revs, revs_index)
+        epses = financials[ticker]['Basic EPS']
+        eps_rs = relative_strength_vs_benchmark(epses, epses_index)
+        revs = financials[ticker]['Operating Revenue']
+        rev_rs = relative_strength_vs_benchmark(revs, revs_index)
 
         pe = info[ticker]['trailingPE']
         if not isinstance(pe, float):
@@ -399,6 +396,9 @@ def main(period='2y', ma="EMA", out_dir='out'):
     code = 'SOX'
     #code = 'SPX+DJIA+NDX+RUI+SOX'
     tickers = get_tickers(code)
+
+    # cases of missing 'Basic EPS' field.
+    tickers = ['3036A.TW', '2882B.TW', '8349A.TWO', '2887Z1.TW']
 
     rank = ranking(tickers, period=period, interval='1wk', ma=ma)
     print(rank.head(10))
