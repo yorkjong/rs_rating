@@ -4,7 +4,7 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.6"
+__version__ = "3.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/09/09 (last revision)"
 
@@ -159,6 +159,14 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
 
         financials = financials.sort_index(ascending=True)
 
+        if financials.empty:
+            print(f"\nWarning: {symbol}: Financials data is empty, "
+                  "returning NaN-filled DataFrame.")
+            if fields:
+                return pd.DataFrame({field: [np.NaN] for field in fields})
+            else:
+                return pd.DataFrame()
+
         if fields:
             # Check for missing fields and keep only those that exist
             missing_fields = [field for field in fields
@@ -180,7 +188,7 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
 
     except Exception as e:
         print(f"\nError fetching financials for {symbol}: {e}")
-        return pd.DataFrame()
+        return pd.DataFrame(np.NaN, index=[0], columns=fields)
 
 
 def download_financials(symbols, fields=None, frequency='quarterly',

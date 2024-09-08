@@ -400,6 +400,7 @@ def main(period='2y', ma="EMA", out_dir='out'):
     # cases of missing 'Basic EPS' field.
     tickers = ['3036A.TW', '2882B.TW', '8349A.TWO', '2887Z1.TW']
 
+    tickers = ['910861.TW',]
     rank = ranking(tickers, period=period, interval='1wk', ma=ma)
     print(rank.head(10))
 
