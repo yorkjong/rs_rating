@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.6"
+__version__ = "3.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/08 (last revision)"
 
@@ -180,6 +180,8 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
 
     # Align and interpolate missing data
     length = min(len(metric_series), len(bench_series))
+    metric_series = metric_series.infer_objects()
+    bench_series = bench_series.infer_objects()
     metric_series = metric_series.interpolate(method='linear')[-length:]
     bench_series = bench_series.interpolate(method='linear')[-length:]
 
@@ -202,7 +204,7 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
     # Replace inf and -inf with NaN
     rsm = rsm.replace([np.inf, -np.inf], np.nan)
 
-    return round(rsm, 2)
+    return rsm.round(2)
 
 
 #------------------------------------------------------------------------------
