@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "4.0"
+__version__ = "4.1"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/08 (last revision)"
 
@@ -300,12 +300,11 @@ def ranking(tickers, ticker_ref='^GSPC',
             eps_rs = relative_strength_vs_benchmark(epses, epses_index)
             revs = financials[ticker]['Operating Revenue']
             rev_rs = relative_strength_vs_benchmark(revs, revs_index)
-        if isinstance(info[ticker]['trailingPE'], float):
-            pe = round(info[ticker]['trailingPE'], 2)
-        else:
-            print(f"{ticker}: {info[ticker]['trailingPE']}")
-            pe = info[ticker]['trailingPE']
 
+        pe = info[ticker]['trailingPE']
+        if not isinstance(pe, float):
+            print(f"info[{ticker}]['trailingPE']: {pe}")
+            pe = np.NaN
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -333,7 +332,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': rev_rs.iloc[-1],
             'TTM RPS': info[ticker]['revenuePerShare'],
-            'TTM PE': pe,
+            'TTM PE': round(pe, 2),
         }
         results.append(row)
 
@@ -341,8 +340,8 @@ def ranking(tickers, ticker_ref='^GSPC',
     ranking_df = pd.DataFrame(results)
 
     # Rank based on Relative Strength
-    rank_columns = ['RS Rank (%)', ' 3 Months Ago']
-    rs_columns = ['RS (%)', '3 Months Ago']
+    rank_columns = ['RS Rank (%)',]
+    rs_columns = ['RS (%)',]
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)
         ranking_df[rank_col] = (rank_pct * 100).round(2)
