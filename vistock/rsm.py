@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "4.2"
+__version__ = "4.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/09 (last revision)"
 
@@ -180,10 +180,8 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
 
     # Align and interpolate missing data
     length = min(len(metric_series), len(bench_series))
-    metric_series = metric_series.infer_objects()
-    bench_series = bench_series.infer_objects()
-    metric_series = metric_series.interpolate(method='linear')[-length:]
-    bench_series = bench_series.interpolate(method='linear')[-length:]
+    metric_series = metric_series.infer_objects().interpolate()[-length:]
+    bench_series = bench_series.infer_objects().interpolate()[-length:]
 
     # Calculate the moving average
     avg_metric = metric_series.rolling(window=window, min_periods=1).mean()
@@ -399,9 +397,11 @@ def main(period='2y', ma="EMA", out_dir='out'):
     tickers = get_tickers(code)
 
     # cases of missing 'Basic EPS' field.
-    tickers = ['3036A.TW', '2882B.TW', '8349A.TWO', '2887Z1.TW']
+    #tickers = ['3036A.TW', '2882B.TW', '8349A.TWO', '2887Z1.TW']
 
-    tickers = ['910861.TW',]
+    # case of empty financials DataFrame
+    #tickers = ['910861.TW']
+
     rank = ranking(tickers, period=period, interval='1wk', ma=ma)
     print(rank.head(10))
 
