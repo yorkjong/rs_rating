@@ -300,6 +300,12 @@ def ranking(tickers, ticker_ref='^GSPC',
             eps_rs = relative_strength_vs_benchmark(epses, epses_index)
             revs = financials[ticker]['Operating Revenue']
             rev_rs = relative_strength_vs_benchmark(revs, revs_index)
+        if isinstance(info[ticker]['trailingPE'], float):
+            pe = round(info[ticker]['trailingPE'], 2)
+        else:
+            print(f"{ticker}: {info[ticker]['trailingPE']}")
+            pe = info[ticker]['trailingPE']
+
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -327,7 +333,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': rev_rs.iloc[-1],
             'TTM RPS': info[ticker]['revenuePerShare'],
-            'TTM PE': round(info[ticker]['trailingPE'], 2),
+            'TTM PE': pe,
         }
         results.append(row)
 
