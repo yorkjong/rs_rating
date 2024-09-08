@@ -41,9 +41,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.8"
+__version__ = "4.3"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/09/08 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/09/09 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -180,10 +180,8 @@ def relative_strength_vs_benchmark(metric_series, bench_series, window=4):
 
     # Align and interpolate missing data
     length = min(len(metric_series), len(bench_series))
-    metric_series = metric_series.infer_objects()
-    bench_series = bench_series.infer_objects()
-    metric_series = metric_series.interpolate(method='linear')[-length:]
-    bench_series = bench_series.interpolate(method='linear')[-length:]
+    metric_series = metric_series.infer_objects().interpolate()[-length:]
+    bench_series = bench_series.infer_objects().interpolate()[-length:]
 
     # Calculate the moving average
     avg_metric = metric_series.rolling(window=window, min_periods=1).mean()
@@ -262,7 +260,8 @@ def ranking(tickers, ticker_ref='^GSPC',
     info = yfu.download_tickers_info(
         tickers,
         ['quoteType', 'previousClose',
-         'marketCap', 'sharesOutstanding', 'sector', 'industry']
+         'trailingEps', 'revenuePerShare', 'trailingPE',
+         'marketCap', 'sharesOutstanding', 'sector', 'industry',]
     )
     tickers = [t for t in tickers if t in info]
     tickers = [t for t in tickers if info[t]['quoteType'] == 'EQUITY']
@@ -281,7 +280,8 @@ def ranking(tickers, ticker_ref='^GSPC',
                                            'Basic EPS', 'sharesOutstanding')
     revs_index = yfu.calc_weighted_metric(financials, info,
                                           'Operating Revenue', 'marketCap')
-    print(epses_index)
+    #print(epses_index)
+
     results = []
     price_ma = {}
     for ticker in tickers:
@@ -292,13 +292,15 @@ def ranking(tickers, ticker_ref='^GSPC',
             price_ma[f'{win}'] = ma_func(df['Close'], win).round(2)
         vol_div_vma = (df['Volume'] / ma_func(df['Volume'], vma_win)).round(2)
 
-        if ticker not in financials:
-            eps_rs = rev_rs = pd.Series([np.NaN])
-        else:
-            epses = financials[ticker]['Basic EPS']
-            eps_rs = relative_strength_vs_benchmark(epses, epses_index)
-            revs = financials[ticker]['Operating Revenue']
-            rev_rs = relative_strength_vs_benchmark(revs, revs_index)
+        epses = financials[ticker]['Basic EPS']
+        eps_rs = relative_strength_vs_benchmark(epses, epses_index)
+        revs = financials[ticker]['Operating Revenue']
+        rev_rs = relative_strength_vs_benchmark(revs, revs_index)
+
+        pe = info[ticker]['trailingPE']
+        if not isinstance(pe, float):
+            print(f"info[{ticker}]['trailingPE']: {pe}")
+            pe = np.NaN
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
@@ -306,6 +308,7 @@ def ranking(tickers, ticker_ref='^GSPC',
         one_month_ago = end_date - pd.DateOffset(months=1)
         three_months_ago = end_date - pd.DateOffset(months=3)
         six_months_ago = end_date - pd.DateOffset(months=6)
+        nine_months_ago = end_date - pd.DateOffset(months=9)
 
         # Construct DataFrame for current stock
         row = {
@@ -317,11 +320,15 @@ def ranking(tickers, ticker_ref='^GSPC',
             '1 Month Ago': rsm.asof(one_month_ago),
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
-            'Price': df['Close'].iloc[-1].round(2),
+            '9 Months Ago': rsm.asof(nine_months_ago),
+            'Price': info[ticker]['previousClose'],
             **{f'MA{w}': price_ma[f'{w}'].iloc[-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
             'EPS RS (%)': eps_rs.iloc[-1],
+            'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': rev_rs.iloc[-1],
+            'TTM RPS': info[ticker]['revenuePerShare'],
+            'TTM PE': round(pe, 2),
         }
         results.append(row)
 
@@ -329,10 +336,8 @@ def ranking(tickers, ticker_ref='^GSPC',
     ranking_df = pd.DataFrame(results)
 
     # Rank based on Relative Strength
-    rank_columns = ['RS Rank (%)', ' 1 Week Ago',
-                    ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
-    rs_columns = ['RS (%)', '1 Week Ago',
-                  '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
+    rank_columns = ['RS Rank (%)',]
+    rs_columns = ['RS (%)',]
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)
         ranking_df[rank_col] = (rank_pct * 100).round(2)
@@ -346,8 +351,8 @@ def ranking(tickers, ticker_ref='^GSPC',
             'Price',
             *[f'MA{w}' for w in ma_wins],
             f'Volume / VMA{vma_win}',
-            'EPS RS (%)',
-            'Rev RS (%)',
+            'EPS RS (%)', 'TTM EPS',
+            'Rev RS (%)', 'TTM RPS', 'TTM PE',
         ],
     )
     return ranking_df
@@ -391,6 +396,12 @@ def main(period='2y', ma="EMA", out_dir='out'):
     #code = 'SPX+DJIA+NDX+RUI+SOX'
     tickers = get_tickers(code)
 
+    # cases of missing 'Basic EPS' field.
+    #tickers = ['3036A.TW', '2882B.TW', '8349A.TWO', '2887Z1.TW']
+
+    # case of empty financials DataFrame
+    #tickers = ['910861.TW']
+
     rank = ranking(tickers, period=period, interval='1wk', ma=ma)
     print(rank.head(10))
 
@@ -408,6 +419,5 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    #main()
     main(ma="SMA")
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
