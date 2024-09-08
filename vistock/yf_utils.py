@@ -4,7 +4,7 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.7"
+__version__ = "3.8"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/26 (initial version) ~ 2024/09/09 (last revision)"
 
@@ -87,8 +87,12 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field):
         if (weight > 0 and financial_df is not None
                        and metric in financial_df.columns):
             # Apply forward fill to fill missing metric values
-            metric_data = financial_df[metric].ffill().values
-            metric_list.append(metric_data)
+            #metric_data = financial_df[metric].ffill()
+
+            # Apply interpolate to fill missing metric values
+            metric_data = financial_df[metric].infer_objects().interpolate()
+
+            metric_list.append(metric_data.values)
             weights.append(weight)
         else:
             print("Warning: No valid metric or "
