@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "3.8"
+__version__ = "3.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/09/08 (last revision)"
 
@@ -262,7 +262,8 @@ def ranking(tickers, ticker_ref='^GSPC',
     info = yfu.download_tickers_info(
         tickers,
         ['quoteType', 'previousClose',
-         'marketCap', 'sharesOutstanding', 'sector', 'industry']
+         'trailingEps', 'revenuePerShare', 'trailingPE',
+         'marketCap', 'sharesOutstanding', 'sector', 'industry',]
     )
     tickers = [t for t in tickers if t in info]
     tickers = [t for t in tickers if info[t]['quoteType'] == 'EQUITY']
@@ -317,11 +318,14 @@ def ranking(tickers, ticker_ref='^GSPC',
             '1 Month Ago': rsm.asof(one_month_ago),
             '3 Months Ago': rsm.asof(three_months_ago),
             '6 Months Ago': rsm.asof(six_months_ago),
-            'Price': df['Close'].iloc[-1].round(2),
+            'Price': info[ticker]['previousClose'],
             **{f'MA{w}': price_ma[f'{w}'].iloc[-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
             'EPS RS (%)': eps_rs.iloc[-1],
+            'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': rev_rs.iloc[-1],
+            'TTM RPS': info[ticker]['revenuePerShare'],
+            'TTM PE': info[ticker]['trailingPE'],
         }
         results.append(row)
 
@@ -346,8 +350,8 @@ def ranking(tickers, ticker_ref='^GSPC',
             'Price',
             *[f'MA{w}' for w in ma_wins],
             f'Volume / VMA{vma_win}',
-            'EPS RS (%)',
-            'Rev RS (%)',
+            'EPS RS (%)', 'TTM EPS',
+            'Rev RS (%)', 'TTM RPS', 'TTM PE',
         ],
     )
     return ranking_df
@@ -408,6 +412,5 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    #main()
     main(ma="SMA")
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
