@@ -31,9 +31,9 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "2.3"
+__version__ = "2.4"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/09/09 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/09/10 (last revision)"
 
 __all__ = [
     'get_tickers',
@@ -172,6 +172,53 @@ rut_tickers = functools.partial(
 
 
 #------------------------------------------------------------------------------
+# StatementDog.com look-up
+#------------------------------------------------------------------------------
+
+def w5000_tickers():
+    """
+    Fetches all stock symbols from the StatementDog US stock list page,
+    and returns them as a list.
+
+    This function mimics the Wilshire 5000 Index by using the StatementDog
+    website's US stock list as a proxy for all listed U.S. stocks. The list
+    includes stocks from both the New York Stock Exchange (NYSE) and the
+    NASDAQ, and serves as a comprehensive dataset of publicly traded companies
+    in the U.S.
+
+    Returns:
+        list: A list of stock symbols from the StatementDog US stock list.
+              Returns an empty list if the request fails.
+
+    Example:
+        >>> tickers = w5000_tickers()
+        >>> len(tickers) > 5000
+        True
+        >>> 'AAPL' in tickers
+        True
+    """
+    # URL of the target page
+    url = 'https://statementdog.com/us-stock-list'
+
+    # Request the web page content
+    response = requests.get(url)
+
+    # Ensure the request was successful
+    if response.status_code != 200:
+        print("Failed to retrieve the page.")
+        return []
+
+    # Parse the HTML using BeautifulSoup
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Find all <span> elements with the class 'us-stock-company-ticker'
+    symbols = [span.text for span
+               in soup.find_all('span', class_='us-stock-company-ticker')]
+
+    return symbols
+
+
+#------------------------------------------------------------------------------
 # Manually keyed stock list
 #------------------------------------------------------------------------------
 
@@ -231,6 +278,7 @@ def get_tickers(source):
             - '^RUI', 'RUI': Russell 1000
             - '^RUT', 'RUT': Russell 2000
             - '^SOX', 'SOX': PHLX Semiconductor
+            - '^W5000', 'W5000': Wilshire 5000 Total Market Index
             - '^TWII' 'TWII', 'TWSE': Taiwan Weighted Index
             - 'TPEX': Taipei Exchange
             - 'ESB': Emerging Stock Board
@@ -253,6 +301,8 @@ def get_tickers(source):
         True
         >>> len(get_tickers('^RUT')) > 1990
         True
+        >>> len(get_tickers('^W5000')) > 5000
+        True
         >>> 500 < len(get_tickers('^GSPC+^NDX')) < (500+100)
         True
         >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
@@ -271,6 +321,7 @@ def get_tickers(source):
         '^RUI': rui_tickers,
         '^RUT': rut_tickers,
         '^SOX': sox_tickers,
+        '^W5000': w5000_tickers,
         '^TWII': tw.get_twse_tickers,
         'SPX': spx_tickers,
         'DJIA': djia_tickers,
@@ -279,6 +330,8 @@ def get_tickers(source):
         'RUI': rui_tickers,
         'RUT': rut_tickers,
         'R1000': rui_tickers,
+        'R2000': rut_tickers,
+        'W5000': w5000_tickers,
         'TWII': tw.get_twse_tickers,
         'TWSE': tw.get_twse_tickers,
         'TPEX': tw.get_tpex_tickers,
@@ -316,6 +369,8 @@ def ticker_from_name(name):
     '^NDX'
     >>> ticker_from_name('Russell 1000')
     '^RUI'
+    >>> ticker_from_name('Wilshire 5000 Total Market Index')
+    '^W5000'
     >>> ticker_from_name('Taiwan Weighted Index')
     '^TWII'
     """
@@ -327,6 +382,7 @@ def ticker_from_name(name):
         "Russell 1000": "^RUI",
         "Russell 2000": "^RUT",
         "PHLX Semiconductor": "^SOX",
+        "Wilshire 5000 Total Market Index": "^W5000",
         "Taiwan Weighted Index": "^TWII",
         'Euro Stoxx 50': '^STOXX50E',       # Europe
         'FTSE 100': '^FTSE',                # London, UK
@@ -364,6 +420,7 @@ def get_name(index_symbol):
             - '^NYA', 'NYA': NYSE Composite
             - '^MID', 'MID': S&P MidCap 400
             - '^TWII', 'TWII': Taiwan Weighted Index
+            - '^W5000', 'W5000': Wilshire 5000 Total Market Index
             - '^STOXX50E': Euro Stoxx 50,
             - '^FTSE': FTSE 100,
             - '^GDAXI': DAX,
@@ -393,6 +450,8 @@ def get_name(index_symbol):
         'Russell 2000'
         >>> get_name('^SOX')
         'PHLX Semiconductor'
+        >>> get_name('^W5000')
+        'Wilshire 5000 Total Market Index'
         >>> get_name('^TWII')
         'Taiwan Weighted Index'
         >>> get_name('^HSI')
@@ -410,6 +469,7 @@ def get_name(index_symbol):
         '^RUI': 'Russell 1000',
         '^RUT': 'Russell 2000',
         '^SOX': 'PHLX Semiconductor',
+        '^W5000': 'Wilshire 5000 Total Market Index',
         '^NYA': 'NYSE Composite',
         '^MID': 'S&P MidCap 400',
         '^TWII': 'Taiwan Weighted Index',
@@ -422,6 +482,7 @@ def get_name(index_symbol):
         'R1000': 'Russell 1000',
         'R2000': 'Russell 2000',
         'SOX': 'PHLX Semiconductor',
+        'W5000': 'Wilshire 5000 Total Market Index',
         'NYA': 'NYSE Composite',
         'MID': 'S&P MidCap 400',
         'TWII': 'Taiwan Weighted Index',
