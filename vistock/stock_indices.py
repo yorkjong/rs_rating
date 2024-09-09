@@ -148,7 +148,7 @@ def symbols_from_bullishbears_table(article):
     Examples:
         >>> symbols = symbols_from_bullishbears_table('sp500-stocks-list')
         >>> len(symbols)
-        503
+        502
         >>> symbols = symbols_from_bullishbears_table('dow-jones-stocks-list')
         >>> len(symbols)
         30
@@ -163,7 +163,8 @@ def symbols_from_bullishbears_table(article):
         True
     """
     df = table_from_bullishbears(article)
-    return list(df['Symbol'])
+    symbols = list(df['Symbol'])
+    return [s for s in symbols if isinstance(s, str)]
 
 
 rut_tickers = functools.partial(
