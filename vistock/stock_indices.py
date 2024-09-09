@@ -31,9 +31,9 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "2.2"
+__version__ = "2.3"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/09/04 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/09/09 (last revision)"
 
 __all__ = [
     'get_tickers',
@@ -51,6 +51,9 @@ import yfinance as yf
 
 from . import tw
 
+#------------------------------------------------------------------------------
+# Wikipedia look-up
+#------------------------------------------------------------------------------
 
 def table_from_wikipedia(article, class_, id):
     """
@@ -111,6 +114,65 @@ ndx_tickers = functools.partial(
 rui_tickers = functools.partial(
         symbols_from_wikipedia_table, 'Russell_1000_Index', id=None)
 
+#------------------------------------------------------------------------------
+# bullishbears.com look-up
+#------------------------------------------------------------------------------
+
+def table_from_bullishbears(article):
+    """
+    Fetches the first table from a specified Bullish Bears article.
+
+    Args:
+        article (str): The relative path of the article on the Bullish Bears
+            website.
+
+    Returns:
+        pd.DataFrame: The first table found in the specified URL, parsed into
+            a Pandas DataFrame.
+    """
+    url = f'https://bullishbears.com/{article}'
+    return pd.read_html(url)[0]
+
+
+def symbols_from_bullishbears_table(article):
+    """
+    Extracts stock symbols from a table in a Bullish Bears article.
+
+    Args:
+        article (str): The relative path of the article on the Bullish Bears
+            website.
+
+    Returns:
+        list: A list of stock symbols from the table's "Symbol" column.
+
+    Examples:
+        >>> symbols = symbols_from_bullishbears_table('sp500-stocks-list')
+        >>> len(symbols)
+        503
+        >>> symbols = symbols_from_bullishbears_table('dow-jones-stocks-list')
+        >>> len(symbols)
+        30
+        >>> symbols = symbols_from_bullishbears_table('nasdaq-stocks-list')
+        >>> len(symbols)
+        100
+        >>> symbols = symbols_from_bullishbears_table(
+        ...     'russell-2000-stocks-list')
+        >>> 'SMCI' in symbols
+        True
+        >>> len(symbols) > 1990
+        True
+    """
+    df = table_from_bullishbears(article)
+    return list(df['Symbol'])
+
+
+rut_tickers = functools.partial(
+        symbols_from_bullishbears_table, 'russell-2000-stocks-list')
+
+
+#------------------------------------------------------------------------------
+# Manually keyed stock list
+#------------------------------------------------------------------------------
 
 def sox_tickers():
     """
@@ -142,6 +204,9 @@ def sox_tickers():
     ]
     return tickers
 
+#------------------------------------------------------------------------------
+# Published Functions
+#------------------------------------------------------------------------------
 
 def get_tickers(source):
     """
@@ -163,6 +228,7 @@ def get_tickers(source):
             - '^DJI', 'DJIA': Dow Jones Industrial Average
             - '^NDX', 'NDX': NASDAQ-100
             - '^RUI', 'RUI': Russell 1000
+            - '^RUT', 'RUT': Russell 2000
             - '^SOX', 'SOX': PHLX Semiconductor
             - '^TWII' 'TWII', 'TWSE': Taiwan Weighted Index
             - 'TPEX': Taipei Exchange
@@ -184,6 +250,8 @@ def get_tickers(source):
         True
         >>> len(get_tickers('^RUI')) >= 1000
         True
+        >>> len(get_tickers('^RUT')) > 1990
+        True
         >>> 500 < len(get_tickers('^GSPC+^NDX')) < (500+100)
         True
         >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
@@ -200,6 +268,7 @@ def get_tickers(source):
         '^DJI': djia_tickers,
         '^NDX': ndx_tickers,
         '^RUI': rui_tickers,
+        '^RUT': rut_tickers,
         '^SOX': sox_tickers,
         '^TWII': tw.get_twse_tickers,
         'SPX': spx_tickers,
@@ -207,6 +276,7 @@ def get_tickers(source):
         'NDX': ndx_tickers,
         'SOX': sox_tickers,
         'RUI': rui_tickers,
+        'RUT': rut_tickers,
         'R1000': rui_tickers,
         'TWII': tw.get_twse_tickers,
         'TWSE': tw.get_twse_tickers,
