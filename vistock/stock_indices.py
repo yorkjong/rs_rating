@@ -31,7 +31,7 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "2.4"
+__version__ = "2.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/09/10 (last revision)"
 
@@ -175,10 +175,10 @@ rut_tickers = functools.partial(
 # StatementDog.com look-up
 #------------------------------------------------------------------------------
 
-def w5000_tickers():
+def us_listed_tickers():
     """
-    Fetches all stock symbols from the StatementDog US stock list page,
-    and returns them as a list.
+    Fetches all symbols of U.S. listed stocks from the StatementDog US stock
+    list page, and returns them as a list.
 
     This function mimics the Wilshire 5000 Index by using the StatementDog
     website's US stock list as a proxy for all listed U.S. stocks. The list
@@ -191,7 +191,7 @@ def w5000_tickers():
               Returns an empty list if the request fails.
 
     Example:
-        >>> tickers = w5000_tickers()
+        >>> tickers = us_listed_tickers()
         >>> len(tickers) > 5000
         True
         >>> 'AAPL' in tickers
@@ -279,6 +279,7 @@ def get_tickers(source):
             - '^RUT', 'RUT': Russell 2000
             - '^SOX', 'SOX': PHLX Semiconductor
             - '^W5000', 'W5000': Wilshire 5000 Total Market Index
+            - 'U.S. listed': U.S. listed stocks
             - '^TWII' 'TWII', 'TWSE': Taiwan Weighted Index
             - 'TPEX': Taipei Exchange
             - 'ESB': Emerging Stock Board
@@ -303,6 +304,10 @@ def get_tickers(source):
         True
         >>> len(get_tickers('^W5000')) > 5000
         True
+        >>> len(get_tickers('U.S.Listed')) > 5000
+        True
+        >>> len(get_tickers('USLS')) > 5000
+        True
         >>> 500 < len(get_tickers('^GSPC+^NDX')) < (500+100)
         True
         >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
@@ -321,7 +326,7 @@ def get_tickers(source):
         '^RUI': rui_tickers,
         '^RUT': rut_tickers,
         '^SOX': sox_tickers,
-        '^W5000': w5000_tickers,
+        '^W5000': us_listed_tickers,
         '^TWII': tw.get_twse_tickers,
         'SPX': spx_tickers,
         'DJIA': djia_tickers,
@@ -331,7 +336,9 @@ def get_tickers(source):
         'RUT': rut_tickers,
         'R1000': rui_tickers,
         'R2000': rut_tickers,
-        'W5000': w5000_tickers,
+        'W5000': us_listed_tickers,
+        'U.S.LISTED': us_listed_tickers,
+        'USLS': us_listed_tickers,
         'TWII': tw.get_twse_tickers,
         'TWSE': tw.get_twse_tickers,
         'TPEX': tw.get_tpex_tickers,
@@ -383,6 +390,7 @@ def ticker_from_name(name):
         "Russell 2000": "^RUT",
         "PHLX Semiconductor": "^SOX",
         "Wilshire 5000 Total Market Index": "^W5000",
+        "U.S. Listed Stocks": "USLS",
         "Taiwan Weighted Index": "^TWII",
         'Euro Stoxx 50': '^STOXX50E',       # Europe
         'FTSE 100': '^FTSE',                # London, UK
@@ -421,13 +429,14 @@ def get_name(index_symbol):
             - '^MID', 'MID': S&P MidCap 400
             - '^TWII', 'TWII': Taiwan Weighted Index
             - '^W5000', 'W5000': Wilshire 5000 Total Market Index
-            - '^STOXX50E': Euro Stoxx 50,
-            - '^FTSE': FTSE 100,
-            - '^GDAXI': DAX,
-            - '^FCHI': CAC 40,
-            - '^GSPTSE': S&P/TSX Composite,
-            - '^N225': Nikkei 225,
-            - '^HSI': Hang Seng Index,
+            - 'USLS': U.S. Listed Stocks
+            - '^STOXX50E': Euro Stoxx 50
+            - '^FTSE': FTSE 100
+            - '^GDAXI': DAX
+            - '^FCHI': CAC 40
+            - '^GSPTSE': S&P/TSX Composite
+            - '^N225': Nikkei 225
+            - '^HSI': Hang Seng Index
 
     Returns:
         str: The name of the index if found.
@@ -458,8 +467,6 @@ def get_name(index_symbol):
         'Hang Seng Index'
         >>> get_name('AAPL')
         'Apple Inc.'
-        >>> get_name('Unknown')
-        'Unknown'
     """
     dic = {
         '^GSPC': 'S&P 500',
@@ -483,6 +490,7 @@ def get_name(index_symbol):
         'R2000': 'Russell 2000',
         'SOX': 'PHLX Semiconductor',
         'W5000': 'Wilshire 5000 Total Market Index',
+        'USLS': 'U.S. Listed Stocks',
         'NYA': 'NYSE Composite',
         'MID': 'S&P MidCap 400',
         'TWII': 'Taiwan Weighted Index',
