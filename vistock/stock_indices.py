@@ -31,9 +31,9 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "2.5"
+__version__ = "2.6"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/09/10 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/09/11 (last revision)"
 
 __all__ = [
     'get_tickers',
@@ -465,8 +465,10 @@ def get_name(index_symbol):
         'Taiwan Weighted Index'
         >>> get_name('^HSI')
         'Hang Seng Index'
+        >>> get_name('SOXX')
+        'iShares Semiconductor ETF'
         >>> get_name('AAPL')
-        'Apple Inc.'
+        'AAPL'
     """
     dic = {
         '^GSPC': 'S&P 500',
@@ -510,9 +512,11 @@ def get_name(index_symbol):
     try:
         if tw.is_chinese(index_symbol) or tw.is_taiwan_stock(index_symbol):
             return index_symbol
-        return yf.Ticker(index_symbol).info['shortName']
+        if yf.Ticker(index_symbol).info['quoteType'] in ('ETF', 'INDEX'):
+            return yf.Ticker(index_symbol).info['shortName']
     except:
-        return index_symbol
+        pass
+    return index_symbol
 
 
 #------------------------------------------------------------------------------
