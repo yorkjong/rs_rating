@@ -31,7 +31,7 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "2.6"
+__version__ = "2.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/06 (initial version) ~ 2024/09/11 (last revision)"
 
@@ -300,7 +300,7 @@ def get_tickers(source):
         True
         >>> len(get_tickers('^RUI')) >= 1000
         True
-        >>> len(get_tickers('^RUT')) > 1990
+        >>> len(get_tickers('^RUT')) > 1900
         True
         >>> len(get_tickers('^W5000')) > 5000
         True
@@ -354,7 +354,17 @@ def get_tickers(source):
         else:
             raise KeyError(f"Index symbol '{s}' not found.")
 
-    return list(tickers)
+    symbols = sorted(list(tickers))
+
+    # Filter out symbols containing '.', such as SPAC units or preferred
+    # stocks, which may not be supported by yfinance
+
+    # Filter out symbols containing '.', except for Taiwan stocks (.TW, .TWO),
+    # as others may not be supported by yfinance
+    symbols = [symbol for symbol in symbols
+               if '.' not in symbol or symbol.endswith(('.TW', '.TWO'))]
+
+    return symbols
 
 
 def ticker_from_name(name):
