@@ -37,7 +37,7 @@ ranking_df = financial_metric_ranking(stock_data)
 """
 __version__ = "1.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/09/15 (initial version) ~ 2024/09/15 (last revision)"
+__date__ = "2024/09/15 (initial version) ~ 2024/09/24 (last revision)"
 
 __all__ = [
     'metric_strength_vs_benchmark',
@@ -158,6 +158,11 @@ def yoy_growth(data_series, frequency):
         period = 1  # For annual data, one year is 1 year
     else:
         period = 1  # Default case
+
+    # Ensure inputs are pandas Series
+    if not isinstance(data_series, pd.Series):
+        data_series = pd.Series(data_series)
+    data_series = data_series.infer_objects()
 
     # Shift series to align current and previous values
     shifted_series = data_series.shift(period)
