@@ -47,6 +47,8 @@ __all__ = [
 import numpy as np
 import pandas as pd
 
+import vistock.yf_utils as yfu
+
 
 #------------------------------------------------------------------------------
 # Financial Metric Relative Strength
@@ -161,7 +163,7 @@ def yoy_growth(data_series, frequency):
     shifted_series = data_series.shift(period)
 
     # Compute minimum absolute values for the current and previous values
-    min_abs_values = np.minimum(np.abs(data_series), np.abs(shifted_series))
+    min_abs_values = np.minimum(data_series.abs(), shifted_series.abs())
 
     # Calculate YoY growth using min abs value
     growth = (data_series - shifted_series) / min_abs_values
@@ -173,8 +175,65 @@ def yoy_growth(data_series, frequency):
 # Financial Metric Ranking
 #------------------------------------------------------------------------------
 
-def financial_metric_ranking():
-    pass
+def financial_metric_ranking(tickers):
+    # Fetch info for stocks
+    info = yfu.download_tickers_info(
+        tickers,
+        ['quoteType', 'previousClose',
+         'trailingEps', 'revenuePerShare', 'trailingPE',
+         'marketCap', 'sharesOutstanding', 'sector', 'industry',]
+    )
+
+    # Fetch financials data for stocks
+    fins_q = yfu.download_financials(
+        tickers, ['Basic EPS', 'Operating Revenue'], 'quarterly')
+    fins_a = yfu.download_financials(
+        tickers, ['Basic EPS', 'Operating Revenue'], 'annual')
+
+    # weighted EPS of benchmark
+    bench_eps_q = yfu.calc_weighted_metric(
+        fins_q, info, 'Basic EPS', 'sharesOutstanding')
+    bench_eps_a = yfu.calc_weighted_metric(
+        fins_a, info, 'Basic EPS', 'sharesOutstanding')
+
+    # weighted RPS of benchmark
+    bench_rev_q = yfu.calc_weighted_metric(fins_q, info,
+                                           'Operating Revenue', 'marketCap')
+    bench_rev_a = yfu.calc_weighted_metric(fins_a, info,
+                                           'Operating Revenue', 'marketCap')
+    rows = []
+    for ticker in tickers:
+        eps_q = fins_q[ticker]['Basic EPS']
+        eps_a = fins_a[ticker]['Basic EPS']
+        eps_rs = metric_strength_vs_benchmark(eps_q, eps_a,
+                                              bench_eps_q, bench_eps_a)
+
+        pe = info[ticker]['trailingPE']
+        if not isinstance(pe, float):
+            print(f"info[{ticker}]['trailingPE']: {pe}")
+            pe = np.NaN
+
+        # Construct DataFrame for current stock
+        row = {
+            'Ticker': ticker,
+            'Sector': info[ticker]['sector'],
+            'Industry': info[ticker]['industry'],
+            'Price': info[ticker]['previousClose'],
+            'EPS RS (%)': eps_rs.iloc[-1],
+            'TTM EPS': info[ticker]['trailingEps'],
+            'Rev RS (%)': rev_rs.iloc[-1],
+            'TTM RPS': info[ticker]['revenuePerShare'],
+            'TTM PE': round(pe, 2),
+        }
+        rows.append(row)
+
+    # Combine results into a single DataFrame
+    ranking_df = pd.DataFrame(rows)
+
+    # Sort by current rank
+    ranking_df = ranking_df.sort_values(by='EPS RS (%)', ascending=False)
+
+    return ranking_df
 
 
 #------------------------------------------------------------------------------
@@ -182,7 +241,26 @@ def financial_metric_ranking():
 #------------------------------------------------------------------------------
 
 def main():
-    pass
+    import os
+    from datetime import datetime
+    from vistock.stock_indices import get_tickers
+
+    code = 'SOX'
+    #code = 'SPX+DJIA+NDX+RUI+SOX'
+    tickers = get_tickers(code)
+
+    tickers = ['NVDA', 'TSM']
+    rank = financial_metric_ranking(tickers)
+    print(rank.head(10))
+
+    # Save to CSV
+    print("\n\n***")
+    os.makedirs(out_dir, exist_ok=True)
+    today = datetime.now().strftime('%Y%m%d')
+    filename = f'{code}_ibd_fin_{today}.csv'
+    rank.to_csv(os.path.join(out_dir, filename), index=False)
+    print(f'Your "{filename}" is in the "{out_dir}" folder.')
+    print("***\n")
 
 
 if __name__ == "__main__":
