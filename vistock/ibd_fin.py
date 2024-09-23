@@ -248,7 +248,7 @@ def financial_metric_ranking(tickers):
 # Test
 #------------------------------------------------------------------------------
 
-def main():
+def main(out_dir='out'):
     import os
     from datetime import datetime
     from vistock.stock_indices import get_tickers
