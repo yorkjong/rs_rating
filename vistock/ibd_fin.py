@@ -83,13 +83,20 @@ def metric_strength_vs_benchmark(quarterly_metric, annual_metric,
         multiplied by 100.
     """
     # Calculate weighted YoY growth
-    weighted_yoy_growth_metric = weighted_yoy_growth(quarterly_metric,
-                                                     annual_metric)
-    weighted_yoy_growth_bench = weighted_yoy_growth(quarterly_bench,
-                                                    annual_bench)
+    yoy_growth_metric = weighted_yoy_growth(quarterly_metric, annual_metric)
+    yoy_growth_bench = weighted_yoy_growth(quarterly_bench, annual_bench)
+
+    # Align and interpolate missing data
+    length = min(len(yoy_growth_metric), len(yoy_growth_bench))
+    yoy_growth_metric = yoy_growth_metric[-length:]
+    yoy_growth_bench = yoy_growth_bench[-length:]
 
     # Calculate relative strength
-    strength = (weighted_yoy_growth_metric - weighted_yoy_growth_bench) * 100
+    strength = (yoy_growth_metric.values - yoy_growth_bench.values) * 100
+
+    # Return result as a Series with the original index
+    strength = pd.Series(strength, index=yoy_growth_metric.index)
+
     return strength
 
 
