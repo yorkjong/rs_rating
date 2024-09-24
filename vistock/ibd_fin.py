@@ -188,6 +188,8 @@ def financial_metric_ranking(tickers):
          'trailingEps', 'revenuePerShare', 'trailingPE',
          'marketCap', 'sharesOutstanding', 'sector', 'industry',]
     )
+    tickers = [t for t in tickers if t in info]
+    tickers = [t for t in tickers if info[t]['quoteType'] == 'EQUITY']
 
     # Fetch financials data for stocks
     fins_q = yfu.download_financials(
