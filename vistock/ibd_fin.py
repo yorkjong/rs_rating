@@ -219,7 +219,7 @@ def financial_metric_ranking(tickers):
         pe = info[ticker]['trailingPE']
         if not isinstance(pe, float):
             print(f"info[{ticker}]['trailingPE']: {pe}")
-            pe = np.NaN
+            pe = np.nan
 
         # Construct DataFrame for current stock
         row = {

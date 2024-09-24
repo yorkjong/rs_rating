@@ -4,9 +4,9 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.8"
+__version__ = "3.9"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/09/09 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/09/24 (last revision)"
 
 __all__ = [
     'calc_weighted_metric',
@@ -167,7 +167,7 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
             print(f"\nWarning: {symbol}: Financials data is empty, "
                   "returning NaN-filled DataFrame.")
             if fields:
-                return pd.DataFrame({field: [np.NaN] for field in fields})
+                return pd.DataFrame({field: [np.nan] for field in fields})
             else:
                 return pd.DataFrame()
 
@@ -183,7 +183,7 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
             # adding NaNs for missing fields
             for field in fields:
                 if field not in financials.columns:
-                    financials[field] = np.NaN
+                    financials[field] = np.nan
 
             # Filter financials to include only requested fields
             financials = financials[fields]
@@ -192,7 +192,7 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
 
     except Exception as e:
         print(f"\nError fetching financials for {symbol}: {e}")
-        return pd.DataFrame(np.NaN, index=[0], columns=fields)
+        return pd.DataFrame(np.nan, index=[0], columns=fields)
 
 
 def download_financials(symbols, fields=None, frequency='quarterly',
@@ -324,7 +324,7 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
                     if key in ('previousClose', 'trailingEps',
                                'revenuePerShare', 'trailingPE',
                                'marketCap', 'sharesOutstanding'):
-                        inf[key] = np.NaN  # Default for numeric fields
+                        inf[key] = np.nan  # Default for numeric fields
                     elif key in ['quoteType', 'sector', 'industry']:
                         inf[key] = ''  # Default for string fields
                     else:

@@ -43,7 +43,7 @@ See Also:
 """
 __version__ = "4.4"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/09/12 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/09/24 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -300,7 +300,7 @@ def ranking(tickers, ticker_ref='^GSPC',
         pe = info[ticker]['trailingPE']
         if not isinstance(pe, float):
             print(f"info[{ticker}]['trailingPE']: {pe}")
-            pe = np.NaN
+            pe = np.nan
 
         # Calculate RSM for different time periods
         end_date = rsm.index[-1]
