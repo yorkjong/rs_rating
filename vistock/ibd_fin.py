@@ -37,7 +37,7 @@ ranking_df = financial_metric_ranking(stock_data)
 """
 __version__ = "1.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/09/15 (initial version) ~ 2024/09/24 (last revision)"
+__date__ = "2024/09/15 (initial version) ~ 2024/09/29 (last revision)"
 
 __all__ = [
     'metric_strength_vs_benchmark',
@@ -86,7 +86,7 @@ def metric_strength_vs_benchmark(quarterly_metric, annual_metric,
     yoy_growth_metric = weighted_yoy_growth(quarterly_metric, annual_metric)
     yoy_growth_bench = weighted_yoy_growth(quarterly_bench, annual_bench)
 
-    # Align and interpolate missing data
+    # Align
     length = min(len(yoy_growth_metric), len(yoy_growth_bench))
     yoy_growth_metric = yoy_growth_metric[-length:]
     yoy_growth_bench = yoy_growth_bench[-length:]
@@ -131,13 +131,21 @@ def weighted_yoy_growth(quarterly_data, annual_data):
     # Rolling moving average for smoothing YoY growth values
     moving_average = lambda x: x.rolling(window=3, min_periods=1).mean()
 
+    ma_yoy_q = moving_average(quarterly_yoy_growth)
+    ma_yoy_a = moving_average(annual_yoy_growth)
+
+    # Align
+    length = min(len(ma_yoy_q), len(ma_yoy_a))
+    ma_yoy_q = ma_yoy_q[-length:]
+    ma_yoy_a = ma_yoy_a[-length:]
+
     # Combine quarterly and annual YoY growth with weights
     growth = (
-        moving_average(quarterly_yoy_growth * quarterly_weight) +
-        moving_average(annual_yoy_growth * annual_weight)
+        ma_yoy_q.values * quarterly_weight + ma_yoy_a.values * annual_weight
     ) / (quarterly_weight + annual_weight)
 
-    return growth
+    # Return result as a Series with the original index
+    return pd.Series(growth, index=ma_yoy_q.index)
 
 
 def yoy_growth(data_series, frequency):
