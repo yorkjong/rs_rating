@@ -177,7 +177,7 @@ def yoy_growth(data_series, frequency):
     # Ensure inputs are pandas Series
     if not isinstance(data_series, pd.Series):
         data_series = pd.Series(data_series)
-    data_series = data_series.infer_objects()
+    data_series = data_series.infer_objects().interpolate()
 
     # Shift series to align current and previous values
     shifted_series = data_series.shift(period)
