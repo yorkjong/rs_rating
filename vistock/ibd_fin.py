@@ -74,14 +74,16 @@ def metric_strength_vs_benchmark(quarterly_metric, annual_metric,
     # Calculate weighted YoY growth
     yoy_growth_metric = weighted_yoy_growth(quarterly_metric, annual_metric)
     yoy_growth_bench = weighted_yoy_growth(quarterly_bench, annual_bench)
+    #print('weighted yoy:', yoy_growth_metric, yoy_growth_bench)
 
-    # Align
+    # Align series lengths
     length = min(len(yoy_growth_metric), len(yoy_growth_bench))
     yoy_growth_metric = yoy_growth_metric[-length:]
     yoy_growth_bench = yoy_growth_bench[-length:]
 
     # Calculate relative strength
     strength = (yoy_growth_metric.values - yoy_growth_bench.values) * 100
+    print('strength:', strength.round(2))
 
     # Return result as a Series with the original index
     return pd.Series(strength, index=yoy_growth_metric.index)
@@ -110,18 +112,20 @@ def weighted_yoy_growth(quarterly_data, annual_data):
     # Calculate YoY growth for each period
     quarterly_yoy_growth = yoy_growth(quarterly_data, frequency='Q')
     annual_yoy_growth = yoy_growth(annual_data, frequency='A')
+    #print('yoy_growth', quarterly_yoy_growth, annual_yoy_growth)
 
     # Weights based on the importance of quarterly vs annual data
     quarterly_weight = 2    # weight for quarterly data
     annual_weight = 1       # weight for annual data
 
     # Rolling moving average for smoothing YoY growth values
-    moving_average = lambda x: x.rolling(window=3, min_periods=1).mean()
+    win = 3                 # window size of the moving average
+    moving_average = lambda x: x.rolling(window=win, min_periods=1).mean()
 
     ma_yoy_q = moving_average(quarterly_yoy_growth)
     ma_yoy_a = moving_average(annual_yoy_growth)
 
-    # Align
+    # Align series lengths
     length = min(len(ma_yoy_q), len(ma_yoy_a))
     ma_yoy_q = ma_yoy_q[-length:]
     ma_yoy_a = ma_yoy_a[-length:]
@@ -202,6 +206,7 @@ def financial_metric_ranking(tickers):
         fins_q, info, 'Basic EPS', 'sharesOutstanding')
     bench_eps_a = yfu.calc_weighted_metric(
         fins_a, info, 'Basic EPS', 'sharesOutstanding')
+    print('bench_eps:', bench_eps_q, bench_eps_a)
 
     # weighted RPS of benchmark
     bench_rev_q = yfu.calc_weighted_metric(fins_q, info,
