@@ -83,7 +83,7 @@ def metric_strength_vs_benchmark(quarterly_metric, annual_metric,
 
     # Calculate relative strength
     strength = (yoy_growth_metric.values - yoy_growth_bench.values) * 100
-    print('strength:', strength.round(2))
+    #print('strength:', strength.round(2))
 
     # Return result as a Series with the original index
     return pd.Series(strength, index=yoy_growth_metric.index)
@@ -119,11 +119,10 @@ def weighted_yoy_growth(quarterly_data, annual_data):
     annual_weight = 1       # weight for annual data
 
     # Rolling moving average for smoothing YoY growth values
-    win = 3                 # window size of the moving average
-    moving_average = lambda x: x.rolling(window=win, min_periods=1).mean()
+    moving_average = lambda x, w: x.rolling(window=w, min_periods=1).mean()
 
-    ma_yoy_q = moving_average(quarterly_yoy_growth)
-    ma_yoy_a = moving_average(annual_yoy_growth)
+    ma_yoy_q = moving_average(quarterly_yoy_growth, 2)
+    ma_yoy_a = moving_average(annual_yoy_growth, 3)
 
     # Align series lengths
     length = min(len(ma_yoy_q), len(ma_yoy_a))
@@ -206,7 +205,7 @@ def financial_metric_ranking(tickers):
         fins_q, info, 'Basic EPS', 'sharesOutstanding')
     bench_eps_a = yfu.calc_weighted_metric(
         fins_a, info, 'Basic EPS', 'sharesOutstanding')
-    print('bench_eps:', bench_eps_q, bench_eps_a)
+    #print('bench_eps:', bench_eps_q, bench_eps_a)
 
     # weighted RPS of benchmark
     bench_rev_q = yfu.calc_weighted_metric(fins_q, info,
@@ -219,7 +218,7 @@ def financial_metric_ranking(tickers):
         eps_a = fins_a[ticker]['Basic EPS']
         eps_rs = metric_strength_vs_benchmark(eps_q, eps_a,
                                               bench_eps_q, bench_eps_a)
-        print('eps: ', eps_q, eps_a)
+        #print('eps: ', eps_q, eps_a)
         #rev_q = fins_q[ticker]['Operating Revenue']
         #rev_a = fins_a[ticker]['Operating Revenue']
         #rev_rs = metric_strength_vs_benchmark(rev_q, rev_a,
@@ -265,7 +264,7 @@ def main(out_dir='out'):
     #code = 'SPX+DJIA+NDX+RUI+SOX'
     tickers = get_tickers(code)
 
-    tickers = ['NVDA', 'TSM']
+    #tickers = ['NVDA', 'TSM', 'AAPL']
     rank = financial_metric_ranking(tickers)
     print(rank.head(10))
 
