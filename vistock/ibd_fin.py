@@ -154,12 +154,10 @@ def yoy_growth(data_series, frequency):
         year prior, adjusted by the minimum absolute value of the current and
         previous values.
     """
-    if frequency == 'Q':
-        period = 4  # For quarterly data, one year is 4 quarters
-    elif frequency == 'A':
-        period = 1  # For annual data, one year is 1 year
-    else:
-        period = 1  # Default case
+    period = {
+        'Q': 4,
+        'A': 1,
+    }[frequency]
 
     # Ensure inputs are pandas Series
     if not isinstance(data_series, pd.Series):
