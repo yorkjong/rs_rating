@@ -26,7 +26,8 @@ import yfinance as yf
 # Weighted Average Metric (e.g., EPS, Revenue)
 #------------------------------------------------------------------------------
 
-def calc_weighted_metric(financials, tickers_info, metric, weight_field):
+def calc_weighted_metric(financials, tickers_info, metric, weight_field,
+                         threshold=0.7):
     """
     Calculate the weighted average of a specified financial metric for all stock
     symbols in the provided dataset using NumPy. The weights can be based on any
@@ -47,6 +48,9 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field):
     weight_field : str
         The field name to use for weighting (e.g., 'marketCap',
         'sharesOutstanding').
+    threshold : float, optional
+        The minimum percentage of the total possible weight required for a valid
+        weighted average (default is 0.7, meaning 70%).
 
     Returns
     -------
@@ -120,8 +124,15 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field):
     valid_mask = ~np.isnan(weighted_metric)
 
     # Calculate total weight for each time point
-    total_weight = np.sum(weights[:, np.newaxis] * valid_mask, axis=0)
+    total_weight = np.sum(weights[:, np.newaxis] * valid_mask,
+                          axis=0).astype(float)
+    max_total_weight = weights.sum()
 
+    # Set values to NaN where total_weight is below threshold
+    below_threshold_mask = total_weight < (max_total_weight * threshold)
+    total_weight[below_threshold_mask] = np.nan
+
+    # Calculate weighted average metric
     weighted_avg_metric = np.nansum(weighted_metric, axis=0) / total_weight
 
     return weighted_avg_metric
