@@ -17,10 +17,16 @@ __all__ = [
 
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import logging
 
 import numpy as np
 import pandas as pd
 import yfinance as yf
+
+# Configure logging
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 
 #------------------------------------------------------------------------------
 # Weighted Average Metric (e.g., EPS, Revenue)
@@ -99,11 +105,11 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field,
             metric_list.append(metric_data.values)
             weights.append(weight)
         else:
-            print("Warning: No valid metric or "
-                  f"weight data available for {symbol}.")
+            logger.warning("No valid metric or "
+                           f"weight data available for {symbol}.")
 
     if not metric_list:
-        print("No valid metric data found for any symbol.")
+        logger.warning("No valid metric data found for any symbol.")
         return np.array([])
 
     # Ensure all metric arrays have the same length. Use NaN for padding.
@@ -174,8 +180,8 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
         financials = financials.sort_index(ascending=True)
 
         if financials.empty:
-            print(f"\nWarning: {symbol}: Financials data is empty, "
-                  "returning NaN-filled DataFrame.")
+            logger.warning(f"\n{symbol}: Financials data is empty, "
+                           "returning NaN-filled DataFrame.")
             if fields:
                 return pd.DataFrame({field: [np.nan] for field in fields})
             else:
@@ -186,8 +192,9 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
             missing_fields = [field for field in fields
                               if field not in financials.columns]
             if missing_fields:
-                print(f"\nWarning:{symbol}: Missing fields: "
-                      f"{str(missing_fields)} will be filled with NaN.")
+                logger.warning(
+                    f"\n{symbol}: Missing fields: "
+                    f"{str(missing_fields)} will be filled with NaN.")
 
             # Ensure all requested fields are present,
             # adding NaNs for missing fields
@@ -201,7 +208,7 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
         return financials
 
     except Exception as e:
-        print(f"\nError fetching financials for {symbol}: {e}")
+        logger.error(f"\nError fetching financials for {symbol}: {e}")
         return pd.DataFrame(np.nan, index=[0], columns=fields)
 
 
@@ -267,7 +274,7 @@ def download_financials(symbols, fields=None, frequency='quarterly',
                     print_progress_bar(iteration, len(symbols),
                                        suffix='financials downloaded')
             except Exception as e:
-                print(f"Error fetching financials for {symbol}: {e}")
+                logger.error(f"Error fetching financials for {symbol}: {e}")
 
     return financials_dict
 
@@ -339,9 +346,10 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
                         inf[key] = ''  # Default for string fields
                     else:
                         inf[key] = None  # Default for other data types
-                        print(f"\nError fetching data for {symbol}: {e}")
+                        logger.error(
+                            f"\nError fetching data for {symbol}: {e}")
         except Exception as e:
-            print(f"\nError fetching data for {symbol}: {e}")
+            logger.error(f"\nError fetching data for {symbol}: {e}")
         return inf
 
     info_dict = {}
@@ -366,7 +374,7 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
                     print_progress_bar(iteration, len(symbols),
                                        suffix='info downloaded')
             except Exception as e:
-                print(f"Error fetching info for {symbol}: {e}")
+                logger.error(f"Error fetching info for {symbol}: {e}")
 
     return info_dict
 
