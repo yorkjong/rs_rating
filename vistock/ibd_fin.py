@@ -234,9 +234,9 @@ def financial_metric_ranking(tickers):
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'Price': info[ticker]['previousClose'],
-            'EPS RS (%)': eps_rs.iloc[-1],
+            'EPS RS (%)': round(eps_rs.iloc[-1], 2),
             'TTM EPS': info[ticker]['trailingEps'],
-            'Rev RS (%)': rev_rs.iloc[-1],
+            #'Rev RS (%)': round(rev_rs.iloc[-1], 2),
             'TTM RPS': info[ticker]['revenuePerShare'],
             'TTM PE': round(pe, 2),
         }
