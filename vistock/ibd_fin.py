@@ -240,8 +240,10 @@ def financial_metric_ranking(tickers):
         eps_a = fins_a[ticker]['Basic EPS']
         eps_rs = metric_strength_vs_benchmark(eps_q, eps_a,
                                               bench_eps_q, bench_eps_a)
-        eps_qoq = qoq_growth(eps_q).round(2)
         #print('eps: ', eps_q, eps_a)
+        eps_qoq = qoq_growth(eps_q).round(2)
+        eps_yoy = yoy_growth(eps_q, 'Q').round(2)
+        #print('eps_yoy:', eps_yoy)
 
         rev_q = fins_q[ticker]['Operating Revenue']
         rev_a = fins_a[ticker]['Operating Revenue']
@@ -258,10 +260,11 @@ def financial_metric_ranking(tickers):
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'Price': info[ticker]['previousClose'],
-            'QoQ 4Q Algo': eps_qoq.iloc[-4],
-            'QoQ 3Q Algo': eps_qoq.iloc[-3],
-            'QoQ 2Q Algo': eps_qoq.iloc[-2],
+            'QoQ 3 Qtrs Algo': eps_qoq.iloc[-3],
+            'QoQ 2 Qtrs Algo': eps_qoq.iloc[-2],
             'QoQ latest': eps_qoq.iloc[-1],
+            'YoY 2 Qtrs Algo': eps_yoy.iloc[-2],
+            'YoY latest': eps_yoy.iloc[-1],
             'EPS RS (%)': round(eps_rs.iloc[-1], 2),
             'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': round(rev_rs.iloc[-1], 2),
@@ -292,7 +295,7 @@ def main(out_dir='out'):
     #code = 'SPX+DJIA+NDX+RUI+SOX'
     tickers = get_tickers(code)
 
-    #tickers = ['NVDA', 'TSM', 'AAPL']
+    #tickers = ['AMD', 'NVDA', 'TSM']
     rank = financial_metric_ranking(tickers)
     print(rank.head(10))
 
