@@ -24,9 +24,9 @@ from ibd_fin import financial_metric_ranking
 # Example usage
 ranking_df = financial_metric_ranking(stock_data)
 """
-__version__ = "1.0"
+__version__ = "1.1"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/09/15 (initial version) ~ 2024/09/29 (last revision)"
+__date__ = "2024/09/15 (initial version) ~ 2024/09/30 (last revision)"
 
 __all__ = [
     'metric_strength_vs_benchmark',
@@ -179,6 +179,28 @@ def yoy_growth(data_series, frequency):
     return growth
 
 
+def qoq_growth(data_series):
+    """
+    Calculate Quarter-over-Quarter (QoQ) growth for a financial data series.
+
+    This function calls the yoy_growth function with a frequency of 'A'
+    to compute the YoY growth for quarterly data.
+
+    Parameters
+    ----------
+    data_series : pd.Series
+        Series of quarterly financial data (e.g., revenue, EPS, RPS).
+
+    Returns
+    -------
+    pd.Series
+        Series containing the YoY growth values for quarterly data, where the
+        YoY growth is calculated as the percentage change from the
+        corresponding value one year prior, adjusted by the minimum absolute
+        value of the current and previous values.
+    """
+    return yoy_growth(data_series, 'A')
+
 #------------------------------------------------------------------------------
 # Financial Metric Ranking
 #------------------------------------------------------------------------------
@@ -218,7 +240,9 @@ def financial_metric_ranking(tickers):
         eps_a = fins_a[ticker]['Basic EPS']
         eps_rs = metric_strength_vs_benchmark(eps_q, eps_a,
                                               bench_eps_q, bench_eps_a)
+        eps_qoq = qoq_growth(eps_q).round(2)
         #print('eps: ', eps_q, eps_a)
+
         rev_q = fins_q[ticker]['Operating Revenue']
         rev_a = fins_a[ticker]['Operating Revenue']
         rev_rs = metric_strength_vs_benchmark(rev_q, rev_a,
@@ -234,6 +258,10 @@ def financial_metric_ranking(tickers):
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'Price': info[ticker]['previousClose'],
+            'QoQ 4Q Algo': eps_qoq.iloc[-4],
+            'QoQ 3Q Algo': eps_qoq.iloc[-3],
+            'QoQ 2Q Algo': eps_qoq.iloc[-2],
+            'QoQ latest': eps_qoq.iloc[-1],
             'EPS RS (%)': round(eps_rs.iloc[-1], 2),
             'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': round(rev_rs.iloc[-1], 2),
