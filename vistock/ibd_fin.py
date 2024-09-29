@@ -219,10 +219,10 @@ def financial_metric_ranking(tickers):
         eps_rs = metric_strength_vs_benchmark(eps_q, eps_a,
                                               bench_eps_q, bench_eps_a)
         #print('eps: ', eps_q, eps_a)
-        #rev_q = fins_q[ticker]['Operating Revenue']
-        #rev_a = fins_a[ticker]['Operating Revenue']
-        #rev_rs = metric_strength_vs_benchmark(rev_q, rev_a,
-        #                                      bench_rev_q, bench_rev_a)
+        rev_q = fins_q[ticker]['Operating Revenue']
+        rev_a = fins_a[ticker]['Operating Revenue']
+        rev_rs = metric_strength_vs_benchmark(rev_q, rev_a,
+                                              bench_rev_q, bench_rev_a)
         pe = info[ticker]['trailingPE']
         if not isinstance(pe, float):
             print(f"info[{ticker}]['trailingPE']: {pe}")
@@ -236,7 +236,7 @@ def financial_metric_ranking(tickers):
             'Price': info[ticker]['previousClose'],
             'EPS RS (%)': round(eps_rs.iloc[-1], 2),
             'TTM EPS': info[ticker]['trailingEps'],
-            #'Rev RS (%)': round(rev_rs.iloc[-1], 2),
+            'Rev RS (%)': round(rev_rs.iloc[-1], 2),
             'TTM RPS': info[ticker]['revenuePerShare'],
             'TTM PE': round(pe, 2),
         }
