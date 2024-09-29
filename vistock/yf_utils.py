@@ -4,9 +4,9 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "3.9"
+__version__ = "4.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/09/24 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/09/29 (last revision)"
 
 __all__ = [
     'calc_weighted_metric',
@@ -82,7 +82,7 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field):
 
     for symbol, financial_df in financials.items():
         # Retrieve the weight based on the provided weight field
-        weight = tickers_info.get(symbol, {}).get(weight_field, 0)
+        weight = tickers_info.get(symbol, {}).get(weight_field, 0.)
 
         if (weight > 0 and financial_df is not None
                        and metric in financial_df.columns):
@@ -116,12 +116,11 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field):
     # Calculate weighted metric using broadcasting
     weighted_metric = metric_array * weights[:, np.newaxis]
 
-    # Calculate weighted average metric
-    total_weight = weights.sum()
-    if total_weight == 0:
-        print("Total weight is zero. "
-              "Cannot calculate weighted average metric.")
-        return np.array([])
+    # Create a mask for valid (non-NaN) values in weighted_metric
+    valid_mask = ~np.isnan(weighted_metric)
+
+    # Calculate total weight for each time point
+    total_weight = np.sum(weights[:, np.newaxis] * valid_mask, axis=0)
 
     weighted_avg_metric = np.nansum(weighted_metric, axis=0) / total_weight
 
