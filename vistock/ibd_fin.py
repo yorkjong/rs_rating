@@ -13,17 +13,6 @@ Key functionalities include:
 - Sorting and analysis of financial performance across multiple stocks using
   custom ranking methods.
 
-Functions:
-
-- metric_strength_vs_benchmark: Calculates the relative strength of a financial
-  metric versus a benchmark.
-- weighted_yoy_growth: Computes weighted Year-over-Year (YoY) growth for
-  financial data.
-- yoy_growth: Calculates Year-over-Year (YoY) growth for a given financial
-  metric series.
-- financial_metric_ranking: Creates and ranks a DataFrame of financial metrics
-  for multiple stocks, based on custom ranking methods.
-
 Usage:
 
 Import this module to access functions for analyzing and ranking financial data.
