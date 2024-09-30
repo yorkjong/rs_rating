@@ -24,9 +24,9 @@ from ibd_fin import financial_metric_ranking
 # Example usage
 ranking_df = financial_metric_ranking(stock_data)
 """
-__version__ = "1.1"
+__version__ = "1.2"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/09/15 (initial version) ~ 2024/09/30 (last revision)"
+__date__ = "2024/09/15 (initial version) ~ 2024/10/01 (last revision)"
 
 __all__ = [
     'metric_strength_vs_benchmark',
@@ -261,10 +261,10 @@ def financial_metric_ranking(tickers):
             #'Industry': info[ticker]['industry'],
             'Price': info[ticker]['previousClose'],
             'EPS QoQ (%)': eps_qoq.iloc[-1],
-            'QoQ 2Q Algo (%)': eps_qoq.iloc[-2],
-            'QoQ 3Q Algo (%)': eps_qoq.iloc[-3],
+            'QoQ 2Q Algo (%)': eps_qoq.iloc[-2] if len(eps_qoq) > 1 else np.nan,
+            'QoQ 3Q Algo (%)': eps_qoq.iloc[-3] if len(eps_qoq) > 2 else np.nan,
             'EPS YoY (%)': eps_yoy.iloc[-1],
-            'YoY 2Q Algo (%)': eps_yoy.iloc[-2],
+            'YoY 2Q Algo (%)': eps_yoy.iloc[-2] if len(eps_yoy) > 1 else np.nan,
             'EPS RS (%)': round(eps_rs.iloc[-1], 2),
             'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': round(rev_rs.iloc[-1], 2),
@@ -299,6 +299,7 @@ def main(out_dir='out'):
     from vistock.stock_indices import get_tickers
 
     code = 'SOX'
+    code = 'NDX'
     #code = 'SPX+DJIA+NDX+RUI+SOX'
     tickers = get_tickers(code)
 
