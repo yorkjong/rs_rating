@@ -257,14 +257,14 @@ def financial_metric_ranking(tickers):
         # Construct DataFrame for current stock
         row = {
             'Ticker': ticker,
-            'Sector': info[ticker]['sector'],
-            'Industry': info[ticker]['industry'],
+            #'Sector': info[ticker]['sector'],
+            #'Industry': info[ticker]['industry'],
             'Price': info[ticker]['previousClose'],
-            'QoQ 3 Qtrs Algo': eps_qoq.iloc[-3],
-            'QoQ 2 Qtrs Algo': eps_qoq.iloc[-2],
-            'QoQ latest': eps_qoq.iloc[-1],
-            'YoY 2 Qtrs Algo': eps_yoy.iloc[-2],
-            'YoY latest': eps_yoy.iloc[-1],
+            'EPS QoQ (%)': eps_qoq.iloc[-1],
+            'QoQ 2Q Algo (%)': eps_qoq.iloc[-2],
+            'QoQ 3Q Algo (%)': eps_qoq.iloc[-3],
+            'EPS YoY (%)': eps_yoy.iloc[-1],
+            'YoY 2Q Algo (%)': eps_yoy.iloc[-2],
             'EPS RS (%)': round(eps_rs.iloc[-1], 2),
             'TTM EPS': info[ticker]['trailingEps'],
             'Rev RS (%)': round(rev_rs.iloc[-1], 2),
@@ -278,6 +278,13 @@ def financial_metric_ranking(tickers):
 
     # Sort by current rank
     ranking_df = ranking_df.sort_values(by='EPS RS (%)', ascending=False)
+
+    # Rank based on Relative Strength
+    rank_columns = ['EPS RS Rank (%)', 'RPS RS Rank (%)']
+    rs_columns = ['EPS RS (%)', 'Rev RS (%)']
+    for rank_col, rs_col in zip(rank_columns, rs_columns):
+        rank_pct = ranking_df[rs_col].rank(pct=True)
+        ranking_df[rank_col] = (rank_pct * 100).round(2)
 
     return ranking_df
 
