@@ -31,9 +31,9 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "2.7"
+__version__ = "2.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/09/11 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/10/01 (last revision)"
 
 __all__ = [
     'get_tickers',
@@ -106,7 +106,8 @@ def symbols_from_wikipedia_table(article,
 
 
 spx_tickers = functools.partial(
-        symbols_from_wikipedia_table, 'List_of_S%26P_500_companies')
+        symbols_from_wikipedia_table, 'List_of_S%26P_500_companies',
+        class_=None)
 djia_tickers = functools.partial(
         symbols_from_wikipedia_table, 'Dow_Jones_Industrial_Average')
 ndx_tickers = functools.partial(
