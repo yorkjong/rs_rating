@@ -257,8 +257,8 @@ def financial_metric_ranking(tickers):
         # Construct DataFrame for current stock
         row = {
             'Ticker': ticker,
-            #'Sector': info[ticker]['sector'],
-            #'Industry': info[ticker]['industry'],
+            'Sector': info[ticker]['sector'],
+            'Industry': info[ticker]['industry'],
             'Price': info[ticker]['previousClose'],
             'EPS QoQ (%)': eps_qoq.iloc[-1],
             'QoQ 2Q Algo (%)': eps_qoq.iloc[-2] if len(eps_qoq) > 1 else np.nan,
