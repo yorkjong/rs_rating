@@ -311,7 +311,7 @@ def main(out_dir='out'):
     print("\n\n***")
     os.makedirs(out_dir, exist_ok=True)
     today = datetime.now().strftime('%Y%m%d')
-    filename = f'{code}_ibd_fin_{today}.csv'
+    filename = f'{code}_stocks_fin_{today}.csv'
     rank.to_csv(os.path.join(out_dir, filename), index=False)
     print(f'Your "{filename}" is in the "{out_dir}" folder.')
     print("***\n")
