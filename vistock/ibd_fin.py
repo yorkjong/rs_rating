@@ -24,7 +24,7 @@ from ibd_fin import financial_metric_ranking
 # Example usage
 ranking_df = financial_metric_ranking(stock_data)
 """
-__version__ = "1.2"
+__version__ = "1.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/09/15 (initial version) ~ 2024/10/01 (last revision)"
 
@@ -174,7 +174,7 @@ def yoy_growth(data_series, frequency):
     min_abs_values = np.minimum(data_series.abs(), shifted_series.abs())
 
     # Calculate YoY growth using min abs value
-    growth = (data_series - shifted_series) / min_abs_values
+    growth = (data_series - shifted_series) / (min_abs_values + 1e-8)
 
     return growth
 
