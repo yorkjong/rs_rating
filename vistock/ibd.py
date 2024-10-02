@@ -59,9 +59,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "2.9"
+__version__ = "3.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/08/30 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/02 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -113,9 +113,12 @@ def relative_strength(closes, closes_ref, interval='1d'):
 
     ::
 
-        growth = a/b =  ((a - b) / b) + 1 = return + 1
-        growth_rate = growth_stock / growth_index
-        rating = growth_rate * 100
+        PR = current/previous = ((current - previous) / previous) + 1
+           = return + 1
+        relative_rate = PR_stock / PR_index
+        relative_strength = relative_rate * 100
+
+    Here PR means 'price ratio' or 'price relative'
 
     The quarter-weighted growth is calculated using the `weighted_return`
     function.
