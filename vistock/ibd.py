@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.9"
+__version__ = "4.0"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -320,12 +320,12 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     rs_data = []
     for ticker in tickers:
         rs = rs_func(df[ticker], df[ticker_ref], interval)
+        closes = df[ticker].ffill()
         end_date = rs.index[-1]
 
-        # Construct DataFrame for current stock
         rs_data.append({
             'Ticker': ticker,
-            'Price': round(df[ticker].iloc[-1], 2),
+            'Price': round(closes.iloc[-1], 2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'Relative Strength': rs.asof(end_date),
@@ -430,22 +430,17 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     df = df.xs('Close', level='Price', axis=1)
 
     # Batch download stock info
-    info = yfu.download_tickers_info(tickers,
-                                     ['sector', 'industry', 'previousClose'])
-    def price(ticker):
-        ret = df[ticker].iloc[-1]
-        if ret is np.nan:
-            ret = info[ticker]['previousClose']
-        return round(ret, 2)
-
+    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
     # Calculate RS values for all stocks
     rs_data = []
     for ticker in tickers:
         rs_series = rs_func(df[ticker], df[ticker_ref], interval)
+        closes = df[ticker].ffill()
         end_date = rs_series.index[-1]
+
         rs_data.append({
             'Ticker': ticker,
-            'Price': price(ticker),
+            'Price': round(closes.iloc[-1], 2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'RS': rs_series.asof(end_date),
@@ -605,10 +600,12 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
         The output directory to store CSV tables. Defaults to 'out'.
     '''
     import vistock.stock_indices as si
-    rank_stock, rank_indust = rankings(
-        si.get_tickers('SOX'), interval='1d',
-        percentile_method=percentile_method, rs_period=rs_period
-    )
+
+    tickers = si.get_tickers('SOX')
+    tickers = ['2330.TW', '2401.TW']
+    rank_stock, rank_indust = rankings(tickers, interval='1d',
+                                       percentile_method=percentile_method,
+                                       rs_period=rs_period)
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
@@ -635,7 +632,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    test_ranking(rs_period='3mo')
+    #test_ranking(rs_period='3mo')
     test_rankings(percentile_method='qcut', rs_period='3mo')
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
