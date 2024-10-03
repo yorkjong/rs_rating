@@ -44,7 +44,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.1"
+__version__ = "3.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -276,30 +276,30 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
     ranking_df = pd.concat(rows, ignore_index=True)
 
     # Rank based on Relative Strength
-    rank_columns = ['Rank', ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
+    rank_columns = ['Rank',
+                    ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
     rs_columns = ['Relative Strength',
                   '1 Month Ago', '3 Months Ago', '6 Months Ago']
     for rank_col, rs_col in zip(rank_columns, rs_columns):
-        ranking_df[rank_col] = ranking_df[rs_col].rank(
-            ascending=False, method='min').astype('Int64')
+        rank_pct = ranking_df[rs_col].rank(pct=True)
+        ranking_df[rank_col] = (rank_pct * 100).round(2)
 
     # Sort by current rank
-    ranking_df = ranking_df.sort_values(by='Rank')
+    ranking_df = ranking_df.sort_values(by='Rank', ascending=False)
 
     # Calculate average RS for each industry
-    industry_rs = ranking_df.groupby(
-        'Industry')['Relative Strength'].mean().round(2).reset_index()
-    industry_rs.columns = ['Industry', 'Industry Relative Strength']
+    industry_rs = ranking_df.groupby('Industry')[
+        'Relative Strength'].mean().round(2).reset_index()
+    industry_rs.columns = ['Industry', 'Industry RS']
 
     # Rank industries based on average Relative Strength
-    industry_rs['Industry Rank'] = industry_rs[
-        'Industry Relative Strength'].rank(
-            ascending=False, method='min').astype('Int64')
+    rank_pct = industry_rs['Industry RS'].rank(pct=True)
+    industry_rs['Industry Rank'] = (rank_pct * 100).round(2)
 
     # Merge industry rankings back into stock DataFrame
     ranking_df = pd.merge(ranking_df, industry_rs, on='Industry', how='left')
 
-    return ranking_df.sort_values(by=['Industry Rank', 'Rank'])
+    return ranking_df
 
 
 #------------------------------------------------------------------------------
