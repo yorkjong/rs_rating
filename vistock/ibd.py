@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.7"
+__version__ = "3.8"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -317,31 +317,25 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     # Fetch info for stocks
     info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
 
-    rows = []
+    rs_data = []
     for ticker in tickers:
         rs = rs_func(df[ticker], df[ticker_ref], interval)
-
-        # Calculate RS for different time periods
         end_date = rs.index[-1]
-        one_month_ago = end_date - pd.DateOffset(months=1)
-        three_months_ago = end_date - pd.DateOffset(months=3)
-        six_months_ago = end_date - pd.DateOffset(months=6)
 
         # Construct DataFrame for current stock
-        rank_df = pd.DataFrame({
-            'Ticker': [ticker],
-            'Price': [round(df[ticker].iloc[-1], 2)],
+        rs_data.append({
+            'Ticker': ticker,
+            'Price': round(df[ticker].iloc[-1], 2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
-            'Relative Strength': [rs.asof(end_date)],
-            '1 Month Ago': [rs.asof(one_month_ago)],
-            '3 Months Ago': [rs.asof(three_months_ago)],
-            '6 Months Ago': [rs.asof(six_months_ago)]
+            'Relative Strength': rs.asof(end_date),
+            '1 Month Ago': rs.asof(end_date - pd.DateOffset(months=1)),
+            '3 Months Ago': rs.asof(end_date - pd.DateOffset(months=3)),
+            '6 Months Ago': rs.asof(end_date - pd.DateOffset(months=6))
         })
-        rows.append(rank_df)
 
-    # Combine rows into a single DataFrame
-    ranking_df = pd.concat(rows, ignore_index=True)
+    # Create DataFrame from RS data
+    ranking_df = pd.DataFrame(rs_data)
 
     # Rank based on Relative Strength
     rank_columns = ['Rank (%)',
