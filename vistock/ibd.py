@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.5"
+__version__ = "3.6"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -306,8 +306,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     """
     # Select the appropriate relative strength function based on the rs_period
     rs_func = {
-        '3mo': relative_strength,
-        '12mo': relative_strength_3m,
+        '3mo': relative_strength_3m,
+        '12mo': relative_strength,
     }[rs_period]
 
     # Fetch data for stock and index
@@ -427,8 +427,8 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     """
     # Select the appropriate relative strength function based on the rs_period
     rs_func = {
-        '3mo': relative_strength,
-        '12mo': relative_strength_3m,
+        '3mo': relative_strength_3m,
+        '12mo': relative_strength,
     }[rs_period]
 
     # Batch download stock data
