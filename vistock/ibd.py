@@ -569,7 +569,8 @@ def test_ranking(period='2y', rs_period='12mo', out_dir='out'):
     from datetime import datetime
     from vistock.stock_indices import get_tickers
 
-    code = 'SPX+DJIA+NDX+SOX'
+    #code = 'SPX+DJIA+NDX+SOX'
+    code = 'SPX'
     tickers = get_tickers(code)
     remove_tickers = ['HBAN', 'SW', 'BRK.B', 'VLTO', 'ARM', 'SOLV', 'GEV', 'BF.B']
     tickers = [t for t in tickers if t not in remove_tickers]
@@ -581,7 +582,7 @@ def test_ranking(period='2y', rs_period='12mo', out_dir='out'):
     print("\n\n***")
     os.makedirs(out_dir, exist_ok=True)
     today = datetime.now().strftime('%Y%m%d')
-    filename = f'{code}_stocks_{period}_ibd_{today}.csv'
+    filename = f'{code}_stocks_rs{rs_period}_{period}_{today}.csv'
     rank.to_csv(os.path.join(out_dir, filename), index=False)
     print(f'Your "{filename}" is in the "{out_dir}" folder.')
     print("***\n")
@@ -602,7 +603,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     import vistock.stock_indices as si
 
     tickers = si.get_tickers('SOX')
-    tickers = ['2330.TW', '2401.TW']
+    #tickers = ['2330.TW', '2401.TW']
     rank_stock, rank_indust = rankings(tickers, interval='1d',
                                        percentile_method=percentile_method,
                                        rs_period=rs_period)
@@ -632,7 +633,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    #test_ranking(rs_period='3mo')
+    test_ranking(rs_period='3mo')
     test_rankings(percentile_method='qcut', rs_period='3mo')
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
