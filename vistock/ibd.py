@@ -288,7 +288,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
 
     # Calculate average RS for each industry
     industry_rs = ranking_df.groupby(
-        'Industry')['Relative Strength'].mean().reset_index()
+        'Industry')['Relative Strength'].mean().round(2).reset_index()
     industry_rs.columns = ['Industry', 'Industry Relative Strength']
 
     # Rank industries based on average Relative Strength
