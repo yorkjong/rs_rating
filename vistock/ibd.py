@@ -11,21 +11,6 @@ Key Features:
 - Stock and industry ranking generation
 - Percentile-based filtering of rankings
 
-Public Functions:
------------------
-- relative_strength: Calculate the relative strength of a stock compared to a
-  reference index.
-- rankings: Generate comprehensive rankings for both individual stocks and
-  industries.
-- ma_window_size: Calculate moving average window size based on the IBD
-  convention.
-
-Constants:
-----------
-- TITLE_PERCENTILE: Column name for the percentile ranking in the output
-                    DataFrames. Used for filtering results based on percentile
-                    thresholds.
-
 Usage:
 ------
 
@@ -59,9 +44,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.0"
+__version__ = "3.1"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/02 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -264,7 +249,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
     # Fetch info for stocks
     info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
 
-    results = []
+    rows = []
     for ticker in tickers:
         rs = relative_strength(df[ticker], df[ticker_ref], interval)
 
@@ -285,23 +270,36 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
             '3 Months Ago': [rs.asof(three_months_ago)],
             '6 Months Ago': [rs.asof(six_months_ago)]
         })
-        results.append(rank_df)
+        rows.append(rank_df)
 
-    # Combine results into a single DataFrame
-    ranking_df = pd.concat(results, ignore_index=True)
+    # Combine rows into a single DataFrame
+    ranking_df = pd.concat(rows, ignore_index=True)
 
     # Rank based on Relative Strength
     rank_columns = ['Rank', ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
     rs_columns = ['Relative Strength',
-                  '1 Month Ago', '3 Months Ago', '6 Months Ago' ]
+                  '1 Month Ago', '3 Months Ago', '6 Months Ago']
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         ranking_df[rank_col] = ranking_df[rs_col].rank(
-                ascending=False, method='min').astype('Int64')
+            ascending=False, method='min').astype('Int64')
 
     # Sort by current rank
     ranking_df = ranking_df.sort_values(by='Rank')
 
-    return ranking_df
+    # Calculate average RS for each industry
+    industry_rs = ranking_df.groupby(
+        'Industry')['Relative Strength'].mean().reset_index()
+    industry_rs.columns = ['Industry', 'Industry Relative Strength']
+
+    # Rank industries based on average Relative Strength
+    industry_rs['Industry Rank'] = industry_rs[
+        'Industry Relative Strength'].rank(
+            ascending=False, method='min').astype('Int64')
+
+    # Merge industry rankings back into stock DataFrame
+    ranking_df = pd.merge(ranking_df, industry_rs, on='Industry', how='left')
+
+    return ranking_df.sort_values(by=['Industry Rank', 'Rank'])
 
 
 #------------------------------------------------------------------------------
@@ -603,7 +601,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    #test_ranking()
-    test_rankings()
+    test_ranking()
+    #test_rankings()
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
