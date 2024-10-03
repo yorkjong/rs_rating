@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.3"
+__version__ = "4.4"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/04 (last revision)"
 
@@ -587,7 +587,7 @@ def test_ranking(period='2y', rs_period='12mo', out_dir='out'):
     print("\n\n***")
     os.makedirs(out_dir, exist_ok=True)
     today = datetime.now().strftime('%Y%m%d')
-    filename = f'{code}_stocks_rs{rs_period}_{period}_{today}.csv'
+    filename = f'{code}_stocks_{period}_ibd{rs_period}_{today}.csv'
     rank.to_csv(os.path.join(out_dir, filename), index=False)
     print(f'Your "{filename}" is in the "{out_dir}" folder.')
     print("***\n")
