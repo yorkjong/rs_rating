@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.2"
+__version__ = "4.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/04 (last revision)"
 
@@ -320,7 +320,6 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     rs_data = []
     for ticker in tickers:
         rs = rs_func(df[ticker], df[ticker_ref], interval)
-        closes = df[ticker].ffill()
         end_date = rs.index[-1]
 
         # Calculate max values for the specified time periods
@@ -331,7 +330,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 
         rs_data.append({
             'Ticker': ticker,
-            'Price': closes.iloc[-1].round(2),
+            'Price': df[ticker].asof(end_date).round(2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'Relative Strength': rs.asof(end_date),
@@ -442,12 +441,11 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     rs_data = []
     for ticker in tickers:
         rs_series = rs_func(df[ticker], df[ticker_ref], interval)
-        closes = df[ticker].ffill()
         end_date = rs_series.index[-1]
 
         rs_data.append({
             'Ticker': ticker,
-            'Price': closes.iloc[-1].round(2),
+            'Price': df[ticker].asof(end_date).round(2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'RS': rs_series.asof(end_date),
@@ -610,7 +608,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     import vistock.stock_indices as si
 
     tickers = si.get_tickers('SOX')
-    #tickers = ['2330.TW', '2401.TW']
+    tickers = ['2330.TW', '2401.TW']
     rank_stock, rank_indust = rankings(tickers, interval='1d',
                                        percentile_method=percentile_method,
                                        rs_period=rs_period)
