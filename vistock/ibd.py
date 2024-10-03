@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.6"
+__version__ = "3.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -250,8 +250,8 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
     }[interval]
 
     # Calculate daily returns for the stock and reference index
-    returns_stock = closes.pct_change().fillna(0)
-    returns_ref = closes_ref.pct_change().fillna(0)
+    returns_stock = closes.ffill().pct_change(fill_method=None)
+    returns_ref = closes_ref.ffill().pct_change(fill_method=None)
 
     # Calculate the Exponential Moving Average (EMA) of the returns
     ema_returns_stock = returns_stock.ewm(span=span, adjust=False).mean()
