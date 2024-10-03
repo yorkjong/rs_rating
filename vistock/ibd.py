@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.8"
+__version__ = "3.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -430,7 +430,13 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     df = df.xs('Close', level='Price', axis=1)
 
     # Batch download stock info
-    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
+    info = yfu.download_tickers_info(tickers,
+                                     ['sector', 'industry', 'previousClose'])
+    def price(ticker):
+        ret = df[ticker].iloc[-1]
+        if ret is np.nan:
+            ret = info[ticker]['previousClose']
+        return round(ret, 2)
 
     # Calculate RS values for all stocks
     rs_data = []
@@ -439,7 +445,7 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
         end_date = rs_series.index[-1]
         rs_data.append({
             'Ticker': ticker,
-            'Price': round(df[ticker].iloc[-1], 2),
+            'Price': price(ticker),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'RS': rs_series.asof(end_date),
