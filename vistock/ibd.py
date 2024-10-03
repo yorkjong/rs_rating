@@ -27,8 +27,7 @@ Usage:
 
     # Filter rankings based on a minimum percentile
     min_percentile = 80
-    top_stocks = stock_rankings[stock_rankings[
-                    ibd.TITLE_PERCENTILE] >= min_percentile]
+    top_stocks = stock_rankings[stock_rankings["Percentile"] >= min_percentile]
 
 See Also:
 ---------
@@ -44,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.2"
+__version__ = "3.3"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -53,29 +52,15 @@ __all__ = [
     'ranking',
     'rankings',
     'ma_window_size',
-    'TITLE_PERCENTILE',
 ]
 
 import os
 
 import numpy as np
 import pandas as pd
-
 import yfinance as yf
 
 import vistock.yf_utils as yfu
-
-TITLE_RANK = "Rank"
-TITLE_TICKER = "Ticker"
-TITLE_TICKERS = "Tickers"
-TITLE_SECTOR = "Sector"
-TITLE_INDUSTRY = "Industry"
-TITLE_PERCENTILE = "Percentile"
-TITLE_1M = "1 Month Ago"
-TITLE_3M = "3 Months Ago"
-TITLE_6M = "6 Months Ago"
-TITLE_RS = "Relative Strength"
-TITLE_PRICE = "Price"
 
 
 #------------------------------------------------------------------------------
@@ -306,7 +291,8 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
-def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
+def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
+             percentile_method='rank'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
@@ -325,178 +311,127 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
         interval (str, optional): The frequency of the data points. Must be one
             of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
             data. Defaults to '1d'.
+        percentile_method (str, optional): Method to calculate percentiles.
+            Either 'rank' or 'qcut'. Defaults to 'rank'.
 
     Returns:
         Tuple[pd.DataFrame, pd.DataFrame]: A tuple of two Pandas DataFrames:
 
         1. Stock Rankings DataFrame:
-            - Columns: rank, ticker, sector, industry, RS (current),
+            - Columns: Rank, Ticker, Price, Sector, Industry, RS (current),
               RS (1 month ago), RS (3 months ago), RS (6 months ago),
-              percentile (current), percentile (1 month ago),
-              percentile (3 months ago), percentile (6 months ago)
-            - Sorted by current RS in descending order
+              Percentile (current), Percentile (1 month ago),
+              Percentile (3 months ago), Percentile (6 months ago)
         2. Industry Rankings DataFrame:
-            - Columns: rank, industry, sector, RS (current),
+            - Columns: Rank, Industry, Sector, RS (current),
               RS (1 month ago), RS (3 months ago), RS (6 months ago),
-              tickers (list of tickers in the industry),
-              percentile (current), percentile (1 month ago),
-              percentile (3 months ago), percentile (6 months ago)
-            - Sorted by current RS in descending order
-
-    Example:
-        >>> tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN']
-        >>> stock_rankings, industry_rankings = rankings(tickers)
-        >>> print(stock_rankings.head())
-        >>> print(industry_rankings.head())
+              Tickers (list of tickers in the industry),
+              Percentile (current), Percentile (1 month ago),
+              Percentile (3 months ago), Percentile (6 months ago)
     """
-    def process_stocks(tickers, ticker_ref, period, interval):
-        """
-        Processes stock data to extract relevant information for rankings.
+    # Batch download stock data
+    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df = df.xs('Close', level='Price', axis=1)
 
-        Iterates through the provided tickers, fetches historical data,
-        calculates relative strength values, and gathers sector and industry
-        information. It also updates industry-specific data for later
-        processing.
+    # Batch download stock info
+    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
 
-        Returns:
-            tuple: A tuple containing two elements:
-                - df_stocks (pd.DataFrame): DataFrame with stock information,
-                  including ticker, sector, industry, and RS values.
-                - industries (dict): Dictionary containing industry-specific
-                  data, such as RS values and tickers for each industry.
-        """
-        # Fetch data for stocks and index
-        df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
-        df = df.xs('Close', level='Price', axis=1)
-
-        # Fetch info for stocks
-        info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
-
-        data = []
-        industries = {}
-        for ticker in tickers:
-            rs_values = calc_rs_values(df[ticker], df[ticker_ref], interval)
-            price = round(df[ticker].iloc[-1], 2)
-            sector = info[ticker]['sector']
-            industry = info[ticker]['industry']
-
-            data.append((ticker, price, sector, industry, *rs_values.values()))
-            update_industry_data(industries, industry, sector, rs_values, ticker)
-
-        df_stocks = pd.DataFrame(
-            data,
-            columns=[TITLE_TICKER, TITLE_PRICE, TITLE_SECTOR, TITLE_INDUSTRY,
-                     TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]
-        )
-        return df_stocks, industries
-
-    def calc_rs_values(prices_stock, prices_ref, interval):
-        """Calculate RS values for a single ticker."""
-        rs_series = relative_strength(prices_stock, prices_ref, interval)
-
+    # Calculate RS values for all stocks
+    rs_data = []
+    for ticker in tickers:
+        rs_series = relative_strength(df[ticker], df[ticker_ref], interval)
         end_date = rs_series.index[-1]
-        one_month_ago = end_date - pd.DateOffset(months=1)
-        three_months_ago = end_date - pd.DateOffset(months=3)
-        six_months_ago = end_date - pd.DateOffset(months=6)
-
-        return {
-            "latest": rs_series.asof(end_date),
-            "1m": rs_series.asof(one_month_ago),
-            "3m": rs_series.asof(three_months_ago),
-            "6m": rs_series.asof(six_months_ago)
-        }
-
-    def update_industry_data(industries, industry, sector, rs_values, ticker):
-        """Updates industry data with information from a single stock."""
-        industry_row = industries.setdefault(industry, {
-            "info": (industry, sector),
-            TITLE_RS: [],
-            TITLE_1M: [], TITLE_3M: [], TITLE_6M: [], TITLE_TICKERS: []
+        rs_data.append({
+            'Ticker': ticker,
+            'Price': round(df[ticker].iloc[-1], 2),
+            'Sector': info[ticker]['sector'],
+            'Industry': info[ticker]['industry'],
+            'RS': rs_series.asof(end_date),
+            '1M': rs_series.asof(end_date - pd.DateOffset(months=1)),
+            '3M': rs_series.asof(end_date - pd.DateOffset(months=3)),
+            '6M': rs_series.asof(end_date - pd.DateOffset(months=6))
         })
-        industry_row[TITLE_RS].append(rs_values['latest'])
-        industry_row[TITLE_1M].append(rs_values['1m'])
-        industry_row[TITLE_3M].append(rs_values['3m'])
-        industry_row[TITLE_6M].append(rs_values['6m'])
-        industry_row[TITLE_TICKERS].append(ticker)
 
-    #--------------------------------------------------------------------------
+    # Create DataFrame from RS data
+    stock_df = pd.DataFrame(rs_data)
 
-    def calc_percentiles(df):
-        """Calculate percentiles for RS and its historical values."""
-        df[TITLE_PERCENTILE] = pd.qcut(df[TITLE_RS], 100, labels=False,
-                                       duplicates="drop")
-        for title in [TITLE_1M, TITLE_3M, TITLE_6M]:
-            df[f" {title}"] = pd.qcut(df[title], 100, labels=False,
-                                      duplicates="drop")
-        return df
+    # Calculate percentiles for RS values
+    def calc_percentile(series):
+        if percentile_method == 'rank':
+            return series.rank(pct=True).mul(100).round(2)
+        elif percentile_method == 'qcut':
+            return pd.qcut(series, 100, labels=False, duplicates='drop')
+        else:
+            raise ValueError(
+                "percentile_method must be either 'rank' or 'qcut'")
 
-    def rank_by_rs(df):
-        """Rank stocks or industries by RS."""
-        df = df.sort_values(TITLE_RS, ascending=False)
-        df[TITLE_RANK] = range(1, len(df) + 1)
-        return df
+    for col in ['RS', '1M', '3M', '6M']:
+        stock_df[f'Percentile ({col})'] = calc_percentile(stock_df[col])
 
-    #--------------------------------------------------------------------------
+    # Sort stocks
+    stock_df = stock_df.sort_values('RS',
+                                    ascending=False).reset_index(drop=True)
 
-    def process_industries(industries, stock_rs):
-        """Processes industry data to prepare it for ranking.
-
-        Takes a dictionary of industry data and a dictionary of stock relative
-        strengths as input. It extracts relevant information for each industry,
-        such as average RS values and a list of tickers, and creates a DataFrame
-        suitable for ranking.
-
-        Args:
-            industries (dict): Dictionary containing industry-specific data,
-                including RS values and tickers for each industry.
-            stock_rs (dict): Dictionary mapping stock tickers to their
-                relative strength values.
-
-        Returns:
-            pd.DataFrame: DataFrame with industry information, including
-            industry name, sector, average RS values, and a list of tickers.
-        """
-        industry_data = [
-            get_industry_row(info, stock_rs)
-            for info in industries.values() if len(info[TITLE_TICKERS]) > 1
-        ]
-        return pd.DataFrame(
-            industry_data,
-            columns=[TITLE_INDUSTRY, TITLE_SECTOR,
-                     TITLE_RS,  TITLE_1M, TITLE_3M, TITLE_6M, TITLE_TICKERS]
+    def get_sorted_tickers(tickers):
+        return ','.join(
+            sorted(tickers,
+                   key=lambda t:
+                        stock_df.loc[stock_df['Ticker'] == t, 'RS'].values[0],
+                   reverse=True)
         )
 
-    def get_industry_row(industry_info, stock_rs):
-        """Extracts a single row of data for an industry."""
-        industry, sector = industry_info["info"]
-        return (
-            industry,
-            sector,
-            *[rs_avg(industry_info, col)
-                for col in [TITLE_RS, TITLE_1M, TITLE_3M, TITLE_6M]],
-            tickers_str(industry_info, stock_rs)
-        )
+    # Calculate industry rankings
+    industry_df = stock_df.groupby('Industry').agg({
+        'Sector': 'first',
+        'RS': lambda x: x.mean().round(2),
+        '1M': lambda x: x.mean().round(2),
+        '3M': lambda x: x.mean().round(2),
+        '6M': lambda x: x.mean().round(2),
+        'Ticker': get_sorted_tickers
+    }).reset_index()
 
-    def rs_avg(industry_info, column):
-        """Calculate average RS value for an industry."""
-        return round(np.mean(industry_info[column]), 2)
+    # Calculate percentiles for industry RS values
+    for col in ['RS', '1M', '3M', '6M']:
+        industry_df[f'Percentile ({col})'] = calc_percentile(industry_df[col])
 
-    def tickers_str(industry_info, stock_rs):
-        """Create a comma-separated string of tickers for an industry."""
-        tickers = sorted(industry_info[TITLE_TICKERS],
-                         key=lambda x: stock_rs[x], reverse=True)
-        return ",".join(tickers)
+    # Sort industries
+    industry_df = industry_df.sort_values(
+        'RS', ascending=False).reset_index(drop=True)
 
-    df_stocks, industries = process_stocks(tickers, ticker_ref,
-                                           period, interval)
-    stock_rankings = rank_by_rs(calc_percentiles(df_stocks))
-    stock_rs = dict(zip(stock_rankings[TITLE_TICKER],
-                        stock_rankings[TITLE_RS]))
+    # Rename columns for clarity
+    stock_df = stock_df.rename(columns={
+        'RS': 'Relative Strength',
+        '1M': '1 Month Ago',
+        '3M': '3 Months Ago',
+        '6M': '6 Months Ago',
+        'Percentile (RS)': 'Percentile'
+    })
+    industry_df = industry_df.rename(columns={
+        'RS': 'Relative Strength',
+        '1M': '1 Month Ago',
+        '3M': '3 Months Ago',
+        '6M': '6 Months Ago',
+        'Ticker': 'Tickers',
+        'Percentile (RS)': 'Percentile'
+    })
 
-    industry_df = process_industries(industries, stock_rs)
-    industry_rankings = rank_by_rs(calc_percentiles(industry_df))
+    # Reorder columns
+    stock_columns = [
+        'Ticker', 'Price', 'Sector', 'Industry',
+        'Relative Strength', '1 Month Ago', '3 Months Ago', '6 Months Ago',
+        'Percentile',  'Percentile (1M)', 'Percentile (3M)', 'Percentile (6M)'
+    ]
+    industry_columns = [
+        'Industry', 'Sector',
+        'Relative Strength', '1 Month Ago', '3 Months Ago', '6 Months Ago',
+        'Tickers',
+        'Percentile', 'Percentile (1M)', 'Percentile (3M)', 'Percentile (6M)'
+    ]
 
-    return stock_rankings, industry_rankings
+    stock_df = stock_df[stock_columns]
+    industry_df = industry_df[industry_columns]
+
+    return stock_df, industry_df
 
 
 #------------------------------------------------------------------------------
@@ -565,7 +500,7 @@ def test_ranking(period='2y', out_dir='out'):
     print("***\n")
 
 
-def test_rankings(min_percentile=80, out_dir='out'):
+def test_rankings(min_percentile=80, percentile_method='qcut', out_dir='out'):
     '''
     Args:
         min_percentile (int, optional): The minimum percentile for a stock to be
@@ -574,14 +509,15 @@ def test_rankings(min_percentile=80, out_dir='out'):
             Defaults to 'out'
     '''
     import vistock.stock_indices as si
-    rank_stock, rank_indust = rankings(si.get_tickers('SOX'), interval='1d')
+    rank_stock, rank_indust = rankings(si.get_tickers('SOX'), interval='1d',
+                                       percentile_method=percentile_method)
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
         return
 
     print('Stock Rankings:')
-    print(rank_stock[rank_stock[TITLE_PERCENTILE] >= min_percentile])
+    print(rank_stock[rank_stock["Percentile"] >= min_percentile])
 
     print('\n\nIndustry Rankings:')
     print(rank_indust)
@@ -601,7 +537,7 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    test_ranking()
-    #test_rankings()
+    #test_ranking()
+    test_rankings(percentile_method='qcut')
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
