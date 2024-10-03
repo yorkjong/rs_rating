@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "3.3"
+__version__ = "3.4"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -414,22 +414,6 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
         'Ticker': 'Tickers',
         'Percentile (RS)': 'Percentile'
     })
-
-    # Reorder columns
-    stock_columns = [
-        'Ticker', 'Price', 'Sector', 'Industry',
-        'Relative Strength', '1 Month Ago', '3 Months Ago', '6 Months Ago',
-        'Percentile',  'Percentile (1M)', 'Percentile (3M)', 'Percentile (6M)'
-    ]
-    industry_columns = [
-        'Industry', 'Sector',
-        'Relative Strength', '1 Month Ago', '3 Months Ago', '6 Months Ago',
-        'Tickers',
-        'Percentile', 'Percentile (1M)', 'Percentile (3M)', 'Percentile (6M)'
-    ]
-
-    stock_df = stock_df[stock_columns]
-    industry_df = industry_df[industry_columns]
 
     return stock_df, industry_df
 
