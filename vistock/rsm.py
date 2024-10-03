@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "4.4"
+__version__ = "4.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/10/03 (last revision)"
 
@@ -304,13 +304,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             print(f"info[{ticker}]['trailingPE']: {pe}")
             pe = np.nan
 
-        # Calculate RSM for different time periods
         end_date = rsm.index[-1]
-        one_week_ago = end_date - pd.DateOffset(weeks=1)
-        one_month_ago = end_date - pd.DateOffset(months=1)
-        three_months_ago = end_date - pd.DateOffset(months=3)
-        six_months_ago = end_date - pd.DateOffset(months=6)
-        nine_months_ago = end_date - pd.DateOffset(months=9)
 
         # Construct DataFrame for current stock
         row = {
@@ -318,12 +312,11 @@ def ranking(tickers, ticker_ref='^GSPC',
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'RS (%)': rsm.asof(end_date),
-            '1 Week Ago': rsm.asof(one_week_ago),
-            '1 Month Ago': rsm.asof(one_month_ago),
-            '3 Months Ago': rsm.asof(three_months_ago),
-            '6 Months Ago': rsm.asof(six_months_ago),
-            '9 Months Ago': rsm.asof(nine_months_ago),
-            'Price': df['Close'].iloc[-1].round(2),
+            '1 Week Ago': rsm.asof(end_date - pd.DateOffset(weeks=1)),
+            '1 Month Ago': rsm.asof(end_date - pd.DateOffset(months=1)),
+            '3 Months Ago': rsm.asof(end_date - pd.DateOffset(months=3)),
+            '6 Months Ago': rsm.asof(end_date - pd.DateOffset(months=6)),
+            '9 Months Ago': rsm.asof(end_date - pd.DateOffset(months=9)),
             'Price': closes.iloc[-1].round(2),
             **{f'MA{w}': price_ma[f'{w}'].iloc[-1] for w in ma_wins},
             f'Volume / VMA{vma_win}': vol_div_vma.iloc[-1],
