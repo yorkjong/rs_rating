@@ -49,6 +49,7 @@ __date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
 
 __all__ = [
     'relative_strength',
+    'relative_strength_3m',
     'ranking',
     'rankings',
     'ma_window_size',
@@ -93,20 +94,29 @@ def relative_strength(closes, closes_ref, interval='1d'):
     The quarter-weighted growth is calculated using the `weighted_return`
     function.
 
-    Args:
-        closes (pd.Series): Closing prices of the stock.
-        closes_ref (pd.Series): Closing prices of the reference index.
-        interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
-            data. Defaults to '1d'.
+    Parameters
+    ----------
+    closes : pd.Series
+        Closing prices of the stock.
 
-    Returns:
-        pd.Series: Relative strength values for the stock.
+    closes_ref : pd.Series
+        Closing prices of the reference index.
 
-    Example:
-        >>> stock_closes = pd.Series([100, 102, 105, 103, 107])
-        >>> index_closes = pd.Series([1000, 1010, 1015, 1005, 1020])
-        >>> rs = relative_strength(stock_closes, index_closes)
+    interval : str, optional
+        The frequency of the data points. Must be one of '1d' for daily data,
+        '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
+
+    Returns
+    -------
+    pd.Series
+        Relative strength values for the stock.
+
+    Example
+    -------
+    >>> stock_closes = pd.Series([100, 102, 105, 103, 107])
+    >>> index_closes = pd.Series([1000, 1010, 1015, 1005, 1020])
+    >>> rs = relative_strength(stock_closes, index_closes)
+
     """
     ret_stock = weighted_return(closes, interval)
     ret_ref = weighted_return(closes_ref, interval)
@@ -166,19 +176,27 @@ def quarters_return(closes, n, interval):
     one quarter. This is based on the common assumption of 252 trading
     days in a year.
 
-    Args:
-        closes (pd.Series): Closing prices of the stock/index.
-        n (int): Number of quarters to look back.
-        interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
-            data.
+    Parameters
+    ----------
+    closes : pd.Series
+        Closing prices of the stock or index.
 
-    Returns:
-        pd.Series: the return (percentage change) over the last n quarters.
+    n : int
+        Number of quarters to look back.
 
-    Example:
-        >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
-        >>> quarterly_return = quarters_return(closes, 1)
+    interval : str, optional
+        The frequency of the data points. Must be one of '1d' for daily data,
+        '1wk' for weekly data, or '1mo' for monthly data.
+
+    Returns
+    -------
+    pd.Series
+        The return (percentage change) over the last n quarters.
+
+    Example
+    -------
+    >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
+    >>> quarterly_return = quarters_return(closes, 1)
     """
     quarter = {
         '1d': 252//4,   # 252 trading days in a year
@@ -205,17 +223,24 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
     period. This rating is designed to help investors quickly gauge the
     strength of a stock's performance relative to the market.
 
-    Args:
-        closes (pd.Series): Closing prices of the stock.
-        closes_ref (pd.Series): Closing prices of the reference index.
-        interval (str, optional): The frequency of the data points. Must be one
-            of '1d' for daily data, '1wk' for weekly data, or '1mo' for monthly
-            data. Defaults to '1d'.
+    Parameters
+    ----------
+    closes : pd.Series
+        Closing prices of the stock.
 
-    Returns:
-        pd.Series: 3-Month relative strength values for the stock, rounded
-        to two decimal places. The values represent the stock's performance
-        relative to the benchmark index, with 100 indicating parity.
+    closes_ref : pd.Series
+        Closing prices of the reference index.
+
+    interval : str, optional
+        The frequency of the data points. Must be one of '1d' for daily data,
+        '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
+
+    Returns
+    -------
+    pd.Series
+        3-Month relative strength values for the stock, rounded to two decimal
+        places. The values represent the stock's performance relative to the
+        benchmark index, with 100 indicating parity.
     """
     # Determine the number of trading days for the specified interval
     span = {
@@ -507,24 +532,30 @@ def ma_window_size(interval, days):
     This function adjusts the window size for weekly data to maintain
     consistency with daily calculations.
 
-    Args:
-        interval (str): The data interval. Must be either '1d' for daily or
-            '1wk' for weekly.
-        days (int): Number of calendar days for the desired moving average
-            period.
+    Parameters
+    ----------
+    interval : str
+        The data interval. Must be either '1d' for daily or '1wk' for weekly.
 
-    Returns:
-        int: Calculated window size (number of data points) for the moving
-        average.
+    days : int
+        Number of calendar days for the desired moving average period.
 
-    Raises:
-        ValueError: If an unsupported interval is provided (not '1d' or '1wk').
+    Returns
+    -------
+    int
+        Calculated window size (number of data points) for the moving average.
 
-    Examples:
-        >>> ma_window_size('1d', 50)
-        50
-        >>> ma_window_size('1wk', 50)
-        10
+    Raises
+    ------
+    ValueError
+        If an unsupported interval is provided (not '1d' or '1wk').
+
+    Examples
+    --------
+    >>> ma_window_size('1d', 50)
+    50
+    >>> ma_window_size('1wk', 50)
+    10
     """
     if interval == '1d':
         return days
@@ -564,11 +595,14 @@ def test_ranking(period='2y', rs_period='12mo', out_dir='out'):
 def test_rankings(min_percentile=80, percentile_method='qcut',
                   rs_period='12mo', out_dir='out'):
     '''
-    Args:
-        min_percentile (int, optional): The minimum percentile for a stock to be
-            included in the rankings. Defaults to 80.
-        out_dir (str, optional): The output directory to store CSV tables.
-            Defaults to 'out'
+    Parameters
+    ----------
+    min_percentile : int, optional
+        The minimum percentile for a stock to be included in the rankings.
+        Defaults to 80.
+
+    out_dir : str, optional
+        The output directory to store CSV tables. Defaults to 'out'.
     '''
     import vistock.stock_indices as si
     rank_stock, rank_indust = rankings(
