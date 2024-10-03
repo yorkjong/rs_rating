@@ -276,7 +276,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
     ranking_df = pd.concat(rows, ignore_index=True)
 
     # Rank based on Relative Strength
-    rank_columns = ['Rank',
+    rank_columns = ['Rank (%)',
                     ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
     rs_columns = ['Relative Strength',
                   '1 Month Ago', '3 Months Ago', '6 Months Ago']
@@ -285,7 +285,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
         ranking_df[rank_col] = (rank_pct * 100).round(2)
 
     # Sort by current rank
-    ranking_df = ranking_df.sort_values(by='Rank', ascending=False)
+    ranking_df = ranking_df.sort_values(by='Rank (%)', ascending=False)
 
     # Calculate average RS for each industry
     industry_rs = ranking_df.groupby('Industry')[
@@ -294,7 +294,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d'):
 
     # Rank industries based on average Relative Strength
     rank_pct = industry_rs['Industry RS'].rank(pct=True)
-    industry_rs['Industry Rank'] = (rank_pct * 100).round(2)
+    industry_rs['Industry Rank (%)'] = (rank_pct * 100).round(2)
 
     # Merge industry rankings back into stock DataFrame
     ranking_df = pd.merge(ranking_df, industry_rs, on='Industry', how='left')
