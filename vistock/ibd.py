@@ -43,9 +43,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.0"
+__version__ = "4.1"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/03 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/04 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -325,7 +325,7 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 
         rs_data.append({
             'Ticker': ticker,
-            'Price': round(closes.iloc[-1], 2),
+            'Price': closes.iloc[-1].round(2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'Relative Strength': rs.asof(end_date),
@@ -440,7 +440,7 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 
         rs_data.append({
             'Ticker': ticker,
-            'Price': round(closes.iloc[-1], 2),
+            'Price': closes.iloc[-1].round(2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'RS': rs_series.asof(end_date),
