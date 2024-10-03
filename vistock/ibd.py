@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.1"
+__version__ = "4.2"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/04 (last revision)"
 
@@ -323,15 +323,22 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
         closes = df[ticker].ffill()
         end_date = rs.index[-1]
 
+        # Calculate max values for the specified time periods
+        one_week_ago = end_date - pd.DateOffset(weeks=1)
+        one_month_ago = end_date - pd.DateOffset(months=1)
+        three_months_ago = end_date - pd.DateOffset(months=3)
+        six_months_ago = end_date - pd.DateOffset(months=6)
+
         rs_data.append({
             'Ticker': ticker,
             'Price': closes.iloc[-1].round(2),
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
             'Relative Strength': rs.asof(end_date),
-            '1 Month Ago': rs.asof(end_date - pd.DateOffset(months=1)),
-            '3 Months Ago': rs.asof(end_date - pd.DateOffset(months=3)),
-            '6 Months Ago': rs.asof(end_date - pd.DateOffset(months=6))
+            '1wk..end': rs.loc[one_week_ago:end_date].max(),
+            '1mo..1wk': rs.loc[one_month_ago:one_week_ago].max(),
+            '3mo..1mo': rs.loc[three_months_ago:one_month_ago].max(),
+            '6mo..3mo': rs.loc[six_months_ago:three_months_ago].max(),
         })
 
     # Create DataFrame from RS data
@@ -339,9 +346,9 @@ def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 
     # Rank based on Relative Strength
     rank_columns = ['Rank (%)',
-                    ' 1 Month Ago', ' 3 Months Ago', ' 6 Months Ago']
+                    '1mo..1wk (%)', '3mo..1mo (%)',  '6mo..3mo (%)']
     rs_columns = ['Relative Strength',
-                  '1 Month Ago', '3 Months Ago', '6 Months Ago']
+                  '1mo..1wk', '3mo..1mo', '6mo..3mo']
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)
         ranking_df[rank_col] = (rank_pct * 100).round(2)
