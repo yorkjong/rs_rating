@@ -20,7 +20,7 @@ jobs:
           pip install -r requirements.txt
           pip install -r docs/requirements.txt
       - name: Create .nojekyll file
-        run: touch .nojekyll
+        run: touch _build/.nojekyll
       - name: Sphinx build
         run: |
           sphinx-build docs _build
