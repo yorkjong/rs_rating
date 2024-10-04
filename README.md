@@ -22,11 +22,10 @@
     - [ibd_fin.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_fin.py) — IBD Financial Ratings (e.g., EPS Rating, Revenue Rating)
     - [rsm.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/rsm.py) — Mansfield RS Rating
 
-    To run a test and generate CSV tables for a given set of stocks, execute the following:
+    To run a test and generate CSV tables for a given set of stocks, execute the following (use ibd_rs.py as an example):
 
     ```bash
-    cd rs_rating/rs_rating
-    python ibd_rs.py
+    python -m rs_rating.ibd_rs
     ```
 
 ## Project Background
