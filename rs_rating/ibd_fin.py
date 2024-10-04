@@ -24,9 +24,9 @@ from ibd_fin import financial_metric_ranking
 # Example usage
 ranking_df = financial_metric_ranking(stock_data)
 """
-__version__ = "1.3"
+__version__ = "1.4"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/09/15 (initial version) ~ 2024/10/01 (last revision)"
+__date__ = "2024/09/15 (initial version) ~ 2024/10/04 (last revision)"
 
 __all__ = [
     'metric_strength_vs_benchmark',
@@ -36,7 +36,7 @@ __all__ = [
 import numpy as np
 import pandas as pd
 
-import vistock.yf_utils as yfu
+from . import yf_utils as yfu
 
 
 #------------------------------------------------------------------------------
@@ -296,7 +296,7 @@ def financial_metric_ranking(tickers):
 def main(out_dir='out'):
     import os
     from datetime import datetime
-    from vistock.stock_indices import get_tickers
+    from .stock_indices import get_tickers
 
     code = 'SOX'
     code = 'NDX'
