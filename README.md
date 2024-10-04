@@ -29,8 +29,6 @@
     python ibd_rs.py
     ```
 
-    This will generate ranking tables in CSV format for the specified stocks.
-
 ## Project Background
 
 This project was initially based on the work from [skyte/relative-strength](https://github.com/skyte/relative-strength), which provided the foundation for the IBD RS Rating. The project has since been expanded to include additional rating methods such as IBD's financial ratings and Mansfield RS Rating.
