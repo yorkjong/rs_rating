@@ -4,9 +4,8 @@ Utility functions for working with Yahoo Finance data.
 This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
-__version__ = "4.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/09/29 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2024/10/04 (last revision)"
 
 __all__ = [
     'calc_weighted_metric',
@@ -84,7 +83,7 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field,
     >>> type(weighted_eps)
     <class 'numpy.ndarray'>
     >>> weighted_eps.shape
-    (7,)
+    (6,)
     """
     # Initialize lists to store metric and weight data
     metric_list = []
