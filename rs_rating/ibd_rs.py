@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.4"
+__version__ = "4.5"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/04 (last revision)"
 
@@ -61,7 +61,7 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
-import vistock.yf_utils as yfu
+from . import yf_utils as yfu
 
 
 #------------------------------------------------------------------------------
@@ -572,7 +572,7 @@ def ma_window_size(interval, days):
 def test_ranking(period='2y', rs_period='12mo', out_dir='out'):
     import os
     from datetime import datetime
-    from vistock.stock_indices import get_tickers
+    from .stock_indices import get_tickers
 
     #code = 'SPX+DJIA+NDX+SOX'
     code = 'SPX'
@@ -605,10 +605,10 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     out_dir : str, optional
         The output directory to store CSV tables. Defaults to 'out'.
     '''
-    import vistock.stock_indices as si
+    import stock_indices as si
 
     tickers = si.get_tickers('SOX')
-    tickers = ['2330.TW', '2401.TW']
+    #tickers = ['2330.TW', '2401.TW']
     rank_stock, rank_indust = rankings(tickers, interval='1d',
                                        percentile_method=percentile_method,
                                        rs_period=rs_period)
