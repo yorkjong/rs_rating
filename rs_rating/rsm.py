@@ -41,7 +41,7 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "4.6"
+__version__ = "4.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/23 (initial version) ~ 2024/10/04 (last revision)"
 
@@ -55,9 +55,20 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 
-import vistock.yf_utils as yfu
-from .ta import simple_moving_average, exponential_moving_average
+from . import yf_utils as yfu
 
+
+#------------------------------------------------------------------------------
+# Moving Average
+#------------------------------------------------------------------------------
+
+def simple_moving_average(values, window, min_periods=1):
+    return values.rolling(window=window, min_periods=min_periods).mean()
+
+
+def exponential_moving_average(values, window, min_periods=1, adjust=False):
+    return values.ewm(span=window, min_periods=min_periods,
+                      adjust=adjust).mean()
 
 #------------------------------------------------------------------------------
 # Relative (Price) Stength
@@ -384,7 +395,7 @@ def move_columns_to_end(df, columns_to_move):
 def main(period='2y', ma="EMA", out_dir='out'):
     import os
     from datetime import datetime
-    from vistock.stock_indices import get_tickers
+    from .stock_indices import get_tickers
 
     code = 'SPX+DJIA+NDX+SOX'
     code = 'SOX'
