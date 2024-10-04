@@ -1,5 +1,5 @@
-rs_rating
-=========
+Source
+======
 
 .. toctree::
    :maxdepth: 4
