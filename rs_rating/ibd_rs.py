@@ -376,10 +376,10 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     # Calculate industry rankings
     industry_df = stock_df.groupby('Industry').agg({
         'Sector': 'first',
-        'RS': lambda x: x.mean().round(2),
-        '1M': lambda x: x.mean().round(2),
-        '3M': lambda x: x.mean().round(2),
-        '6M': lambda x: x.mean().round(2),
+        'RS': lambda x: round(x.mean(), 2),
+        '1M': lambda x: round(x.mean(), 2),
+        '3M': lambda x: round(x.mean(), 2),
+        '6M': lambda x: round(x.mean(), 2),
         'Ticker': get_sorted_tickers
     }).reset_index()
 
@@ -430,7 +430,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     from . import stock_indices as si
 
     tickers = si.get_tickers('SOX')
-    #tickers = ['2330.TW', '2401.TW']
+    tickers = si.get_tickers('SPX')
     rank_stock, rank_indust = rankings(tickers, interval='1d',
                                        percentile_method=percentile_method,
                                        rs_period=rs_period)
