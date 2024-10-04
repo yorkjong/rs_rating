@@ -31,9 +31,8 @@ Usage Examples:
     # Get the name of an index from its symbol
     index_name = get_name('^NDX')
 """
-__version__ = "2.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/06 (initial version) ~ 2024/10/01 (last revision)"
+__date__ = "2024/08/06 (initial version) ~ 2024/10/04 (last revision)"
 
 __all__ = [
     'get_tickers',
@@ -49,7 +48,6 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import yfinance as yf
 
-from . import tw
 
 #------------------------------------------------------------------------------
 # Wikipedia look-up
@@ -281,9 +279,6 @@ def get_tickers(source):
             - '^SOX', 'SOX': PHLX Semiconductor
             - '^W5000', 'W5000': Wilshire 5000 Total Market Index
             - 'U.S. listed': U.S. listed stocks
-            - '^TWII' 'TWII', 'TWSE': Taiwan Weighted Index
-            - 'TPEX': Taipei Exchange
-            - 'ESB': Emerging Stock Board
 
     Returns:
         list: A list of tickers for the specified source.
@@ -313,8 +308,6 @@ def get_tickers(source):
         True
         >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
         True
-        >>> len(get_tickers('TWSE+TPEX')) >= 2000
-        True
         >>> get_tickers('^UNKNOWN')
         Traceback (most recent call last):
             ...
@@ -328,7 +321,6 @@ def get_tickers(source):
         '^RUT': rut_tickers,
         '^SOX': sox_tickers,
         '^W5000': us_listed_tickers,
-        '^TWII': tw.get_twse_tickers,
         'SPX': spx_tickers,
         'DJIA': djia_tickers,
         'NDX': ndx_tickers,
@@ -340,10 +332,6 @@ def get_tickers(source):
         'W5000': us_listed_tickers,
         'U.S.LISTED': us_listed_tickers,
         'USLS': us_listed_tickers,
-        'TWII': tw.get_twse_tickers,
-        'TWSE': tw.get_twse_tickers,
-        'TPEX': tw.get_tpex_tickers,
-        'ESB': tw.get_esb_tickers,
     }
 
     sources = [s.strip().upper() for s in source.split('+')]
@@ -521,8 +509,6 @@ def get_name(index_symbol):
     if index_symbol in dic:
         return dic[index_symbol]
     try:
-        if tw.is_chinese(index_symbol) or tw.is_taiwan_stock(index_symbol):
-            return index_symbol
         if yf.Ticker(index_symbol).info['quoteType'] in ('ETF', 'INDEX'):
             return yf.Ticker(index_symbol).info['shortName']
     except:
