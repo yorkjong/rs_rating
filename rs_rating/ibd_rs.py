@@ -50,9 +50,7 @@ __date__ = "2024/08/05 (initial version) ~ 2024/10/04 (last revision)"
 __all__ = [
     'relative_strength',
     'relative_strength_3m',
-    'ranking',
     'rankings',
-    'ma_window_size',
 ]
 
 import os
@@ -264,113 +262,6 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 
 
 #------------------------------------------------------------------------------
-# IBD RS Ranking (with RS rating)
-#------------------------------------------------------------------------------
-
-def ranking(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
-            rs_period='12mo'):
-    """
-    Rank stocks based on their IBD Relative Strength against an index
-    benchmark.
-
-    Parameters
-    ----------
-    tickers : list of str
-        List of stock tickers to rank.
-
-    ticker_ref : str, optional
-        Ticker symbol of the benchmark. Default to '^GSPC' (S&P 500)
-
-    period : str, optional
-        Period for historical data ('6mo', '1y', '2y', '5y', 'ytd', 'max').
-        Default to '2y' (two years).
-
-    interval : str, optional
-        Interval for historical data ('1d', '1wk', '1mo').
-        Default to '1wk' (one week).
-
-    rs_period : str, optional
-        Specify the period for Relative Strength calculation ('12mo' or '3mo').
-        Default to '12mo'.
-
-    Returns
-    -------
-    pandas.DataFrame
-        DataFrame containing the ranked stocks.
-
-    Example
-    -------
-    >>> tickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN']
-    >>> stock_rankings  = ranking(tickers)
-    >>> print(stock_rankings.head())
-    """
-    # Select the appropriate relative strength function based on the rs_period
-    rs_func = {
-        '3mo': relative_strength_3m,
-        '12mo': relative_strength,
-    }[rs_period]
-
-    # Fetch data for stock and index
-    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
-    df = df.xs('Close', level='Price', axis=1)
-
-    # Fetch info for stocks
-    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
-
-    rs_data = []
-    for ticker in tickers:
-        rs = rs_func(df[ticker], df[ticker_ref], interval)
-        end_date = rs.index[-1]
-
-        # Calculate max values for the specified time periods
-        one_week_ago = end_date - pd.DateOffset(weeks=1)
-        one_month_ago = end_date - pd.DateOffset(months=1)
-        three_months_ago = end_date - pd.DateOffset(months=3)
-        six_months_ago = end_date - pd.DateOffset(months=6)
-
-        rs_data.append({
-            'Ticker': ticker,
-            'Price': df[ticker].asof(end_date).round(2),
-            'Sector': info[ticker]['sector'],
-            'Industry': info[ticker]['industry'],
-            'Relative Strength': rs.asof(end_date),
-            '1wk..end': rs.loc[one_week_ago:end_date].max(),
-            '1mo..1wk': rs.loc[one_month_ago:one_week_ago].max(),
-            '3mo..1mo': rs.loc[three_months_ago:one_month_ago].max(),
-            '6mo..3mo': rs.loc[six_months_ago:three_months_ago].max(),
-        })
-
-    # Create DataFrame from RS data
-    ranking_df = pd.DataFrame(rs_data)
-
-    # Rank based on Relative Strength
-    rank_columns = ['Rank (%)',
-                    '1mo..1wk (%)', '3mo..1mo (%)',  '6mo..3mo (%)']
-    rs_columns = ['Relative Strength',
-                  '1mo..1wk', '3mo..1mo', '6mo..3mo']
-    for rank_col, rs_col in zip(rank_columns, rs_columns):
-        rank_pct = ranking_df[rs_col].rank(pct=True)
-        ranking_df[rank_col] = (rank_pct * 100).round(2)
-
-    # Sort by current rank
-    ranking_df = ranking_df.sort_values(by='Rank (%)', ascending=False)
-
-    # Calculate average RS for each industry
-    industry_rs = ranking_df.groupby('Industry')[
-        'Relative Strength'].mean().round(2).reset_index()
-    industry_rs.columns = ['Industry', 'Industry RS']
-
-    # Rank industries based on average Relative Strength
-    rank_pct = industry_rs['Industry RS'].rank(pct=True)
-    industry_rs['Industry Rank (%)'] = (rank_pct * 100).round(2)
-
-    # Merge industry rankings back into stock DataFrame
-    ranking_df = pd.merge(ranking_df, industry_rs, on='Industry', how='left')
-
-    return ranking_df
-
-
-#------------------------------------------------------------------------------
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
@@ -521,77 +412,8 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 
 
 #------------------------------------------------------------------------------
-# Misc Help Functions
-#------------------------------------------------------------------------------
-
-def ma_window_size(interval, days):
-    """
-    Calculate moving average window size based on IBD (Investor's Business
-    Daily) convention.
-
-    This function adjusts the window size for weekly data to maintain
-    consistency with daily calculations.
-
-    Parameters
-    ----------
-    interval : str
-        The data interval. Must be either '1d' for daily or '1wk' for weekly.
-
-    days : int
-        Number of calendar days for the desired moving average period.
-
-    Returns
-    -------
-    int
-        Calculated window size (number of data points) for the moving average.
-
-    Raises
-    ------
-    ValueError
-        If an unsupported interval is provided (not '1d' or '1wk').
-
-    Examples
-    --------
-    >>> ma_window_size('1d', 50)
-    50
-    >>> ma_window_size('1wk', 50)
-    10
-    """
-    if interval == '1d':
-        return days
-    elif interval == '1wk':
-        return days // 5  # 1 week = 5 trading days
-    else:
-        raise ValueError("Unsupported interval")
-
-
-#------------------------------------------------------------------------------
 # Unit Test
 #------------------------------------------------------------------------------
-
-def test_ranking(period='2y', rs_period='12mo', out_dir='out'):
-    import os
-    from datetime import datetime
-    from .stock_indices import get_tickers
-
-    #code = 'SPX+DJIA+NDX+SOX'
-    code = 'SPX'
-    tickers = get_tickers(code)
-    remove_tickers = ['HBAN', 'SW', 'BRK.B', 'VLTO', 'ARM', 'SOLV', 'GEV', 'BF.B']
-    tickers = [t for t in tickers if t not in remove_tickers]
-
-    rank = ranking(tickers, period=period, interval='1d', rs_period=rs_period)
-    print(rank.head(10))
-
-    # Save to CSV
-    print("\n\n***")
-    os.makedirs(out_dir, exist_ok=True)
-    today = datetime.now().strftime('%Y%m%d')
-    filename = f'{code}_stocks_{period}_ibd{rs_period}_{today}.csv'
-    rank.to_csv(os.path.join(out_dir, filename), index=False)
-    print(f'Your "{filename}" is in the "{out_dir}" folder.')
-    print("***\n")
-
 
 def test_rankings(min_percentile=80, percentile_method='qcut',
                   rs_period='12mo', out_dir='out'):
@@ -605,7 +427,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     out_dir : str, optional
         The output directory to store CSV tables. Defaults to 'out'.
     '''
-    import stock_indices as si
+    from . import stock_indices as si
 
     tickers = si.get_tickers('SOX')
     #tickers = ['2330.TW', '2401.TW']
@@ -638,7 +460,6 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    test_ranking(rs_period='3mo')
     test_rankings(percentile_method='qcut', rs_period='3mo')
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 
