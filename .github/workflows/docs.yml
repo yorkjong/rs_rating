@@ -19,6 +19,8 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r docs/requirements.txt
+      - name: Create .nojekyll file
+        run: touch .nojekyll
       - name: Sphinx build
         run: |
           sphinx-build docs _build
@@ -26,3 +28,4 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: _build
+
