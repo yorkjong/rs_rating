@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rs_rating.ibd_rs &mdash; rs_rating 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rs_rating
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Read Me</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rs_rating</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rs_rating.ibd_rs</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rs_rating.ibd_rs</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ibd.py - Stock Analysis and Ranking Module</span>
+
+<span class="sd">This module provides tools for analyzing and ranking stocks based on their</span>
+<span class="sd">relative strength compared to a benchmark index, inspired by the Investor&#39;s</span>
+<span class="sd">Business Daily (IBD) methodology.</span>
+
+<span class="sd">Key Features:</span>
+<span class="sd">-------------</span>
+<span class="sd">- Relative strength calculation</span>
+<span class="sd">- Stock and industry ranking generation</span>
+<span class="sd">- Percentile-based filtering of rankings</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">------</span>
+
+<span class="sd">::</span>
+
+<span class="sd">    import ibd</span>
+
+<span class="sd">    # Generate rankings for a list of stocks</span>
+<span class="sd">    tickers = [&#39;MSFT&#39;, &#39;NVDA&#39;, &#39;AAPL&#39;, &#39;GOOGL&#39;, &#39;AMZN&#39;, &#39;TSLA&#39;]</span>
+<span class="sd">    stock_rankings, industry_rankings = ibd.rankings(tickers)</span>
+
+<span class="sd">    # Calculate relative strength for a single stock</span>
+<span class="sd">    stock_rs = ibd.relative_strength(stock_closes, index_closes)</span>
+
+<span class="sd">    # Filter rankings based on a minimum percentile</span>
+<span class="sd">    min_percentile = 80</span>
+<span class="sd">    top_stocks = stock_rankings[stock_rankings[&quot;Percentile&quot;] &gt;= min_percentile]</span>
+
+<span class="sd">See Also:</span>
+<span class="sd">---------</span>
+<span class="sd">- `RS Rating — Indicator by Fred6724 — tradingview</span>
+<span class="sd">  &lt;https://www.tradingview.com/script/pziQwiT2/&gt;`_</span>
+<span class="sd">- `Relative Strength (IBD Style) — Indicator by Skyte — TradingView</span>
+<span class="sd">  &lt;https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/&gt;`_</span>
+
+<span class="sd">  - `relative-strength/rs_ranking.py at main · skyte/relative-strength</span>
+<span class="sd">    &lt;https://github.com/skyte/relative-strength/blob/main/rs_ranking.py&gt;`_</span>
+
+<span class="sd">- `Exclusive IBD Ratings | Stock News &amp; Stock Market Analysis - IBD</span>
+<span class="sd">  &lt;https://www.investors.com/ibd-university/</span>
+<span class="sd">  find-evaluate-stocks/exclusive-ratings/&gt;`_</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.5&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/04 (last revision)&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;relative_strength&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;relative_strength_3m&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;rankings&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># IBD RS (Relative Strength) Rating</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="relative_strength">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.relative_strength">[docs]</a>
+<span class="k">def</span> <span class="nf">relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the relative strength of a stock compared to a reference index.</span>
+
+<span class="sd">    Relative Strength (RS) is a metric used to evaluate the performance of a</span>
+<span class="sd">    stock relative to a benchmark index. A higher RS rating indicates that the</span>
+<span class="sd">    stock has outperformed the index, while a lower RS rating suggests</span>
+<span class="sd">    underperformance.</span>
+
+<span class="sd">    This function calculates the RS rating by comparing the quarter-weighted</span>
+<span class="sd">    growth of the stock&#39;s closing prices to the quarter-weighted growth of</span>
+<span class="sd">    the reference index&#39;s closing prices over the past year. The formula is as</span>
+<span class="sd">    follows:</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        PR = current/previous = ((current - previous) / previous) + 1</span>
+<span class="sd">           = return + 1</span>
+<span class="sd">        relative_rate = PR_stock / PR_index</span>
+<span class="sd">        relative_strength = relative_rate * 100</span>
+
+<span class="sd">    Here PR means &#39;price ratio&#39; or &#39;price relative&#39;</span>
+
+<span class="sd">    The quarter-weighted growth is calculated using the `weighted_return`</span>
+<span class="sd">    function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    closes : pd.Series</span>
+<span class="sd">        Closing prices of the stock.</span>
+
+<span class="sd">    closes_ref : pd.Series</span>
+<span class="sd">        Closing prices of the reference index.</span>
+
+<span class="sd">    interval : str, optional</span>
+<span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
+<span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data. Defaults to &#39;1d&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        Relative strength values for the stock.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; stock_closes = pd.Series([100, 102, 105, 103, 107])</span>
+<span class="sd">    &gt;&gt;&gt; index_closes = pd.Series([1000, 1010, 1015, 1005, 1020])</span>
+<span class="sd">    &gt;&gt;&gt; rs = relative_strength(stock_closes, index_closes)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ret_stock</span> <span class="o">=</span> <span class="n">weighted_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
+    <span class="n">ret_ref</span> <span class="o">=</span> <span class="n">weighted_return</span><span class="p">(</span><span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
+    <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">ret_stock</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">ret_ref</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">weighted_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the performance of the last year, with the most recent quarter</span>
+<span class="sd">    weighted double.</span>
+
+<span class="sd">    This function calculates returns for each of the last four quarters and</span>
+<span class="sd">    applies a weighting scheme that emphasizes recent performance. The most</span>
+<span class="sd">    recent quarter is given a weight of 40%, while each of the three preceding</span>
+<span class="sd">    quarters are given a weight of 20%.</span>
+
+<span class="sd">    Here is the formula for calculating the return:</span>
+
+<span class="sd">        RS Return = 40% * P3 + 20% * P6 + 20% * P9 + 20% * P12</span>
+<span class="sd">        With</span>
+<span class="sd">        P3 = Performance over the last quarter (3 months)</span>
+<span class="sd">        P6 = Performance over the last two quarters (6 months)</span>
+<span class="sd">        P9 = Performance over the last three quarters (9 months)</span>
+<span class="sd">        P12 = Performance over the last four quarters (12 months)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    closes: pd.Series</span>
+<span class="sd">        Closing prices of the stock/index.</span>
+<span class="sd">    interval: str, optional</span>
+<span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily</span>
+<span class="sd">        data, &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series: Performance values of the stock/index.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; closes = pd.Series([100, 102, 105, 103, 107, 110, 112])</span>
+<span class="sd">    &gt;&gt;&gt; weighted_perf = weighted_return(closes)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate performances over the last quarters</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last quarter</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last two quarters</span>
+    <span class="n">p3</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last three quarters</span>
+    <span class="n">p4</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last four quarters</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">+</span> <span class="n">p3</span> <span class="o">+</span> <span class="n">p4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span>
+
+
+<span class="k">def</span> <span class="nf">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the return (percentage change) over the last n quarters.</span>
+
+<span class="sd">    This function uses 63 trading days (252 / 4) as an approximation for</span>
+<span class="sd">    one quarter. This is based on the common assumption of 252 trading</span>
+<span class="sd">    days in a year.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    closes : pd.Series</span>
+<span class="sd">        Closing prices of the stock or index.</span>
+
+<span class="sd">    n : int</span>
+<span class="sd">        Number of quarters to look back.</span>
+
+<span class="sd">    interval : str, optional</span>
+<span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
+<span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        The return (percentage change) over the last n quarters.</span>
+
+<span class="sd">    Example</span>
+<span class="sd">    -------</span>
+<span class="sd">    &gt;&gt;&gt; closes = pd.Series([100, 102, 105, 103, 107, 110, 112])</span>
+<span class="sd">    &gt;&gt;&gt; quarterly_return = quarters_return(closes, 1)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">quarter</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;1d&#39;</span><span class="p">:</span> <span class="mi">252</span><span class="o">//</span><span class="mi">4</span><span class="p">,</span>   <span class="c1"># 252 trading days in a year</span>
+        <span class="s1">&#39;1wk&#39;</span><span class="p">:</span> <span class="mi">52</span><span class="o">//</span><span class="mi">4</span><span class="p">,</span>   <span class="c1"># 52 weeks in a year</span>
+        <span class="s1">&#39;1mo&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="o">//</span><span class="mi">4</span><span class="p">,</span>   <span class="c1"># 12 months in a year</span>
+    <span class="p">}[</span><span class="n">interval</span><span class="p">]</span>
+    <span class="n">periods</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">closes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">quarter</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">periods</span><span class="p">,</span> <span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ret</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># IBD&#39;s 3-Month Relative Strength</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="relative_strength_3m">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.relative_strength_3m">[docs]</a>
+<span class="k">def</span> <span class="nf">relative_strength_3m</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the 3-Month Relative Strength of a stock compared to a reference</span>
+<span class="sd">    index, based on price performance (returns).</span>
+
+<span class="sd">    The 3-Month Relative Strength Rating (RS Rating) measures the stock&#39;s</span>
+<span class="sd">    price performance against a benchmark index over a recent three-month</span>
+<span class="sd">    period. This rating is designed to help investors quickly gauge the</span>
+<span class="sd">    strength of a stock&#39;s performance relative to the market.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    closes : pd.Series</span>
+<span class="sd">        Closing prices of the stock.</span>
+
+<span class="sd">    closes_ref : pd.Series</span>
+<span class="sd">        Closing prices of the reference index.</span>
+
+<span class="sd">    interval : str, optional</span>
+<span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
+<span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data. Defaults to &#39;1d&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        3-Month relative strength values for the stock, rounded to two decimal</span>
+<span class="sd">        places. The values represent the stock&#39;s performance relative to the</span>
+<span class="sd">        benchmark index, with 100 indicating parity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Determine the number of trading days for the specified interval</span>
+    <span class="n">span</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;1d&#39;</span><span class="p">:</span> <span class="mi">252</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span>  <span class="c1"># a 3-month period based on 252 trading days in a year</span>
+        <span class="s1">&#39;1wk&#39;</span><span class="p">:</span> <span class="mi">52</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span>  <span class="c1"># 13 weeks (3 months) for weekly data</span>
+        <span class="s1">&#39;1mo&#39;</span><span class="p">:</span> <span class="mi">12</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span>  <span class="c1"># 3 months for monthly data</span>
+    <span class="p">}[</span><span class="n">interval</span><span class="p">]</span>
+
+    <span class="c1"># Calculate daily returns for the stock and reference index</span>
+    <span class="n">returns_stock</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">returns_ref</span> <span class="o">=</span> <span class="n">closes_ref</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the Exponential Moving Average (EMA) of the returns</span>
+    <span class="n">ema_returns_stock</span> <span class="o">=</span> <span class="n">returns_stock</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">ema_returns_ref</span> <span class="o">=</span> <span class="n">returns_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="c1"># Calculate the relative strength (RS). Add 1 to avoid negative values</span>
+    <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="n">ema_returns_stock</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">ema_returns_ref</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="k">return</span> <span class="n">rs</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Return the RS values rounded to two decimal places</span></div>
+
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># IBD RS Rankings (with RS rating)</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="rankings">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.rankings">[docs]</a>
+<span class="k">def</span> <span class="nf">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
+             <span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="n">rs_period</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Analyze stocks and generate ranking tables for individual stocks and</span>
+<span class="sd">    industries.</span>
+
+<span class="sd">    This function calculates relative strength (RS) for the given stocks compared</span>
+<span class="sd">    to a reference index, and then ranks both individual stocks and industries</span>
+<span class="sd">    based on their RS values. It provides historical RS data and percentile</span>
+<span class="sd">    rankings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tickers : List[str]</span>
+<span class="sd">        A list of stock tickers to analyze.</span>
+
+<span class="sd">    ticker_ref : str, optional</span>
+<span class="sd">        The ticker symbol for the reference index. Defaults to &#39;^GSPC&#39; (S&amp;P 500).</span>
+
+<span class="sd">    period : str, optional</span>
+<span class="sd">        The period for which to fetch historical data. Defaults to &#39;2y&#39; (two years).</span>
+
+<span class="sd">    interval : str, optional</span>
+<span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
+<span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data. Defaults to &#39;1d&#39;.</span>
+
+<span class="sd">    percentile_method : str, optional</span>
+<span class="sd">        Method to calculate percentiles. Either &#39;rank&#39; or &#39;qcut&#39;. Defaults to &#39;rank&#39;.</span>
+
+<span class="sd">    rs_period : str, optional</span>
+<span class="sd">        Specify the period for Relative Strength calculation (&#39;12mo&#39; or &#39;3mo&#39;).</span>
+<span class="sd">        Defaults to &#39;12mo&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Tuple[pd.DataFrame, pd.DataFrame]</span>
+<span class="sd">        A tuple of two Pandas DataFrames:</span>
+
+<span class="sd">        1. Stock Rankings DataFrame:</span>
+<span class="sd">            - Columns: Rank, Ticker, Price, Sector, Industry, RS (current),</span>
+<span class="sd">              RS (1 month ago), RS (3 months ago), RS (6 months ago),</span>
+<span class="sd">              Percentile (current), Percentile (1 month ago),</span>
+<span class="sd">              Percentile (3 months ago), Percentile (6 months ago)</span>
+
+<span class="sd">        2. Industry Rankings DataFrame:</span>
+<span class="sd">            - Columns: Rank, Industry, Sector, RS (current),</span>
+<span class="sd">              RS (1 month ago), RS (3 months ago), RS (6 months ago),</span>
+<span class="sd">              Tickers (list of tickers in the industry),</span>
+<span class="sd">              Percentile (current), Percentile (1 month ago),</span>
+<span class="sd">              Percentile (3 months ago), Percentile (6 months ago)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Select the appropriate relative strength function based on the rs_period</span>
+    <span class="n">rs_func</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;3mo&#39;</span><span class="p">:</span> <span class="n">relative_strength_3m</span><span class="p">,</span>
+        <span class="s1">&#39;12mo&#39;</span><span class="p">:</span> <span class="n">relative_strength</span><span class="p">,</span>
+    <span class="p">}[</span><span class="n">rs_period</span><span class="p">]</span>
+
+    <span class="c1"># Batch download stock data</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;Close&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Batch download stock info</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_tickers_info</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;industry&#39;</span><span class="p">])</span>
+    <span class="c1"># Calculate RS values for all stocks</span>
+    <span class="n">rs_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
+        <span class="n">rs_series</span> <span class="o">=</span> <span class="n">rs_func</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">ticker</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">ticker_ref</span><span class="p">],</span> <span class="n">interval</span><span class="p">)</span>
+        <span class="n">end_date</span> <span class="o">=</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">rs_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="n">ticker</span><span class="p">,</span>
+            <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">ticker</span><span class="p">]</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;Sector&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;sector&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Industry&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;industry&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">),</span>
+            <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+            <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
+        <span class="p">})</span>
+
+    <span class="c1"># Create DataFrame from RS data</span>
+    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rs_data</span><span class="p">)</span>
+
+    <span class="c1"># Calculate percentiles for RS values</span>
+    <span class="k">def</span> <span class="nf">calc_percentile</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">percentile_method</span> <span class="o">==</span> <span class="s1">&#39;rank&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">series</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">percentile_method</span> <span class="o">==</span> <span class="s1">&#39;qcut&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s1">&#39;drop&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;percentile_method must be either &#39;rank&#39; or &#39;qcut&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="s1">&#39;1M&#39;</span><span class="p">,</span> <span class="s1">&#39;3M&#39;</span><span class="p">,</span> <span class="s1">&#39;6M&#39;</span><span class="p">]:</span>
+        <span class="n">stock_df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Percentile (</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_percentile</span><span class="p">(</span><span class="n">stock_df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+
+    <span class="c1"># Sort stocks</span>
+    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">stock_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span>
+                                    <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_sorted_tickers</span><span class="p">(</span><span class="n">tickers</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="nb">sorted</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span>
+                   <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span>
+                        <span class="n">stock_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">stock_df</span><span class="p">[</span><span class="s1">&#39;Ticker&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;RS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                   <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Calculate industry rankings</span>
+    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">stock_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Industry&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span>
+        <span class="s1">&#39;Sector&#39;</span><span class="p">:</span> <span class="s1">&#39;first&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+        <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+        <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+        <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+        <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="n">get_sorted_tickers</span>
+    <span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+    <span class="c1"># Calculate percentiles for industry RS values</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="s1">&#39;1M&#39;</span><span class="p">,</span> <span class="s1">&#39;3M&#39;</span><span class="p">,</span> <span class="s1">&#39;6M&#39;</span><span class="p">]:</span>
+        <span class="n">industry_df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Percentile (</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_percentile</span><span class="p">(</span><span class="n">industry_df</span><span class="p">[</span><span class="n">col</span><span class="p">])</span>
+
+    <span class="c1"># Sort industries</span>
+    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">industry_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+        <span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Rename columns for clarity</span>
+    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">stock_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="s1">&#39;Relative Strength&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="s1">&#39;1 Month Ago&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="s1">&#39;3 Months Ago&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="s1">&#39;6 Months Ago&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Percentile (RS)&#39;</span><span class="p">:</span> <span class="s1">&#39;Percentile&#39;</span>
+    <span class="p">})</span>
+    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">industry_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="s1">&#39;Relative Strength&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="s1">&#39;1 Month Ago&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="s1">&#39;3 Months Ago&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="s1">&#39;6 Months Ago&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="s1">&#39;Tickers&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Percentile (RS)&#39;</span><span class="p">:</span> <span class="s1">&#39;Percentile&#39;</span>
+    <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">stock_df</span><span class="p">,</span> <span class="n">industry_df</span></div>
+
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Unit Test</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">test_rankings</span><span class="p">(</span><span class="n">min_percentile</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span>
+                  <span class="n">rs_period</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    min_percentile : int, optional</span>
+<span class="sd">        The minimum percentile for a stock to be included in the rankings.</span>
+<span class="sd">        Defaults to 80.</span>
+
+<span class="sd">    out_dir : str, optional</span>
+<span class="sd">        The output directory to store CSV tables. Defaults to &#39;out&#39;.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">stock_indices</span> <span class="k">as</span> <span class="n">si</span>
+
+    <span class="n">tickers</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SOX&#39;</span><span class="p">)</span>
+    <span class="c1">#tickers = [&#39;2330.TW&#39;, &#39;2401.TW&#39;]</span>
+    <span class="n">rank_stock</span><span class="p">,</span> <span class="n">rank_indust</span> <span class="o">=</span> <span class="n">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
+                                       <span class="n">percentile_method</span><span class="o">=</span><span class="n">percentile_method</span><span class="p">,</span>
+                                       <span class="n">rs_period</span><span class="o">=</span><span class="n">rs_period</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rank_stock</span><span class="o">.</span><span class="n">empty</span> <span class="ow">or</span> <span class="n">rank_indust</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not enough data to generate rankings.&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stock Rankings:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">rank_stock</span><span class="p">[</span><span class="n">rank_stock</span><span class="p">[</span><span class="s2">&quot;Percentile&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_percentile</span><span class="p">])</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Industry Rankings:&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">rank_indust</span><span class="p">)</span>
+
+    <span class="c1"># Save to CSV</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">***&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">kind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">rank_stock</span><span class="p">,</span> <span class="n">rank_indust</span><span class="p">],</span>
+                           <span class="p">[</span><span class="s1">&#39;stocks&#39;</span><span class="p">,</span> <span class="s1">&#39;industries&#39;</span><span class="p">]):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;rs_</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Your &quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; is in the &quot;</span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s1">&quot; folder.&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">test_rankings</span><span class="p">(</span><span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span> <span class="n">rs_period</span><span class="o">=</span><span class="s1">&#39;3mo&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, York Jong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

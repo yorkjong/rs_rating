@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rs_rating.rsm &mdash; rs_rating 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rs_rating
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Read Me</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rs_rating</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rs_rating.rsm</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rs_rating.rsm</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Mansfield Relative Strength (RSM) Module</span>
+
+<span class="sd">This module provides functions for calculating and ranking stocks based on</span>
+<span class="sd">Mansfield Relative Strength (RSM) and related metrics. It includes methods</span>
+<span class="sd">to compute Dorsey Relative Strength (RSD), Mansfield Relative Strength (RSM)</span>
+<span class="sd">using both Simple Moving Average (SMA) and Exponential Moving Average (EMA),</span>
+<span class="sd">as well as functionality to rank stocks against a benchmark index.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">----------</span>
+<span class="sd">- dorsey_relative_strength(closes, closes_index): Computes Dorsey Relative</span>
+<span class="sd">  Strength (RSD).</span>
+<span class="sd">- mansfield_relative_strength(closes, closes_index, window): Computes Mansfield</span>
+<span class="sd">  Relative Strength (RSM)</span>
+<span class="sd">- ranking(tickers, ticker_ref=&#39;^GSPC&#39;, period=&#39;2y&#39;, interval=&#39;1wk&#39;, ma=&#39;SMA&#39;,</span>
+<span class="sd">  window=52): Ranks stocks based on their RSM.</span>
+
+<span class="sd">Examples:</span>
+<span class="sd">---------</span>
+<span class="sd">To calculate RSM for a list of stock tickers and rank them:</span>
+
+<span class="sd">&gt;&gt;&gt; tickers = [&#39;AAPL&#39;, &#39;MSFT&#39;, &#39;GOOGL&#39;]</span>
+<span class="sd">&gt;&gt;&gt; rank = ranking(tickers, period=&#39;2y&#39;, interval=&#39;1wk&#39;, window=52)</span>
+<span class="sd">&gt;&gt;&gt; print(rank.head())</span>
+
+<span class="sd">To compute Mansfield Relative Strength using SMA for specific close prices:</span>
+
+<span class="sd">&gt;&gt;&gt; closes = pd.Series([...])  # Example closing prices</span>
+<span class="sd">&gt;&gt;&gt; closes_index = pd.Series([...])  # Example index closing prices</span>
+<span class="sd">&gt;&gt;&gt; rsm = mansfield_relative_strength(closes, closes_index, window=52)</span>
+<span class="sd">&gt;&gt;&gt; print(rsm)</span>
+
+<span class="sd">See Also:</span>
+<span class="sd">---------</span>
+<span class="sd">- `Mansfield Relative Strength | ChartMill.com</span>
+<span class="sd">  &lt;https://www.chartmill.com/documentation/technical-analysis/indicators/</span>
+<span class="sd">  35-Mansfield-Relative-Strength&gt;`_</span>
+<span class="sd">- `How to create the Mansfield Relative Performance Indicator - Stage Analysis</span>
+<span class="sd">  &lt;https://www.stageanalysis.net/blog/4266/</span>
+<span class="sd">  how-to-create-the-mansfield-relative-performance-indicator&gt;`_</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.7&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/23 (initial version) ~ 2024/10/04 (last revision)&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;mansfield_relative_strength&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;dorsey_relative_strength&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ranking&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Moving Average</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">simple_moving_average</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="n">min_periods</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">exponential_moving_average</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="n">min_periods</span><span class="p">,</span>
+                      <span class="n">adjust</span><span class="o">=</span><span class="n">adjust</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Relative (Price) Stength</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="mansfield_relative_strength">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.rsm.mansfield_relative_strength">[docs]</a>
+<span class="k">def</span> <span class="nf">mansfield_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s1">&#39;SMA&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate Mansfield Relative Strength (RSM) for given close prices, index</span>
+<span class="sd">    close prices, and window size using a given moving average method (&#39;SMA&#39;</span>
+<span class="sd">    or &#39;EMA&#39;).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    closes : pandas.Series</span>
+<span class="sd">        Series of closing prices for the stock.</span>
+<span class="sd">    closes_index : pandas.Series</span>
+<span class="sd">        Series of closing prices for the benchmark index.</span>
+<span class="sd">    window : int</span>
+<span class="sd">        Window size for calculating the Simple Moving Average of the Dorsey</span>
+<span class="sd">        Relative Strength.</span>
+<span class="sd">    ma : str, optional</span>
+<span class="sd">        Moving average type (&#39;SMA&#39;, &#39;EMA&#39;). Default to &#39;SMA&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.Series</span>
+<span class="sd">        Series containing the calculated Mansfield Relative Strength (RSM)</span>
+<span class="sd">        values with given moving average method.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; stock_closes = pd.Series([100, 105, 110],</span>
+<span class="sd">    ...     index=pd.date_range(start=&#39;2024-01-01&#39;, periods=3, freq=&#39;D&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; index_closes = pd.Series([2000, 2050, 2100],</span>
+<span class="sd">    ...     index=pd.date_range(start=&#39;2024-01-01&#39;, periods=3, freq=&#39;D&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; mansfield_relative_strength(stock_closes, index_closes, window=2)</span>
+<span class="sd">    2024-01-01    5.000000</span>
+<span class="sd">    2024-01-02    5.097847</span>
+<span class="sd">    2024-01-03    5.238095</span>
+<span class="sd">    dtype: float64</span>
+<span class="sd">    &gt;&gt;&gt; mansfield_relative_strength_with_ema(stock_closes, index_closes,</span>
+<span class="sd">    ...     window=2, ma=&#39;EMA&#39;)</span>
+<span class="sd">    2024-01-01    5.000000</span>
+<span class="sd">    2024-01-02    5.097847</span>
+<span class="sd">    2024-01-03    5.238095</span>
+<span class="sd">    dtype: float64</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Select the MA function based on the &#39;ma&#39; parameter</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ma_func</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;SMA&#39;</span><span class="p">:</span> <span class="n">simple_moving_average</span><span class="p">,</span>
+            <span class="s1">&#39;EMA&#39;</span><span class="p">:</span> <span class="n">exponential_moving_average</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">ma</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid ma type. Must be &#39;SMA&#39; or &#39;EMA&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="n">closes</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
+    <span class="n">closes_index</span> <span class="o">=</span> <span class="n">closes_index</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span>
+    <span class="n">rsd</span> <span class="o">=</span> <span class="n">dorsey_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">)</span>
+    <span class="n">rsm</span> <span class="o">=</span> <span class="p">((</span><span class="n">rsd</span> <span class="o">/</span> <span class="n">ma_func</span><span class="p">(</span><span class="n">rsd</span><span class="p">,</span> <span class="n">window</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="k">return</span> <span class="n">rsm</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="dorsey_relative_strength">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.rsm.dorsey_relative_strength">[docs]</a>
+<span class="k">def</span> <span class="nf">dorsey_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate Dorsey Relative Strength (RSD) for given close prices and index</span>
+<span class="sd">    close prices.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    closes : pandas.Series</span>
+<span class="sd">        Series of closing prices for the stock.</span>
+
+<span class="sd">    closes_index : pandas.Series</span>
+<span class="sd">        Series of closing prices for the benchmark index.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.Series</span>
+<span class="sd">        Series containing the calculated Dorsey Relative Strength (RSD) values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">closes</span> <span class="o">/</span> <span class="n">closes_index</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span></div>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># EPS Relative Strength</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">relative_strength_vs_benchmark</span><span class="p">(</span><span class="n">metric_series</span><span class="p">,</span> <span class="n">bench_series</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the relative strength of a financial metric relative to a</span>
+<span class="sd">    benchmark index.</span>
+
+<span class="sd">    This function computes the relative strength of a financial metric by</span>
+<span class="sd">    comparing each value to the average over a specified window, and calculates</span>
+<span class="sd">    the relative strength.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metric_series: pd.Series or array-like</span>
+<span class="sd">        A series or array-like object of financial metric values for a stock.</span>
+<span class="sd">        This will be converted to a pandas Series.</span>
+<span class="sd">    bench_series: pd.Series or array-like</span>
+<span class="sd">        A series or array-like object of financial metric values for the</span>
+<span class="sd">        benchmark index. This will be converted to a pandas Series.</span>
+<span class="sd">    window: int, optional</span>
+<span class="sd">        The number of periods over which to calculate the moving average (</span>
+<span class="sd">        default is 4).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        A series containing the relative strength of the metric compared to the</span>
+<span class="sd">        benchmark index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ensure inputs are pandas Series</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metric_series</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">metric_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">metric_series</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bench_series</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">bench_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">bench_series</span><span class="p">)</span>
+
+    <span class="c1"># Align and interpolate missing data</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">metric_series</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">bench_series</span><span class="p">))</span>
+    <span class="n">metric_series</span> <span class="o">=</span> <span class="n">metric_series</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()[</span><span class="o">-</span><span class="n">length</span><span class="p">:]</span>
+    <span class="n">bench_series</span> <span class="o">=</span> <span class="n">bench_series</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()[</span><span class="o">-</span><span class="n">length</span><span class="p">:]</span>
+
+    <span class="c1"># Calculate the moving average</span>
+    <span class="n">avg_metric</span> <span class="o">=</span> <span class="n">metric_series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">avg_bench</span> <span class="o">=</span> <span class="n">bench_series</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="c1"># Calculate percentage change relative to the moving average</span>
+    <span class="n">metric_change</span> <span class="o">=</span> <span class="p">(</span><span class="n">metric_series</span> <span class="o">-</span> <span class="n">avg_metric</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">avg_metric</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metric_series</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+    <span class="n">bench_change</span> <span class="o">=</span> <span class="p">(</span><span class="n">bench_series</span> <span class="o">-</span> <span class="n">avg_bench</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">avg_bench</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">bench_series</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+
+    <span class="c1"># Calculate Relative Strength and convert to percentage</span>
+    <span class="n">rsm_values</span> <span class="o">=</span> <span class="p">(</span><span class="n">metric_change</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">bench_change</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="c1"># Return result as a Series with the original index</span>
+    <span class="n">rsm</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">rsm_values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">metric_series</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+    <span class="c1"># Replace inf and -inf with NaN</span>
+    <span class="n">rsm</span> <span class="o">=</span> <span class="n">rsm</span><span class="o">.</span><span class="n">replace</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rsm</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Ranking</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="ranking">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.rsm.ranking">[docs]</a>
+<span class="k">def</span> <span class="nf">ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span>
+            <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1wk&#39;</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s2">&quot;SMA&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rank stocks based on their Mansfield Relative Strength (RSM) against an</span>
+<span class="sd">    index benchmark.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tickers : list of str</span>
+<span class="sd">        List of stock tickers to rank.</span>
+
+<span class="sd">    ticker_ref : str, optional</span>
+<span class="sd">        Ticker symbol of the benchmark. Default to &#39;^GSPC&#39; (S&amp;P 500)</span>
+
+<span class="sd">    period : str, optional</span>
+<span class="sd">        Period for historical data (&#39;6mo&#39;, &#39;1y&#39;, &#39;2y&#39;, &#39;5y&#39;, &#39;ytd&#39;, &#39;max&#39;).</span>
+<span class="sd">        Default to &#39;2y&#39; (two years).</span>
+
+<span class="sd">    interval : str, optional</span>
+<span class="sd">        Interval for historical data (&#39;1d&#39;, &#39;1wk&#39;).</span>
+<span class="sd">        Default to &#39;1wk&#39; (one week).</span>
+
+<span class="sd">    ma : str, optional</span>
+<span class="sd">        Moving average type (&#39;SMA&#39;, &#39;EMA&#39;). Default to &#39;SMA&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        DataFrame containing the ranked stocks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Select the MA function based on the &#39;ma&#39; parameter</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ma_func</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;SMA&#39;</span><span class="p">:</span> <span class="n">simple_moving_average</span><span class="p">,</span>
+            <span class="s1">&#39;EMA&#39;</span><span class="p">:</span> <span class="n">exponential_moving_average</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">ma</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid moving average type. Must be &#39;SMA&#39; or &#39;EMA&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Set moving average windows based on the interval</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">rs_win</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;1d&#39;</span><span class="p">:</span> <span class="mi">252</span><span class="p">,</span> <span class="s1">&#39;1wk&#39;</span><span class="p">:</span> <span class="mi">52</span><span class="p">}[</span><span class="n">interval</span><span class="p">]</span>
+        <span class="n">ma_wins</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;1d&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">150</span><span class="p">],</span> <span class="s1">&#39;1wk&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">]}[</span><span class="n">interval</span><span class="p">]</span>
+        <span class="n">vma_win</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;1d&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="s1">&#39;1wk&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}[</span><span class="n">interval</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid interval. &quot;</span> <span class="s2">&quot;Must be &#39;1d&#39;, or &#39;1wk&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Fetch info for stocks</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_tickers_info</span><span class="p">(</span>
+        <span class="n">tickers</span><span class="p">,</span>
+        <span class="p">[</span><span class="s1">&#39;quoteType&#39;</span><span class="p">,</span> <span class="s1">&#39;previousClose&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;trailingEps&#39;</span><span class="p">,</span> <span class="s1">&#39;revenuePerShare&#39;</span><span class="p">,</span> <span class="s1">&#39;trailingPE&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;marketCap&#39;</span><span class="p">,</span> <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;industry&#39;</span><span class="p">,]</span>
+    <span class="p">)</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tickers</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">info</span><span class="p">]</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tickers</span> <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="s1">&#39;quoteType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;EQUITY&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Fetch data for stocks and index</span>
+    <span class="n">df_all</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+    <span class="n">df_ref</span> <span class="o">=</span> <span class="n">df_all</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="n">ticker_ref</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;Ticker&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Num of downloaded stocks: &quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_all</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s1">&#39;Ticker&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Fetch financials data for stocks</span>
+    <span class="n">financials</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_financials</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;Operating Revenue&#39;</span><span class="p">])</span>
+
+    <span class="n">epses_index</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">calc_weighted_metric</span><span class="p">(</span><span class="n">financials</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span>
+                                           <span class="s1">&#39;Basic EPS&#39;</span><span class="p">,</span> <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">)</span>
+    <span class="n">revs_index</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">calc_weighted_metric</span><span class="p">(</span><span class="n">financials</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span>
+                                          <span class="s1">&#39;Operating Revenue&#39;</span><span class="p">,</span> <span class="s1">&#39;marketCap&#39;</span><span class="p">)</span>
+    <span class="c1">#print(epses_index)</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">price_ma</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df_all</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="n">ticker</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;Ticker&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">rsm</span> <span class="o">=</span> <span class="n">mansfield_relative_strength</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">df_ref</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span>
+                                          <span class="n">rs_win</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="n">ma</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">win</span> <span class="ow">in</span> <span class="n">ma_wins</span><span class="p">:</span>
+            <span class="n">price_ma</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">win</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ma_func</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">],</span> <span class="n">win</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">vol_div_vma</span> <span class="o">=</span> <span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Volume&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">ma_func</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Volume&#39;</span><span class="p">],</span> <span class="n">vma_win</span><span class="p">))</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">epses</span> <span class="o">=</span> <span class="n">financials</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">]</span>
+        <span class="n">eps_rs</span> <span class="o">=</span> <span class="n">relative_strength_vs_benchmark</span><span class="p">(</span><span class="n">epses</span><span class="p">,</span> <span class="n">epses_index</span><span class="p">)</span>
+        <span class="n">revs</span> <span class="o">=</span> <span class="n">financials</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;Operating Revenue&#39;</span><span class="p">]</span>
+        <span class="n">rev_rs</span> <span class="o">=</span> <span class="n">relative_strength_vs_benchmark</span><span class="p">(</span><span class="n">revs</span><span class="p">,</span> <span class="n">revs_index</span><span class="p">)</span>
+
+        <span class="n">pe</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;trailingPE&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pe</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;info[</span><span class="si">{</span><span class="n">ticker</span><span class="si">}</span><span class="s2">][&#39;trailingPE&#39;]: </span><span class="si">{</span><span class="n">pe</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">pe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="n">end_date</span> <span class="o">=</span> <span class="n">rsm</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Construct DataFrame for current stock</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="n">ticker</span><span class="p">,</span>
+            <span class="s1">&#39;Sector&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;sector&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Industry&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;industry&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;RS (%)&#39;</span><span class="p">:</span> <span class="n">rsm</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">),</span>
+            <span class="s1">&#39;1 Week Ago&#39;</span><span class="p">:</span> <span class="n">rsm</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">weeks</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="s1">&#39;1 Month Ago&#39;</span><span class="p">:</span> <span class="n">rsm</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="s1">&#39;3 Months Ago&#39;</span><span class="p">:</span> <span class="n">rsm</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+            <span class="s1">&#39;6 Months Ago&#39;</span><span class="p">:</span> <span class="n">rsm</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">6</span><span class="p">)),</span>
+            <span class="s1">&#39;9 Months Ago&#39;</span><span class="p">:</span> <span class="n">rsm</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">9</span><span class="p">)),</span>
+            <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="o">**</span><span class="p">{</span><span class="sa">f</span><span class="s1">&#39;MA</span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">price_ma</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">ma_wins</span><span class="p">},</span>
+            <span class="sa">f</span><span class="s1">&#39;Volume / VMA</span><span class="si">{</span><span class="n">vma_win</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">:</span> <span class="n">vol_div_vma</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">:</span> <span class="n">eps_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;TTM EPS&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;trailingEps&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Rev RS (%)&#39;</span><span class="p">:</span> <span class="n">rev_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;TTM RPS&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;revenuePerShare&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;TTM PE&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">pe</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="c1"># Combine rows into a single DataFrame</span>
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+    <span class="c1"># Rank based on Relative Strength</span>
+    <span class="n">rank_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RS Rank (%)&#39;</span><span class="p">,]</span>
+    <span class="n">rs_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RS (%)&#39;</span><span class="p">,]</span>
+    <span class="k">for</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">rs_col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rank_columns</span><span class="p">,</span> <span class="n">rs_columns</span><span class="p">):</span>
+        <span class="n">rank_pct</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="p">[</span><span class="n">rs_col</span><span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ranking_df</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank_pct</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Sort by current rank</span>
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;RS Rank (%)&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">move_columns_to_end</span><span class="p">(</span>
+        <span class="n">ranking_df</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;Price&#39;</span><span class="p">,</span>
+            <span class="o">*</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;MA</span><span class="si">{</span><span class="n">w</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">ma_wins</span><span class="p">],</span>
+            <span class="sa">f</span><span class="s1">&#39;Volume / VMA</span><span class="si">{</span><span class="n">vma_win</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">,</span> <span class="s1">&#39;TTM EPS&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;Rev RS (%)&#39;</span><span class="p">,</span> <span class="s1">&#39;TTM RPS&#39;</span><span class="p">,</span> <span class="s1">&#39;TTM PE&#39;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ranking_df</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">move_columns_to_end</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns_to_move</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Move specified columns to the end of the DataFrame.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        The DataFrame whose columns need to be reordered.</span>
+
+<span class="sd">    columns_to_move : list of str</span>
+<span class="sd">        List of column names to move to the end.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        DataFrame with specified columns moved to the end.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the list of columns that are not in columns_to_move</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">columns_to_move</span><span class="p">]</span>
+    <span class="n">cols</span> <span class="o">+=</span> <span class="n">columns_to_move</span>
+    <span class="c1"># Reorder DataFrame columns</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">df</span>
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Unit Test</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s2">&quot;EMA&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+    <span class="kn">from</span> <span class="nn">.stock_indices</span> <span class="kn">import</span> <span class="n">get_tickers</span>
+
+    <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;SPX+DJIA+NDX+SOX&#39;</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;SOX&#39;</span>
+    <span class="c1">#code = &#39;SPX+DJIA+NDX+RUI+SOX&#39;</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="n">get_tickers</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+    <span class="c1"># cases of missing &#39;Basic EPS&#39; field.</span>
+    <span class="c1">#tickers = [&#39;3036A.TW&#39;, &#39;2882B.TW&#39;, &#39;8349A.TWO&#39;, &#39;2887Z1.TW&#39;]</span>
+
+    <span class="c1"># case of empty financials DataFrame</span>
+    <span class="c1">#tickers = [&#39;910861.TW&#39;]</span>
+
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1wk&#39;</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="n">ma</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">rank</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Save to CSV</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">***&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">_stocks_</span><span class="si">{</span><span class="n">period</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">ma</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="n">rank</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Your &quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; is in the &quot;</span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s1">&quot; folder.&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">ma</span><span class="o">=</span><span class="s2">&quot;SMA&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, York Jong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

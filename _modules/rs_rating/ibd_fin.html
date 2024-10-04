@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rs_rating.ibd_fin &mdash; rs_rating 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rs_rating
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Read Me</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rs_rating</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rs_rating.ibd_fin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rs_rating.ibd_fin</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ibd_fin.py -- IBD Financial Analysis Module</span>
+
+<span class="sd">This module provides functions for financial data analysis and comparison, using</span>
+<span class="sd">methods inspired by those used by Investors Business Daily (IBD).</span>
+
+<span class="sd">Key functionalities include:</span>
+
+<span class="sd">- Calculation of relative strength for various financial metrics (e.g., EPS,</span>
+<span class="sd">  Revenue) against benchmarks such as the S&amp;P 500.</span>
+<span class="sd">- Creation of comparative DataFrames that rank stocks based on their financial</span>
+<span class="sd">  metrics and performance.</span>
+<span class="sd">- Sorting and analysis of financial performance across multiple stocks using</span>
+<span class="sd">  custom ranking methods.</span>
+
+<span class="sd">Usage:</span>
+
+<span class="sd">Import this module to access functions for analyzing and ranking financial data.</span>
+<span class="sd">For example:</span>
+<span class="sd">::</span>
+
+<span class="sd">from ibd_fin import financial_metric_ranking</span>
+
+<span class="sd"># Example usage</span>
+<span class="sd">ranking_df = financial_metric_ranking(stock_data)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.4&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/09/15 (initial version) ~ 2024/10/04 (last revision)&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;metric_strength_vs_benchmark&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;financial_metric_ranking&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Financial Metric Relative Strength</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="metric_strength_vs_benchmark">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_fin.metric_strength_vs_benchmark">[docs]</a>
+<span class="k">def</span> <span class="nf">metric_strength_vs_benchmark</span><span class="p">(</span><span class="n">quarterly_metric</span><span class="p">,</span> <span class="n">annual_metric</span><span class="p">,</span>
+                                 <span class="n">quarterly_bench</span><span class="p">,</span> <span class="n">annual_bench</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the relative strength of a financial metric series versus a</span>
+<span class="sd">    benchmark.</span>
+
+<span class="sd">    This function calculates the weighted YoY growth for both the financial</span>
+<span class="sd">    metric and the benchmark, and then computes the relative strength by</span>
+<span class="sd">    comparing the two.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    quarterly_metric : pd.Series</span>
+<span class="sd">        Quarterly financial metric series.</span>
+<span class="sd">    annual_metric : pd.Series</span>
+<span class="sd">        Annual financial metric series.</span>
+<span class="sd">    quarterly_bench : pd.Series</span>
+<span class="sd">        Quarterly benchmark series.</span>
+<span class="sd">    annual_bench : pd.Series</span>
+<span class="sd">        Annual benchmark series.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        Series containing the relative strength values, calculated as the</span>
+<span class="sd">        difference in weighted YoY growth between the metric and the benchmark,</span>
+<span class="sd">        multiplied by 100.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate weighted YoY growth</span>
+    <span class="n">yoy_growth_metric</span> <span class="o">=</span> <span class="n">weighted_yoy_growth</span><span class="p">(</span><span class="n">quarterly_metric</span><span class="p">,</span> <span class="n">annual_metric</span><span class="p">)</span>
+    <span class="n">yoy_growth_bench</span> <span class="o">=</span> <span class="n">weighted_yoy_growth</span><span class="p">(</span><span class="n">quarterly_bench</span><span class="p">,</span> <span class="n">annual_bench</span><span class="p">)</span>
+    <span class="c1">#print(&#39;weighted yoy:&#39;, yoy_growth_metric, yoy_growth_bench)</span>
+
+    <span class="c1"># Align series lengths</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">yoy_growth_metric</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">yoy_growth_bench</span><span class="p">))</span>
+    <span class="n">yoy_growth_metric</span> <span class="o">=</span> <span class="n">yoy_growth_metric</span><span class="p">[</span><span class="o">-</span><span class="n">length</span><span class="p">:]</span>
+    <span class="n">yoy_growth_bench</span> <span class="o">=</span> <span class="n">yoy_growth_bench</span><span class="p">[</span><span class="o">-</span><span class="n">length</span><span class="p">:]</span>
+
+    <span class="c1"># Calculate relative strength</span>
+    <span class="n">strength</span> <span class="o">=</span> <span class="p">(</span><span class="n">yoy_growth_metric</span><span class="o">.</span><span class="n">values</span> <span class="o">-</span> <span class="n">yoy_growth_bench</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="c1">#print(&#39;strength:&#39;, strength.round(2))</span>
+
+    <span class="c1"># Return result as a Series with the original index</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">strength</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">yoy_growth_metric</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">weighted_yoy_growth</span><span class="p">(</span><span class="n">quarterly_data</span><span class="p">,</span> <span class="n">annual_data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate weighted Year-over-Year (YoY) growth for financial data.</span>
+
+<span class="sd">    The function combines quarterly and annual YoY growth data, applying a</span>
+<span class="sd">    weighted moving average to account for the relative importance of each</span>
+<span class="sd">    frequency.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    quarterly_data : pd.Series</span>
+<span class="sd">        Quarterly financial data series.</span>
+<span class="sd">    annual_data : pd.Series</span>
+<span class="sd">        Annual financial data series.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        Series containing the weighted YoY growth values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate YoY growth for each period</span>
+    <span class="n">quarterly_yoy_growth</span> <span class="o">=</span> <span class="n">yoy_growth</span><span class="p">(</span><span class="n">quarterly_data</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;Q&#39;</span><span class="p">)</span>
+    <span class="n">annual_yoy_growth</span> <span class="o">=</span> <span class="n">yoy_growth</span><span class="p">(</span><span class="n">annual_data</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">)</span>
+    <span class="c1">#print(&#39;yoy_growth&#39;, quarterly_yoy_growth, annual_yoy_growth)</span>
+
+    <span class="c1"># Weights based on the importance of quarterly vs annual data</span>
+    <span class="n">quarterly_weight</span> <span class="o">=</span> <span class="mi">2</span>    <span class="c1"># weight for quarterly data</span>
+    <span class="n">annual_weight</span> <span class="o">=</span> <span class="mi">1</span>       <span class="c1"># weight for annual data</span>
+
+    <span class="c1"># Rolling moving average for smoothing YoY growth values</span>
+    <span class="n">moving_average</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">w</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="n">ma_yoy_q</span> <span class="o">=</span> <span class="n">moving_average</span><span class="p">(</span><span class="n">quarterly_yoy_growth</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">ma_yoy_a</span> <span class="o">=</span> <span class="n">moving_average</span><span class="p">(</span><span class="n">annual_yoy_growth</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># Align series lengths</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ma_yoy_q</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">ma_yoy_a</span><span class="p">))</span>
+    <span class="n">ma_yoy_q</span> <span class="o">=</span> <span class="n">ma_yoy_q</span><span class="p">[</span><span class="o">-</span><span class="n">length</span><span class="p">:]</span>
+    <span class="n">ma_yoy_a</span> <span class="o">=</span> <span class="n">ma_yoy_a</span><span class="p">[</span><span class="o">-</span><span class="n">length</span><span class="p">:]</span>
+
+    <span class="c1"># Combine quarterly and annual YoY growth with weights</span>
+    <span class="n">growth</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">ma_yoy_q</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">quarterly_weight</span> <span class="o">+</span> <span class="n">ma_yoy_a</span><span class="o">.</span><span class="n">values</span> <span class="o">*</span> <span class="n">annual_weight</span>
+    <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">quarterly_weight</span> <span class="o">+</span> <span class="n">annual_weight</span><span class="p">)</span>
+
+    <span class="c1"># Return result as a Series with the original index</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">growth</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">ma_yoy_q</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">yoy_growth</span><span class="p">(</span><span class="n">data_series</span><span class="p">,</span> <span class="n">frequency</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate Year-over-Year (YoY) growth for a financial data series.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_series : pd.Series</span>
+<span class="sd">        Series of financial data (e.g., revenue, EPS, RPS).</span>
+<span class="sd">    frequency : str</span>
+<span class="sd">        &#39;Q&#39; for quarterly data, &#39;A&#39; for annual data.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        Series containing the YoY growth values, where the YoY growth is</span>
+<span class="sd">        calculated as the percentage change from the corresponding value one</span>
+<span class="sd">        year prior, adjusted by the minimum absolute value of the current and</span>
+<span class="sd">        previous values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">period</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;Q&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="p">}[</span><span class="n">frequency</span><span class="p">]</span>
+
+    <span class="c1"># Ensure inputs are pandas Series</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_series</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+        <span class="n">data_series</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data_series</span><span class="p">)</span>
+    <span class="n">data_series</span> <span class="o">=</span> <span class="n">data_series</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+
+    <span class="c1"># Shift series to align current and previous values</span>
+    <span class="n">shifted_series</span> <span class="o">=</span> <span class="n">data_series</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">period</span><span class="p">)</span>
+
+    <span class="c1"># Compute minimum absolute values for the current and previous values</span>
+    <span class="n">min_abs_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">data_series</span><span class="o">.</span><span class="n">abs</span><span class="p">(),</span> <span class="n">shifted_series</span><span class="o">.</span><span class="n">abs</span><span class="p">())</span>
+
+    <span class="c1"># Calculate YoY growth using min abs value</span>
+    <span class="n">growth</span> <span class="o">=</span> <span class="p">(</span><span class="n">data_series</span> <span class="o">-</span> <span class="n">shifted_series</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">min_abs_values</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">growth</span>
+
+
+<span class="k">def</span> <span class="nf">qoq_growth</span><span class="p">(</span><span class="n">data_series</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate Quarter-over-Quarter (QoQ) growth for a financial data series.</span>
+
+<span class="sd">    This function calls the yoy_growth function with a frequency of &#39;A&#39;</span>
+<span class="sd">    to compute the YoY growth for quarterly data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data_series : pd.Series</span>
+<span class="sd">        Series of quarterly financial data (e.g., revenue, EPS, RPS).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.Series</span>
+<span class="sd">        Series containing the YoY growth values for quarterly data, where the</span>
+<span class="sd">        YoY growth is calculated as the percentage change from the</span>
+<span class="sd">        corresponding value one year prior, adjusted by the minimum absolute</span>
+<span class="sd">        value of the current and previous values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">yoy_growth</span><span class="p">(</span><span class="n">data_series</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">)</span>
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Financial Metric Ranking</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="financial_metric_ranking">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_fin.financial_metric_ranking">[docs]</a>
+<span class="k">def</span> <span class="nf">financial_metric_ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">):</span>
+    <span class="c1"># Fetch info for stocks</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_tickers_info</span><span class="p">(</span>
+        <span class="n">tickers</span><span class="p">,</span>
+        <span class="p">[</span><span class="s1">&#39;quoteType&#39;</span><span class="p">,</span> <span class="s1">&#39;previousClose&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;trailingEps&#39;</span><span class="p">,</span> <span class="s1">&#39;revenuePerShare&#39;</span><span class="p">,</span> <span class="s1">&#39;trailingPE&#39;</span><span class="p">,</span>
+         <span class="s1">&#39;marketCap&#39;</span><span class="p">,</span> <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;industry&#39;</span><span class="p">,]</span>
+    <span class="p">)</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tickers</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">info</span><span class="p">]</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tickers</span> <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="s1">&#39;quoteType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;EQUITY&#39;</span><span class="p">]</span>
+
+    <span class="c1"># Fetch financials data for stocks</span>
+    <span class="n">fins_q</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_financials</span><span class="p">(</span>
+        <span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">,</span> <span class="s1">&#39;Operating Revenue&#39;</span><span class="p">],</span> <span class="s1">&#39;quarterly&#39;</span><span class="p">)</span>
+    <span class="n">fins_a</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_financials</span><span class="p">(</span>
+        <span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">,</span> <span class="s1">&#39;Operating Revenue&#39;</span><span class="p">],</span> <span class="s1">&#39;annual&#39;</span><span class="p">)</span>
+
+    <span class="c1"># weighted EPS of benchmark</span>
+    <span class="n">bench_eps_q</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">calc_weighted_metric</span><span class="p">(</span>
+        <span class="n">fins_q</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="s1">&#39;Basic EPS&#39;</span><span class="p">,</span> <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">)</span>
+    <span class="n">bench_eps_a</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">calc_weighted_metric</span><span class="p">(</span>
+        <span class="n">fins_a</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="s1">&#39;Basic EPS&#39;</span><span class="p">,</span> <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">)</span>
+    <span class="c1">#print(&#39;bench_eps:&#39;, bench_eps_q, bench_eps_a)</span>
+
+    <span class="c1"># weighted RPS of benchmark</span>
+    <span class="n">bench_rev_q</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">calc_weighted_metric</span><span class="p">(</span><span class="n">fins_q</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span>
+                                           <span class="s1">&#39;Operating Revenue&#39;</span><span class="p">,</span> <span class="s1">&#39;marketCap&#39;</span><span class="p">)</span>
+    <span class="n">bench_rev_a</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">calc_weighted_metric</span><span class="p">(</span><span class="n">fins_a</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span>
+                                           <span class="s1">&#39;Operating Revenue&#39;</span><span class="p">,</span> <span class="s1">&#39;marketCap&#39;</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
+        <span class="n">eps_q</span> <span class="o">=</span> <span class="n">fins_q</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">]</span>
+        <span class="n">eps_a</span> <span class="o">=</span> <span class="n">fins_a</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">]</span>
+        <span class="n">eps_rs</span> <span class="o">=</span> <span class="n">metric_strength_vs_benchmark</span><span class="p">(</span><span class="n">eps_q</span><span class="p">,</span> <span class="n">eps_a</span><span class="p">,</span>
+                                              <span class="n">bench_eps_q</span><span class="p">,</span> <span class="n">bench_eps_a</span><span class="p">)</span>
+        <span class="c1">#print(&#39;eps: &#39;, eps_q, eps_a)</span>
+        <span class="n">eps_qoq</span> <span class="o">=</span> <span class="n">qoq_growth</span><span class="p">(</span><span class="n">eps_q</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">eps_yoy</span> <span class="o">=</span> <span class="n">yoy_growth</span><span class="p">(</span><span class="n">eps_q</span><span class="p">,</span> <span class="s1">&#39;Q&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1">#print(&#39;eps_yoy:&#39;, eps_yoy)</span>
+
+        <span class="n">rev_q</span> <span class="o">=</span> <span class="n">fins_q</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;Operating Revenue&#39;</span><span class="p">]</span>
+        <span class="n">rev_a</span> <span class="o">=</span> <span class="n">fins_a</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;Operating Revenue&#39;</span><span class="p">]</span>
+        <span class="n">rev_rs</span> <span class="o">=</span> <span class="n">metric_strength_vs_benchmark</span><span class="p">(</span><span class="n">rev_q</span><span class="p">,</span> <span class="n">rev_a</span><span class="p">,</span>
+                                              <span class="n">bench_rev_q</span><span class="p">,</span> <span class="n">bench_rev_a</span><span class="p">)</span>
+        <span class="n">pe</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;trailingPE&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pe</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;info[</span><span class="si">{</span><span class="n">ticker</span><span class="si">}</span><span class="s2">][&#39;trailingPE&#39;]: </span><span class="si">{</span><span class="n">pe</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">pe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="c1"># Construct DataFrame for current stock</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="n">ticker</span><span class="p">,</span>
+            <span class="s1">&#39;Sector&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;sector&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Industry&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;industry&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;previousClose&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;EPS QoQ (%)&#39;</span><span class="p">:</span> <span class="n">eps_qoq</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;QoQ 2Q Algo (%)&#39;</span><span class="p">:</span> <span class="n">eps_qoq</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eps_qoq</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s1">&#39;QoQ 3Q Algo (%)&#39;</span><span class="p">:</span> <span class="n">eps_qoq</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eps_qoq</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s1">&#39;EPS YoY (%)&#39;</span><span class="p">:</span> <span class="n">eps_yoy</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s1">&#39;YoY 2Q Algo (%)&#39;</span><span class="p">:</span> <span class="n">eps_yoy</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eps_yoy</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">eps_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;TTM EPS&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;trailingEps&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Rev RS (%)&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">rev_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;TTM RPS&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;revenuePerShare&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;TTM PE&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">pe</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+
+    <span class="c1"># Combine results into a single DataFrame</span>
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+    <span class="c1"># Sort by current rank</span>
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Rank based on Relative Strength</span>
+    <span class="n">rank_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EPS RS Rank (%)&#39;</span><span class="p">,</span> <span class="s1">&#39;RPS RS Rank (%)&#39;</span><span class="p">]</span>
+    <span class="n">rs_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">,</span> <span class="s1">&#39;Rev RS (%)&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">rs_col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rank_columns</span><span class="p">,</span> <span class="n">rs_columns</span><span class="p">):</span>
+        <span class="n">rank_pct</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="p">[</span><span class="n">rs_col</span><span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ranking_df</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank_pct</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ranking_df</span></div>
+
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Test</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+    <span class="kn">from</span> <span class="nn">.stock_indices</span> <span class="kn">import</span> <span class="n">get_tickers</span>
+
+    <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;SOX&#39;</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;NDX&#39;</span>
+    <span class="c1">#code = &#39;SPX+DJIA+NDX+RUI+SOX&#39;</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="n">get_tickers</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+    <span class="c1">#tickers = [&#39;AMD&#39;, &#39;NVDA&#39;, &#39;TSM&#39;]</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">financial_metric_ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">rank</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+    <span class="c1"># Save to CSV</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">***&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s1">_stocks_fin_</span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+    <span class="n">rank</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Your &quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; is in the &quot;</span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s1">&quot; folder.&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">time</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, York Jong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

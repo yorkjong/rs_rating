@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rs_rating.yf_utils &mdash; rs_rating 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            rs_rating
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Read Me</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Source</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">rs_rating</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">rs_rating.yf_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rs_rating.yf_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility functions for working with Yahoo Finance data.</span>
+
+<span class="sd">This module contains various utility functions for retrieving and processing</span>
+<span class="sd">stock data using the Yahoo Finance API via the `yfinance` library.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/26 (initial version) ~ 2024/10/04 (last revision)&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;calc_weighted_metric&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fetch_financials&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;download_financials&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;download_tickers_info&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+
+<span class="c1"># Configure logging</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Weighted Average Metric (e.g., EPS, Revenue)</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="calc_weighted_metric">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.yf_utils.calc_weighted_metric">[docs]</a>
+<span class="k">def</span> <span class="nf">calc_weighted_metric</span><span class="p">(</span><span class="n">financials</span><span class="p">,</span> <span class="n">tickers_info</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">weight_field</span><span class="p">,</span>
+                         <span class="n">threshold</span><span class="o">=</span><span class="mf">0.7</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the weighted average of a specified financial metric for all stock</span>
+<span class="sd">    symbols in the provided dataset using NumPy. The weights can be based on any</span>
+<span class="sd">    specified field (e.g., market capitalization or shares outstanding).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    financials : dict</span>
+<span class="sd">        A dictionary where each key is a stock ticker and the value is a</span>
+<span class="sd">        DataFrame of the ticker&#39;s quarterly financials.</span>
+<span class="sd">    tickers_info : dict</span>
+<span class="sd">        A dictionary where each key is a stock ticker and the value is a</span>
+<span class="sd">        dictionary of the ticker&#39;s info, including market cap, shares</span>
+<span class="sd">        outstanding, etc.</span>
+<span class="sd">    metric : str</span>
+<span class="sd">        The name of the financial metric to calculate (e.g., &#39;Basic EPS&#39;,</span>
+<span class="sd">        &#39;Total Revenue&#39;, &#39;Operating Revenue&#39;).</span>
+<span class="sd">    weight_field : str</span>
+<span class="sd">        The field name to use for weighting (e.g., &#39;marketCap&#39;,</span>
+<span class="sd">        &#39;sharesOutstanding&#39;).</span>
+<span class="sd">    threshold : float, optional</span>
+<span class="sd">        The minimum percentage of the total possible weight required for a valid</span>
+<span class="sd">        weighted average (default is 0.7, meaning 70%).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        The weighted average of the specified metric over the specified</span>
+<span class="sd">        number of quarters (or years).</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; tickers = [&#39;AAPL&#39;, &#39;MSFT&#39;, &#39;GOOG&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; financials = download_financials(tickers, [&#39;Basic EPS&#39;])</span>
+<span class="sd">    ...                             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">    [...**********************100%**********************]</span>
+<span class="sd">    3 of 3 financials downloaded</span>
+<span class="sd">    &gt;&gt;&gt; tickers_info = {</span>
+<span class="sd">    ...     &#39;AAPL&#39;: {&#39;marketCap&#39;: 3357369434112,</span>
+<span class="sd">    ...              &#39;sharesOutstanding&#39;: 15204100096},</span>
+<span class="sd">    ...     &#39;MSFT&#39;: {&#39;marketCap&#39;: 2985852141568,</span>
+<span class="sd">    ...              &#39;sharesOutstanding&#39;: 7433039872},</span>
+<span class="sd">    ...     &#39;GOOG&#39;: {&#39;marketCap&#39;: 1864140193792,</span>
+<span class="sd">    ...              &#39;sharesOutstanding&#39;: 5584999936},</span>
+<span class="sd">    ... }</span>
+<span class="sd">    &gt;&gt;&gt; weighted_eps = calc_weighted_metric(financials, tickers_info,</span>
+<span class="sd">    ...                                     &#39;Basic EPS&#39;, &#39;sharesOutstanding&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; type(weighted_eps)</span>
+<span class="sd">    &lt;class &#39;numpy.ndarray&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; weighted_eps.shape</span>
+<span class="sd">    (6,)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize lists to store metric and weight data</span>
+    <span class="n">metric_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">financial_df</span> <span class="ow">in</span> <span class="n">financials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Retrieve the weight based on the provided weight field</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="n">tickers_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weight_field</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">weight</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">financial_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                       <span class="ow">and</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">financial_df</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="c1"># Apply forward fill to fill missing metric values</span>
+            <span class="c1">#metric_data = financial_df[metric].ffill()</span>
+
+            <span class="c1"># Apply interpolate to fill missing metric values</span>
+            <span class="n">metric_data</span> <span class="o">=</span> <span class="n">financial_df</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">infer_objects</span><span class="p">()</span><span class="o">.</span><span class="n">interpolate</span><span class="p">()</span>
+
+            <span class="n">metric_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metric_data</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+            <span class="n">weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No valid metric or &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;weight data available for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_list</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No valid metric data found for any symbol.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+
+    <span class="c1"># Ensure all metric arrays have the same length. Use NaN for padding.</span>
+    <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">metric_list</span><span class="p">)</span>
+    <span class="n">metric_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">metric_list</span><span class="p">),</span> <span class="n">max_length</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+
+    <span class="c1"># Fill metric data right-aligned</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">metric_list</span><span class="p">):</span>
+        <span class="n">metric_array</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):]</span> <span class="o">=</span> <span class="n">data</span>  <span class="c1"># Right-align the data</span>
+
+    <span class="c1"># Convert weights to a NumPy array</span>
+    <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+
+    <span class="c1"># Calculate weighted metric using broadcasting</span>
+    <span class="n">weighted_metric</span> <span class="o">=</span> <span class="n">metric_array</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+    <span class="c1"># Create a mask for valid (non-NaN) values in weighted_metric</span>
+    <span class="n">valid_mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">weighted_metric</span><span class="p">)</span>
+
+    <span class="c1"># Calculate total weight for each time point</span>
+    <span class="n">total_weight</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">valid_mask</span><span class="p">,</span>
+                          <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">max_total_weight</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+    <span class="c1"># Set values to NaN where total_weight is below threshold</span>
+    <span class="n">below_threshold_mask</span> <span class="o">=</span> <span class="n">total_weight</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">max_total_weight</span> <span class="o">*</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="n">total_weight</span><span class="p">[</span><span class="n">below_threshold_mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># Calculate weighted average metric</span>
+    <span class="n">weighted_avg_metric</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">weighted_metric</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_weight</span>
+
+    <span class="k">return</span> <span class="n">weighted_avg_metric</span></div>
+
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Stock Data Downloading</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="fetch_financials">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.yf_utils.fetch_financials">[docs]</a>
+<span class="k">def</span> <span class="nf">fetch_financials</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;quarterly&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetch the financials for a single ticker symbol using yfinance.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    symbol: str</span>
+<span class="sd">        Ticker symbol as a string</span>
+<span class="sd">    fields: list, optional</span>
+<span class="sd">        List of fields to return. If None, all fields will be returned.</span>
+<span class="sd">        Defaults to None.</span>
+<span class="sd">    frequency: str</span>
+<span class="sd">        The frequency of the financial data (&#39;quarterly&#39; or &#39;annual&#39;).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    DataFrame</span>
+<span class="sd">        DataFrame containing the ticker&#39;s financials</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ticker</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">financials</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;quarterly&#39;</span><span class="p">:</span> <span class="n">ticker</span><span class="o">.</span><span class="n">quarterly_financials</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+                <span class="s1">&#39;annual&#39;</span><span class="p">:</span> <span class="n">ticker</span><span class="o">.</span><span class="n">financials</span><span class="o">.</span><span class="n">T</span><span class="p">,</span>
+            <span class="p">}[</span><span class="n">frequency</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Frequency must be &#39;quarterly&#39; or &#39;annual&#39;.&quot;</span><span class="p">)</span>
+
+        <span class="n">financials</span> <span class="o">=</span> <span class="n">financials</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">financials</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: Financials data is empty, &quot;</span>
+                           <span class="s2">&quot;returning NaN-filled DataFrame.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">field</span><span class="p">:</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">fields</span><span class="p">:</span>
+            <span class="c1"># Check for missing fields and keep only those that exist</span>
+            <span class="n">missing_fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">field</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span>
+                              <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">financials</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">missing_fields</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: Missing fields: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">missing_fields</span><span class="p">)</span><span class="si">}</span><span class="s2"> will be filled with NaN.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Ensure all requested fields are present,</span>
+            <span class="c1"># adding NaNs for missing fields</span>
+            <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">financials</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">financials</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+            <span class="c1"># Filter financials to include only requested fields</span>
+            <span class="n">financials</span> <span class="o">=</span> <span class="n">financials</span><span class="p">[</span><span class="n">fields</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">financials</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error fetching financials for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">fields</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="download_financials">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.yf_utils.download_financials">[docs]</a>
+<span class="k">def</span> <span class="nf">download_financials</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;quarterly&#39;</span><span class="p">,</span>
+                        <span class="n">max_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads the financials (quarterly or annual) of multiple stocks and</span>
+<span class="sd">    returns the specified fields.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    symbols: list of str</span>
+<span class="sd">        List of ticker symbols, e.g., [&#39;AAPL&#39;, &#39;MSFT&#39;, &#39;TSLA&#39;].</span>
+<span class="sd">    fields: list, optional</span>
+<span class="sd">        List of fields to return. If None, all fields will be returned.</span>
+<span class="sd">        Defaults to None.</span>
+<span class="sd">    frequency: str, optional</span>
+<span class="sd">        The frequency of the financial data to fetch. Options are &#39;quarterly&#39;</span>
+<span class="sd">        or &#39;annual&#39;. Defaults to &#39;quarterly&#39;.</span>
+<span class="sd">    max_workers: int, optional</span>
+<span class="sd">        Maximum number of threads to use for parallel requests. Defaults to 8.</span>
+<span class="sd">    progress: bool, optional</span>
+<span class="sd">        Whether to show a progress bar. Defaults to True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict:</span>
+<span class="sd">        A dictionary where each key is a stock ticker, and the value is a</span>
+<span class="sd">        DataFrame of the specified fields.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; symbols = [&#39;AAPL&#39;, &#39;MSFT&#39;, &#39;TSLA&#39;, &#39;GOOG&#39;, &#39;AMZN&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; financials = download_financials(symbols, frequency=&#39;annual&#39;)</span>
+<span class="sd">    ...                             # doctest: +NORMALIZE_WHITESPACE, +ELLIPSIS</span>
+<span class="sd">    [...*******************100%**********************]</span>
+<span class="sd">      5 of 5 financials downloaded</span>
+<span class="sd">    &gt;&gt;&gt; epses = financials[&#39;AAPL&#39;][&#39;Basic EPS&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; type(epses)</span>
+<span class="sd">    &lt;class &#39;pandas.core.series.Series&#39;&gt;</span>
+<span class="sd">    &gt;&gt;&gt; len(epses) &gt;= 4</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">financials_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="n">future_to_symbol</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">fetch_financials</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">frequency</span><span class="p">):</span>
+            <span class="n">symbol</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbols</span>
+        <span class="p">}</span>
+
+        <span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">future_to_symbol</span><span class="p">):</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="n">future_to_symbol</span><span class="p">[</span><span class="n">future</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">financials</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># Blocking call, waits for the result</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">financials</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="n">financials_dict</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">financials</span>
+
+                <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+                    <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">print_progress_bar</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">),</span>
+                                       <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;financials downloaded&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching financials for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">financials_dict</span></div>
+
+
+
+<div class="viewcode-block" id="download_tickers_info">
+<a class="viewcode-back" href="../../rs_rating.html#rs_rating.yf_utils.download_tickers_info">[docs]</a>
+<span class="k">def</span> <span class="nf">download_tickers_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_workers</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Downloads the basic information of multiple stocks and returns the</span>
+<span class="sd">    specified fields.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    symbols: list of str</span>
+<span class="sd">        List of ticker symbols, e.g., [&#39;AAPL&#39;, &#39;MSFT&#39;, &#39;TSLA&#39;]</span>
+<span class="sd">    fields: list, optional</span>
+<span class="sd">        List of fields to return. If None, all fields will be returned.</span>
+<span class="sd">    max_workers: int</span>
+<span class="sd">        Maximum number of threads to use for parallel requests</span>
+<span class="sd">    progress: bool</span>
+<span class="sd">        Whether to show a progress bar</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict:</span>
+<span class="sd">        A dictionary where each key is a stock ticker, and the value is a</span>
+<span class="sd">        dictionary of the specified fields.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; symbols = [&#39;AAPL&#39;, &#39;MSFT&#39;, &#39;TSLA&#39;, &#39;GOOG&#39;, &#39;AMZN&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; info = download_tickers_info(symbols) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    ...                                       # doctest: +ELLIPSIS</span>
+<span class="sd">    [...*******************100%**********************]  5 of 5 info downloaded</span>
+<span class="sd">    &gt;&gt;&gt; info[&#39;AAPL&#39;][&#39;longName&#39;]</span>
+<span class="sd">    &#39;Apple Inc.&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">fetch_info</span><span class="p">(</span><span class="n">symbol</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fetch the info for a single ticker symbol using yfinance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        symbol: str</span>
+<span class="sd">            Ticker symbol as a string</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary containing the ticker&#39;s info</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">Ticker</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span><span class="o">.</span><span class="n">info</span>
+            <span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">info</span>
+            <span class="k">if</span> <span class="s1">&#39;symbol&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">or</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;symbol&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">symbol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="s1">&#39;quoteType&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{}</span>
+
+            <span class="n">inf</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># Filter info dictionary to include only requested fields</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">inf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;previousClose&#39;</span><span class="p">,</span> <span class="s1">&#39;trailingEps&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;revenuePerShare&#39;</span><span class="p">,</span> <span class="s1">&#39;trailingPE&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;marketCap&#39;</span><span class="p">,</span> <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">):</span>
+                        <span class="n">inf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>  <span class="c1"># Default for numeric fields</span>
+                    <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;quoteType&#39;</span><span class="p">,</span> <span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;industry&#39;</span><span class="p">]:</span>
+                        <span class="n">inf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># Default for string fields</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">inf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Default for other data types</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error fetching data for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error fetching data for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inf</span>
+
+    <span class="n">info_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">max_workers</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+        <span class="c1"># Submit fetch_info tasks for all symbols to the thread pool</span>
+        <span class="n">future_to_symbol</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">fetch_info</span><span class="p">,</span> <span class="n">symbol</span><span class="p">):</span> <span class="n">symbol</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">symbols</span>
+        <span class="p">}</span>
+
+        <span class="n">iteration</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">future_to_symbol</span><span class="p">):</span>
+            <span class="n">symbol</span> <span class="o">=</span> <span class="n">future_to_symbol</span><span class="p">[</span><span class="n">future</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># Blocking call, waits for the result</span>
+                <span class="k">if</span> <span class="n">info</span><span class="p">:</span>
+                    <span class="n">info_dict</span><span class="p">[</span><span class="n">symbol</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span>
+
+                <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+                    <span class="n">iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">print_progress_bar</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">symbols</span><span class="p">),</span>
+                                       <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;info downloaded&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching info for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">info_dict</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">print_progress_bar</span><span class="p">(</span><span class="n">iteration</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">48</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Call in a loop to create a terminal progress bar with the percentage in</span>
+<span class="sd">    the middle.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    iteration: int</span>
+<span class="sd">        Current iteration number</span>
+<span class="sd">    total: int</span>
+<span class="sd">        Total number of iterations</span>
+<span class="sd">    length: int, optional</span>
+<span class="sd">        Length of the progress bar in characters (default is 48)</span>
+<span class="sd">    fill: str, optional</span>
+<span class="sd">        Character used to fill the progress bar (default is &#39;*&#39;)</span>
+<span class="sd">    suffix: str, optional</span>
+<span class="sd">        String to display at the end of the progress bar (default is &#39;&#39;)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; print_progress_bar(3, 10, length=30) # doctest: +NORMALIZE_WHITESPACE</span>
+<span class="sd">    [*********    30%              ]  3 of 10</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">percent</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="mf">100.</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">iteration</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">total</span><span class="p">)</span><span class="si">:</span><span class="s2">3.0f</span><span class="si">}</span><span class="s2">%&quot;</span>
+    <span class="n">percent_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">percent</span><span class="p">)</span>
+
+    <span class="n">filled_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">length</span> <span class="o">*</span> <span class="n">iteration</span> <span class="o">//</span> <span class="n">total</span><span class="p">)</span>
+    <span class="n">bar</span> <span class="o">=</span> <span class="n">fill</span> <span class="o">*</span> <span class="n">filled_length</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">length</span> <span class="o">-</span> <span class="n">filled_length</span><span class="p">)</span>
+
+    <span class="c1"># Calculate the start position to place the percentage in the middle</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">length</span> <span class="o">-</span> <span class="n">percent_len</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+    <span class="c1"># Replace part of the bar with the percentage string</span>
+    <span class="n">bar_with_percent</span> <span class="o">=</span> <span class="n">bar</span><span class="p">[:</span><span class="n">pos</span><span class="p">]</span> <span class="o">+</span> <span class="n">percent</span> <span class="o">+</span> <span class="n">bar</span><span class="p">[</span><span class="n">pos</span> <span class="o">+</span> <span class="n">percent_len</span><span class="p">:]</span>
+
+    <span class="c1"># The \r moves the cursor back to the start of the line</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\r</span><span class="s1">[</span><span class="si">{</span><span class="n">bar_with_percent</span><span class="si">}</span><span class="s1">]  </span><span class="si">{</span><span class="n">iteration</span><span class="si">}</span><span class="s1"> of </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s1">&#39;</span>
+                     <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">suffix</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>  <span class="c1"># to ensure immediate display</span>
+
+    <span class="k">if</span> <span class="n">iteration</span> <span class="o">==</span> <span class="n">total</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+
+<span class="c1">#------------------------------------------------------------------------------</span>
+<span class="c1"># Unit Test</span>
+<span class="c1">#------------------------------------------------------------------------------</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">time</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, York Jong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

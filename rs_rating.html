@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rs_rating package &mdash; rs_rating 1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=f2a433a1"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Source" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            rs_rating
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="readme.html">Read Me</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Source</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">rs_rating package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.ibd_fin">rs_rating.ibd_fin module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_fin.financial_metric_ranking"><code class="docutils literal notranslate"><span class="pre">financial_metric_ranking()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_fin.metric_strength_vs_benchmark"><code class="docutils literal notranslate"><span class="pre">metric_strength_vs_benchmark()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.ibd_rs">rs_rating.ibd_rs module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#key-features">Key Features:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage">Usage:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_rs.rankings"><code class="docutils literal notranslate"><span class="pre">rankings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_rs.relative_strength"><code class="docutils literal notranslate"><span class="pre">relative_strength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_rs.relative_strength_3m"><code class="docutils literal notranslate"><span class="pre">relative_strength_3m()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.rsm">rs_rating.rsm module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#functions">Functions:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#examples">Examples:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">See Also:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.rsm.dorsey_relative_strength"><code class="docutils literal notranslate"><span class="pre">dorsey_relative_strength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.rsm.mansfield_relative_strength"><code class="docutils literal notranslate"><span class="pre">mansfield_relative_strength()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.rsm.ranking"><code class="docutils literal notranslate"><span class="pre">ranking()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.stock_indices">rs_rating.stock_indices module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#main-functions">Main Functions:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#usage-examples">Usage Examples:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.stock_indices.get_name"><code class="docutils literal notranslate"><span class="pre">get_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.stock_indices.get_tickers"><code class="docutils literal notranslate"><span class="pre">get_tickers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.stock_indices.ticker_from_name"><code class="docutils literal notranslate"><span class="pre">ticker_from_name()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.yf_utils">rs_rating.yf_utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.yf_utils.calc_weighted_metric"><code class="docutils literal notranslate"><span class="pre">calc_weighted_metric()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.yf_utils.download_financials"><code class="docutils literal notranslate"><span class="pre">download_financials()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.yf_utils.download_tickers_info"><code class="docutils literal notranslate"><span class="pre">download_tickers_info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rs_rating.yf_utils.fetch_financials"><code class="docutils literal notranslate"><span class="pre">fetch_financials()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-rs_rating">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rs_rating</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Source</a></li>
+      <li class="breadcrumb-item active">rs_rating package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rs_rating.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rs-rating-package">
+<h1>rs_rating package<a class="headerlink" href="#rs-rating-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-rs_rating.ibd_fin">
+<span id="rs-rating-ibd-fin-module"></span><h2>rs_rating.ibd_fin module<a class="headerlink" href="#module-rs_rating.ibd_fin" title="Link to this heading"></a></h2>
+<p>ibd_fin.py – IBD Financial Analysis Module</p>
+<p>This module provides functions for financial data analysis and comparison, using
+methods inspired by those used by Investors Business Daily (IBD).</p>
+<p>Key functionalities include:</p>
+<ul class="simple">
+<li><p>Calculation of relative strength for various financial metrics (e.g., EPS,
+Revenue) against benchmarks such as the S&amp;P 500.</p></li>
+<li><p>Creation of comparative DataFrames that rank stocks based on their financial
+metrics and performance.</p></li>
+<li><p>Sorting and analysis of financial performance across multiple stocks using
+custom ranking methods.</p></li>
+</ul>
+<p>Usage:</p>
+<p>Import this module to access functions for analyzing and ranking financial data.
+For example:</p>
+<p>from ibd_fin import financial_metric_ranking</p>
+<p># Example usage
+ranking_df = financial_metric_ranking(stock_data)</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.ibd_fin.financial_metric_ranking">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_fin.</span></span><span class="sig-name descname"><span class="pre">financial_metric_ranking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tickers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_fin.html#financial_metric_ranking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_fin.financial_metric_ranking" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.ibd_fin.metric_strength_vs_benchmark">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_fin.</span></span><span class="sig-name descname"><span class="pre">metric_strength_vs_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quarterly_metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quarterly_bench</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annual_bench</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_fin.html#metric_strength_vs_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_fin.metric_strength_vs_benchmark" title="Link to this definition"></a></dt>
+<dd><p>Calculate the relative strength of a financial metric series versus a
+benchmark.</p>
+<p>This function calculates the weighted YoY growth for both the financial
+metric and the benchmark, and then computes the relative strength by
+comparing the two.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quarterly_metric</strong> (<em>pd.Series</em>) – Quarterly financial metric series.</p></li>
+<li><p><strong>annual_metric</strong> (<em>pd.Series</em>) – Annual financial metric series.</p></li>
+<li><p><strong>quarterly_bench</strong> (<em>pd.Series</em>) – Quarterly benchmark series.</p></li>
+<li><p><strong>annual_bench</strong> (<em>pd.Series</em>) – Annual benchmark series.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series containing the relative strength values, calculated as the
+difference in weighted YoY growth between the metric and the benchmark,
+multiplied by 100.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rs_rating.ibd_rs">
+<span id="rs-rating-ibd-rs-module"></span><h2>rs_rating.ibd_rs module<a class="headerlink" href="#module-rs_rating.ibd_rs" title="Link to this heading"></a></h2>
+<p>ibd.py - Stock Analysis and Ranking Module</p>
+<p>This module provides tools for analyzing and ranking stocks based on their
+relative strength compared to a benchmark index, inspired by the Investor’s
+Business Daily (IBD) methodology.</p>
+<section id="key-features">
+<h3>Key Features:<a class="headerlink" href="#key-features" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Relative strength calculation</p></li>
+<li><p>Stock and industry ranking generation</p></li>
+<li><p>Percentile-based filtering of rankings</p></li>
+</ul>
+</section>
+<section id="usage">
+<h3>Usage:<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ibd</span>
+
+<span class="c1"># Generate rankings for a list of stocks</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;NVDA&#39;</span><span class="p">,</span> <span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOGL&#39;</span><span class="p">,</span> <span class="s1">&#39;AMZN&#39;</span><span class="p">,</span> <span class="s1">&#39;TSLA&#39;</span><span class="p">]</span>
+<span class="n">stock_rankings</span><span class="p">,</span> <span class="n">industry_rankings</span> <span class="o">=</span> <span class="n">ibd</span><span class="o">.</span><span class="n">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">)</span>
+
+<span class="c1"># Calculate relative strength for a single stock</span>
+<span class="n">stock_rs</span> <span class="o">=</span> <span class="n">ibd</span><span class="o">.</span><span class="n">relative_strength</span><span class="p">(</span><span class="n">stock_closes</span><span class="p">,</span> <span class="n">index_closes</span><span class="p">)</span>
+
+<span class="c1"># Filter rankings based on a minimum percentile</span>
+<span class="n">min_percentile</span> <span class="o">=</span> <span class="mi">80</span>
+<span class="n">top_stocks</span> <span class="o">=</span> <span class="n">stock_rankings</span><span class="p">[</span><span class="n">stock_rankings</span><span class="p">[</span><span class="s2">&quot;Percentile&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_percentile</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="see-also">
+<h3>See Also:<a class="headerlink" href="#see-also" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.tradingview.com/script/pziQwiT2/">RS Rating — Indicator by Fred6724 — tradingview</a></p></li>
+<li><p><a class="reference external" href="https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/">Relative Strength (IBD Style) — Indicator by Skyte — TradingView</a></p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/skyte/relative-strength/blob/main/rs_ranking.py">relative-strength/rs_ranking.py at main · skyte/relative-strength</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference external" href="https://www.investors.com/ibd-university/find-evaluate-stocks/exclusive-ratings/">Exclusive IBD Ratings | Stock News &amp; Stock Market Analysis - IBD</a></p></li>
+</ul>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.ibd_rs.rankings">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_rs.</span></span><span class="sig-name descname"><span class="pre">rankings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tickers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticker_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'^GSPC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rank'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rs_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'12mo'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_rs.html#rankings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_rs.rankings" title="Link to this definition"></a></dt>
+<dd><p>Analyze stocks and generate ranking tables for individual stocks and
+industries.</p>
+<p>This function calculates relative strength (RS) for the given stocks compared
+to a reference index, and then ranks both individual stocks and industries
+based on their RS values. It provides historical RS data and percentile
+rankings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tickers</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of stock tickers to analyze.</p></li>
+<li><p><strong>ticker_ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The ticker symbol for the reference index. Defaults to ‘^GSPC’ (S&amp;P 500).</p></li>
+<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – The period for which to fetch historical data. Defaults to ‘2y’ (two years).</p></li>
+<li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – The frequency of the data points. Must be one of ‘1d’ for daily data,
+‘1wk’ for weekly data, or ‘1mo’ for monthly data. Defaults to ‘1d’.</p></li>
+<li><p><strong>percentile_method</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to calculate percentiles. Either ‘rank’ or ‘qcut’. Defaults to ‘rank’.</p></li>
+<li><p><strong>rs_period</strong> (<em>str</em><em>, </em><em>optional</em>) – Specify the period for Relative Strength calculation (‘12mo’ or ‘3mo’).
+Defaults to ‘12mo’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A tuple of two Pandas DataFrames:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Stock Rankings DataFrame:</dt><dd><ul class="simple">
+<li><p>Columns: Rank, Ticker, Price, Sector, Industry, RS (current),
+RS (1 month ago), RS (3 months ago), RS (6 months ago),
+Percentile (current), Percentile (1 month ago),
+Percentile (3 months ago), Percentile (6 months ago)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Industry Rankings DataFrame:</dt><dd><ul class="simple">
+<li><p>Columns: Rank, Industry, Sector, RS (current),
+RS (1 month ago), RS (3 months ago), RS (6 months ago),
+Tickers (list of tickers in the industry),
+Percentile (current), Percentile (1 month ago),
+Percentile (3 months ago), Percentile (6 months ago)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[pd.DataFrame, pd.DataFrame]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.ibd_rs.relative_strength">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_rs.</span></span><span class="sig-name descname"><span class="pre">relative_strength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">closes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closes_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_rs.html#relative_strength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_rs.relative_strength" title="Link to this definition"></a></dt>
+<dd><p>Calculate the relative strength of a stock compared to a reference index.</p>
+<p>Relative Strength (RS) is a metric used to evaluate the performance of a
+stock relative to a benchmark index. A higher RS rating indicates that the
+stock has outperformed the index, while a lower RS rating suggests
+underperformance.</p>
+<p>This function calculates the RS rating by comparing the quarter-weighted
+growth of the stock’s closing prices to the quarter-weighted growth of
+the reference index’s closing prices over the past year. The formula is as
+follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PR</span> <span class="o">=</span> <span class="n">current</span><span class="o">/</span><span class="n">previous</span> <span class="o">=</span> <span class="p">((</span><span class="n">current</span> <span class="o">-</span> <span class="n">previous</span><span class="p">)</span> <span class="o">/</span> <span class="n">previous</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+   <span class="o">=</span> <span class="k">return</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">relative_rate</span> <span class="o">=</span> <span class="n">PR_stock</span> <span class="o">/</span> <span class="n">PR_index</span>
+<span class="n">relative_strength</span> <span class="o">=</span> <span class="n">relative_rate</span> <span class="o">*</span> <span class="mi">100</span>
+</pre></div>
+</div>
+<p>Here PR means ‘price ratio’ or ‘price relative’</p>
+<p>The quarter-weighted growth is calculated using the <cite>weighted_return</cite>
+function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>closes</strong> (<em>pd.Series</em>) – Closing prices of the stock.</p></li>
+<li><p><strong>closes_ref</strong> (<em>pd.Series</em>) – Closing prices of the reference index.</p></li>
+<li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – The frequency of the data points. Must be one of ‘1d’ for daily data,
+‘1wk’ for weekly data, or ‘1mo’ for monthly data. Defaults to ‘1d’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Relative strength values for the stock.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.Series</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stock_closes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">103</span><span class="p">,</span> <span class="mi">107</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index_closes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1010</span><span class="p">,</span> <span class="mi">1015</span><span class="p">,</span> <span class="mi">1005</span><span class="p">,</span> <span class="mi">1020</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rs</span> <span class="o">=</span> <span class="n">relative_strength</span><span class="p">(</span><span class="n">stock_closes</span><span class="p">,</span> <span class="n">index_closes</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.ibd_rs.relative_strength_3m">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_rs.</span></span><span class="sig-name descname"><span class="pre">relative_strength_3m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">closes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closes_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_rs.html#relative_strength_3m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_rs.relative_strength_3m" title="Link to this definition"></a></dt>
+<dd><p>Calculate the 3-Month Relative Strength of a stock compared to a reference
+index, based on price performance (returns).</p>
+<p>The 3-Month Relative Strength Rating (RS Rating) measures the stock’s
+price performance against a benchmark index over a recent three-month
+period. This rating is designed to help investors quickly gauge the
+strength of a stock’s performance relative to the market.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>closes</strong> (<em>pd.Series</em>) – Closing prices of the stock.</p></li>
+<li><p><strong>closes_ref</strong> (<em>pd.Series</em>) – Closing prices of the reference index.</p></li>
+<li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – The frequency of the data points. Must be one of ‘1d’ for daily data,
+‘1wk’ for weekly data, or ‘1mo’ for monthly data. Defaults to ‘1d’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3-Month relative strength values for the stock, rounded to two decimal
+places. The values represent the stock’s performance relative to the
+benchmark index, with 100 indicating parity.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pd.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rs_rating.rsm">
+<span id="rs-rating-rsm-module"></span><h2>rs_rating.rsm module<a class="headerlink" href="#module-rs_rating.rsm" title="Link to this heading"></a></h2>
+<p>Mansfield Relative Strength (RSM) Module</p>
+<p>This module provides functions for calculating and ranking stocks based on
+Mansfield Relative Strength (RSM) and related metrics. It includes methods
+to compute Dorsey Relative Strength (RSD), Mansfield Relative Strength (RSM)
+using both Simple Moving Average (SMA) and Exponential Moving Average (EMA),
+as well as functionality to rank stocks against a benchmark index.</p>
+<section id="functions">
+<h3>Functions:<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>dorsey_relative_strength(closes, closes_index): Computes Dorsey Relative
+Strength (RSD).</p></li>
+<li><p>mansfield_relative_strength(closes, closes_index, window): Computes Mansfield
+Relative Strength (RSM)</p></li>
+<li><p>ranking(tickers, ticker_ref=’^GSPC’, period=’2y’, interval=’1wk’, ma=’SMA’,
+window=52): Ranks stocks based on their RSM.</p></li>
+</ul>
+</section>
+<section id="examples">
+<h3>Examples:<a class="headerlink" href="#examples" title="Link to this heading"></a></h3>
+<p>To calculate RSM for a list of stock tickers and rank them:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOGL&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rank</span> <span class="o">=</span> <span class="n">ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1wk&#39;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">52</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rank</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>To compute Mansfield Relative Strength using SMA for specific close prices:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">closes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="o">...</span><span class="p">])</span>  <span class="c1"># Example closing prices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">closes_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="o">...</span><span class="p">])</span>  <span class="c1"># Example index closing prices</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rsm</span> <span class="o">=</span> <span class="n">mansfield_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">52</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">rsm</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h3>See Also:<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.chartmill.com/documentation/technical-analysis/indicators/35-Mansfield-Relative-Strength">Mansfield Relative Strength | ChartMill.com</a></p></li>
+<li><p><a class="reference external" href="https://www.stageanalysis.net/blog/4266/how-to-create-the-mansfield-relative-performance-indicator">How to create the Mansfield Relative Performance Indicator - Stage Analysis</a></p></li>
+</ul>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.rsm.dorsey_relative_strength">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.rsm.</span></span><span class="sig-name descname"><span class="pre">dorsey_relative_strength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">closes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closes_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/rsm.html#dorsey_relative_strength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.rsm.dorsey_relative_strength" title="Link to this definition"></a></dt>
+<dd><p>Calculate Dorsey Relative Strength (RSD) for given close prices and index
+close prices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>closes</strong> (<em>pandas.Series</em>) – Series of closing prices for the stock.</p></li>
+<li><p><strong>closes_index</strong> (<em>pandas.Series</em>) – Series of closing prices for the benchmark index.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series containing the calculated Dorsey Relative Strength (RSD) values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.rsm.mansfield_relative_strength">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.rsm.</span></span><span class="sig-name descname"><span class="pre">mansfield_relative_strength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">closes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closes_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SMA'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/rsm.html#mansfield_relative_strength"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.rsm.mansfield_relative_strength" title="Link to this definition"></a></dt>
+<dd><p>Calculate Mansfield Relative Strength (RSM) for given close prices, index
+close prices, and window size using a given moving average method (‘SMA’
+or ‘EMA’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>closes</strong> (<em>pandas.Series</em>) – Series of closing prices for the stock.</p></li>
+<li><p><strong>closes_index</strong> (<em>pandas.Series</em>) – Series of closing prices for the benchmark index.</p></li>
+<li><p><strong>window</strong> (<em>int</em>) – Window size for calculating the Simple Moving Average of the Dorsey
+Relative Strength.</p></li>
+<li><p><strong>ma</strong> (<em>str</em><em>, </em><em>optional</em>) – Moving average type (‘SMA’, ‘EMA’). Default to ‘SMA’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Series containing the calculated Mansfield Relative Strength (RSM)
+values with given moving average method.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.Series</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">stock_closes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">110</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2024-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index_closes</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">2050</span><span class="p">,</span> <span class="mi">2100</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">index</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="s1">&#39;2024-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mansfield_relative_strength</span><span class="p">(</span><span class="n">stock_closes</span><span class="p">,</span> <span class="n">index_closes</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">2024-01-01    5.000000</span>
+<span class="go">2024-01-02    5.097847</span>
+<span class="go">2024-01-03    5.238095</span>
+<span class="go">dtype: float64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mansfield_relative_strength_with_ema</span><span class="p">(</span><span class="n">stock_closes</span><span class="p">,</span> <span class="n">index_closes</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">window</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s1">&#39;EMA&#39;</span><span class="p">)</span>
+<span class="go">2024-01-01    5.000000</span>
+<span class="go">2024-01-02    5.097847</span>
+<span class="go">2024-01-03    5.238095</span>
+<span class="go">dtype: float64</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.rsm.ranking">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.rsm.</span></span><span class="sig-name descname"><span class="pre">ranking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tickers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticker_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'^GSPC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1wk'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SMA'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/rsm.html#ranking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.rsm.ranking" title="Link to this definition"></a></dt>
+<dd><p>Rank stocks based on their Mansfield Relative Strength (RSM) against an
+index benchmark.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tickers</strong> (<em>list</em><em> of </em><em>str</em>) – List of stock tickers to rank.</p></li>
+<li><p><strong>ticker_ref</strong> (<em>str</em><em>, </em><em>optional</em>) – Ticker symbol of the benchmark. Default to ‘^GSPC’ (S&amp;P 500)</p></li>
+<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – Period for historical data (‘6mo’, ‘1y’, ‘2y’, ‘5y’, ‘ytd’, ‘max’).
+Default to ‘2y’ (two years).</p></li>
+<li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – Interval for historical data (‘1d’, ‘1wk’).
+Default to ‘1wk’ (one week).</p></li>
+<li><p><strong>ma</strong> (<em>str</em><em>, </em><em>optional</em>) – Moving average type (‘SMA’, ‘EMA’). Default to ‘SMA’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame containing the ranked stocks.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>pandas.DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rs_rating.stock_indices">
+<span id="rs-rating-stock-indices-module"></span><h2>rs_rating.stock_indices module<a class="headerlink" href="#module-rs_rating.stock_indices" title="Link to this heading"></a></h2>
+<p>stock_indices.py - Functions for retrieving and managing stock market indices data.</p>
+<p>This module provides functions for retrieving ticker symbols for various stock
+market indices and identifying index names from their ticker symbols. It
+supports querying index tickers from specified sources and obtaining the name
+of an index based on its symbol.</p>
+<section id="main-functions">
+<h3>Main Functions:<a class="headerlink" href="#main-functions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>get_tickers(source): Retrieve ticker symbols for a specified stock market
+index source.</p></li>
+<li><p>get_name(index_symbol): Retrieve the name of an index from its ticker symbol.</p></li>
+<li><p>ticker_from_name(name): Get the ticker symbol of an index from its long name.</p></li>
+</ul>
+</section>
+<section id="usage-examples">
+<h3>Usage Examples:<a class="headerlink" href="#usage-examples" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stock_indices</span> <span class="kn">import</span> <span class="n">get_tickers</span><span class="p">,</span> <span class="n">get_name</span>
+
+<span class="c1"># Get tickers for the S&amp;P 500 index</span>
+<span class="n">spx_tickers</span> <span class="o">=</span> <span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SPX&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get tickers for the Philadelphia Semiconductor</span>
+<span class="n">sox_tickers</span> <span class="o">=</span> <span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SOX&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get tickers for the SPX and the SOX</span>
+<span class="n">tickers</span> <span class="o">=</span> <span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SPX+SOX&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get the name of an index from its symbol</span>
+<span class="n">index_name</span> <span class="o">=</span> <span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^NDX&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.stock_indices.get_name">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.stock_indices.</span></span><span class="sig-name descname"><span class="pre">get_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index_symbol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/stock_indices.html#get_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.stock_indices.get_name" title="Link to this definition"></a></dt>
+<dd><p>Return the name of the index based on the provided symbol.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index_symbol</strong> (<em>str</em>) – <p>The ticker symbol or common abbreviation for the
+index.</p>
+<ul class="simple">
+<li><p>Yahoo Finance ticker symbols (e.g., ‘^GSPC’ for S&amp;P 500, ‘^NDX’ for
+NASDAQ-100).</p></li>
+<li><p>Common abbreviations (e.g., ‘SPX’ for S&amp;P 500, ‘NDX’ for
+NASDAQ-100).</p></li>
+</ul>
+<p>Possible values include:</p>
+<ul class="simple">
+<li><p>’^GSPC’, ‘SPX’: S&amp;P 500</p></li>
+<li><p>’^DJI’, ‘DJIA’: Dow Jones Industrial Average</p></li>
+<li><p>’^NDX’, ‘NDX’: NASDAQ 100</p></li>
+<li><p>’^IXIC’, ‘COMP’: NASDAQ Composite</p></li>
+<li><p>’^RUI’, ‘RUI’, ‘R1000’: Russell 1000</p></li>
+<li><p>’^RUT’, ‘RUT’, ‘R2000’: Russell 2000</p></li>
+<li><p>’^SOX’, ‘SOX’: PHLX Semiconductor</p></li>
+<li><p>’^NYA’, ‘NYA’: NYSE Composite</p></li>
+<li><p>’^MID’, ‘MID’: S&amp;P MidCap 400</p></li>
+<li><p>’^TWII’, ‘TWII’: Taiwan Weighted Index</p></li>
+<li><p>’^W5000’, ‘W5000’: Wilshire 5000 Total Market Index</p></li>
+<li><p>’USLS’: U.S. Listed Stocks</p></li>
+<li><p>’^STOXX50E’: Euro Stoxx 50</p></li>
+<li><p>’^FTSE’: FTSE 100</p></li>
+<li><p>’^GDAXI’: DAX</p></li>
+<li><p>’^FCHI’: CAC 40</p></li>
+<li><p>’^GSPTSE’: S&amp;P/TSX Composite</p></li>
+<li><p>’^N225’: Nikkei 225</p></li>
+<li><p>’^HSI’: Hang Seng Index</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The name of the index if found.
+If not found, returns the original index_symbol.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;SPX&#39;</span><span class="p">)</span>
+<span class="go">&#39;S&amp;P 500&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">)</span>
+<span class="go">&#39;S&amp;P 500&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^DJI&#39;</span><span class="p">)</span>
+<span class="go">&#39;Dow Jones Industrial Average&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^IXIC&#39;</span><span class="p">)</span>
+<span class="go">&#39;NASDAQ Composite&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^NDX&#39;</span><span class="p">)</span>
+<span class="go">&#39;NASDAQ 100&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^RUI&#39;</span><span class="p">)</span>
+<span class="go">&#39;Russell 1000&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^RUT&#39;</span><span class="p">)</span>
+<span class="go">&#39;Russell 2000&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^SOX&#39;</span><span class="p">)</span>
+<span class="go">&#39;PHLX Semiconductor&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^W5000&#39;</span><span class="p">)</span>
+<span class="go">&#39;Wilshire 5000 Total Market Index&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^TWII&#39;</span><span class="p">)</span>
+<span class="go">&#39;Taiwan Weighted Index&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;^HSI&#39;</span><span class="p">)</span>
+<span class="go">&#39;Hang Seng Index&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;SOXX&#39;</span><span class="p">)</span>
+<span class="go">&#39;iShares Semiconductor ETF&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_name</span><span class="p">(</span><span class="s1">&#39;AAPL&#39;</span><span class="p">)</span>
+<span class="go">&#39;AAPL&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.stock_indices.get_tickers">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.stock_indices.</span></span><span class="sig-name descname"><span class="pre">get_tickers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/stock_indices.html#get_tickers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.stock_indices.get_tickers" title="Link to this definition"></a></dt>
+<dd><p>Retrieve a list of tickers for the specified index or combined indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source</strong> (<em>str</em>) – <p>The ticker symbol or common abbreviation for the index
+or indices.</p>
+<ul class="simple">
+<li><p>Yahoo Finance ticker symbols (e.g., ‘^GSPC’ for S&amp;P 500, ‘^NDX’
+for NASDAQ-100).</p></li>
+<li><p>Common abbreviations (e.g., ‘SPX’ for S&amp;P 500, ‘NDX’ for
+NASDAQ-100).</p></li>
+<li><p>Multiple indices can be combined using ‘+’ (e.g., ‘^GSPC+^NDX’).</p></li>
+</ul>
+<p>Possible values include:</p>
+<ul class="simple">
+<li><p>’^GSPC’, ‘SPX’: S&amp;P 500</p></li>
+<li><p>’^DJI’, ‘DJIA’: Dow Jones Industrial Average</p></li>
+<li><p>’^NDX’, ‘NDX’: NASDAQ-100</p></li>
+<li><p>’^RUI’, ‘RUI’: Russell 1000</p></li>
+<li><p>’^RUT’, ‘RUT’: Russell 2000</p></li>
+<li><p>’^SOX’, ‘SOX’: PHLX Semiconductor</p></li>
+<li><p>’^W5000’, ‘W5000’: Wilshire 5000 Total Market Index</p></li>
+<li><p>’U.S. listed’: U.S. listed stocks</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of tickers for the specified source.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError</strong> – If the provided source is not recognized or does not</p></li>
+<li><p><strong>correspond to a known index.</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SPX&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">500</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">500</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;^NDX&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">100</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;^RUI&#39;</span><span class="p">))</span> <span class="o">&gt;=</span> <span class="mi">1000</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;^RUT&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1900</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;^W5000&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">5000</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;U.S.Listed&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">5000</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;USLS&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">5000</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">500</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;^GSPC+^NDX&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">500</span><span class="o">+</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">500</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SPX+SOX+NDX&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">500</span><span class="o">+</span><span class="mi">30</span><span class="o">+</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;^UNKNOWN&#39;</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="gr">KeyError</span>: <span class="n">&quot;Index symbol &#39;^UNKNOWN&#39; not found.&quot;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.stock_indices.ticker_from_name">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.stock_indices.</span></span><span class="sig-name descname"><span class="pre">ticker_from_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/stock_indices.html#ticker_from_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.stock_indices.ticker_from_name" title="Link to this definition"></a></dt>
+<dd><p>Get ticker symbol of an index from its long name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – the long name of a ticker.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the ticker symbol</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+<p>Examples:
+&gt;&gt;&gt; ticker_from_name(‘S&amp;P 500’)
+‘^GSPC’
+&gt;&gt;&gt; ticker_from_name(‘Dow Jones Industrial Average’)
+‘^DJI’
+&gt;&gt;&gt; ticker_from_name(‘NASDAQ 100’)
+‘^NDX’
+&gt;&gt;&gt; ticker_from_name(‘Russell 1000’)
+‘^RUI’
+&gt;&gt;&gt; ticker_from_name(‘Wilshire 5000 Total Market Index’)
+‘^W5000’
+&gt;&gt;&gt; ticker_from_name(‘Taiwan Weighted Index’)
+‘^TWII’</p>
+</dd></dl>
+
+</section>
+<section id="module-rs_rating.yf_utils">
+<span id="rs-rating-yf-utils-module"></span><h2>rs_rating.yf_utils module<a class="headerlink" href="#module-rs_rating.yf_utils" title="Link to this heading"></a></h2>
+<p>Utility functions for working with Yahoo Finance data.</p>
+<p>This module contains various utility functions for retrieving and processing
+stock data using the Yahoo Finance API via the <cite>yfinance</cite> library.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.yf_utils.calc_weighted_metric">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">calc_weighted_metric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">financials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tickers_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#calc_weighted_metric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.calc_weighted_metric" title="Link to this definition"></a></dt>
+<dd><p>Calculate the weighted average of a specified financial metric for all stock
+symbols in the provided dataset using NumPy. The weights can be based on any
+specified field (e.g., market capitalization or shares outstanding).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>financials</strong> (<em>dict</em>) – A dictionary where each key is a stock ticker and the value is a
+DataFrame of the ticker’s quarterly financials.</p></li>
+<li><p><strong>tickers_info</strong> (<em>dict</em>) – A dictionary where each key is a stock ticker and the value is a
+dictionary of the ticker’s info, including market cap, shares
+outstanding, etc.</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – The name of the financial metric to calculate (e.g., ‘Basic EPS’,
+‘Total Revenue’, ‘Operating Revenue’).</p></li>
+<li><p><strong>weight_field</strong> (<em>str</em>) – The field name to use for weighting (e.g., ‘marketCap’,
+‘sharesOutstanding’).</p></li>
+<li><p><strong>threshold</strong> (<em>float</em><em>, </em><em>optional</em>) – The minimum percentage of the total possible weight required for a valid
+weighted average (default is 0.7, meaning 70%).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The weighted average of the specified metric over the specified
+number of quarters (or years).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOG&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">financials</span> <span class="o">=</span> <span class="n">download_financials</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">])</span>
+<span class="gp">... </span>                            
+<span class="go">[...**********************100%**********************]</span>
+<span class="go">3 of 3 financials downloaded</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tickers_info</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s1">&#39;AAPL&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;marketCap&#39;</span><span class="p">:</span> <span class="mi">3357369434112</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">:</span> <span class="mi">15204100096</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s1">&#39;MSFT&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;marketCap&#39;</span><span class="p">:</span> <span class="mi">2985852141568</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">:</span> <span class="mi">7433039872</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="s1">&#39;GOOG&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;marketCap&#39;</span><span class="p">:</span> <span class="mi">1864140193792</span><span class="p">,</span>
+<span class="gp">... </span>             <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">:</span> <span class="mi">5584999936</span><span class="p">},</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weighted_eps</span> <span class="o">=</span> <span class="n">calc_weighted_metric</span><span class="p">(</span><span class="n">financials</span><span class="p">,</span> <span class="n">tickers_info</span><span class="p">,</span>
+<span class="gp">... </span>                                    <span class="s1">&#39;Basic EPS&#39;</span><span class="p">,</span> <span class="s1">&#39;sharesOutstanding&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">weighted_eps</span><span class="p">)</span>
+<span class="go">&lt;class &#39;numpy.ndarray&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">weighted_eps</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(6,)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.yf_utils.download_financials">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">download_financials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'quarterly'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#download_financials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.download_financials" title="Link to this definition"></a></dt>
+<dd><p>Downloads the financials (quarterly or annual) of multiple stocks and
+returns the specified fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbols</strong> (<em>list</em><em> of </em><em>str</em>) – List of ticker symbols, e.g., [‘AAPL’, ‘MSFT’, ‘TSLA’].</p></li>
+<li><p><strong>fields</strong> (<em>list</em><em>, </em><em>optional</em>) – List of fields to return. If None, all fields will be returned.
+Defaults to None.</p></li>
+<li><p><strong>frequency</strong> (<em>str</em><em>, </em><em>optional</em>) – The frequency of the financial data to fetch. Options are ‘quarterly’
+or ‘annual’. Defaults to ‘quarterly’.</p></li>
+<li><p><strong>max_workers</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of threads to use for parallel requests. Defaults to 8.</p></li>
+<li><p><strong>progress</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to show a progress bar. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary where each key is a stock ticker, and the value is a
+DataFrame of the specified fields.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;TSLA&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOG&#39;</span><span class="p">,</span> <span class="s1">&#39;AMZN&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">financials</span> <span class="o">=</span> <span class="n">download_financials</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;annual&#39;</span><span class="p">)</span>
+<span class="gp">... </span>                            
+<span class="go">[...*******************100%**********************]</span>
+<span class="go">  5 of 5 financials downloaded</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">epses</span> <span class="o">=</span> <span class="n">financials</span><span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">][</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">epses</span><span class="p">)</span>
+<span class="go">&lt;class &#39;pandas.core.series.Series&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">epses</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.yf_utils.download_tickers_info">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">download_tickers_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#download_tickers_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.download_tickers_info" title="Link to this definition"></a></dt>
+<dd><p>Downloads the basic information of multiple stocks and returns the
+specified fields.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbols</strong> (<em>list</em><em> of </em><em>str</em>) – List of ticker symbols, e.g., [‘AAPL’, ‘MSFT’, ‘TSLA’]</p></li>
+<li><p><strong>fields</strong> (<em>list</em><em>, </em><em>optional</em>) – List of fields to return. If None, all fields will be returned.</p></li>
+<li><p><strong>max_workers</strong> (<em>int</em>) – Maximum number of threads to use for parallel requests</p></li>
+<li><p><strong>progress</strong> (<em>bool</em>) – Whether to show a progress bar</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary where each key is a stock ticker, and the value is a
+dictionary of the specified fields.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;TSLA&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOG&#39;</span><span class="p">,</span> <span class="s1">&#39;AMZN&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">download_tickers_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> 
+<span class="gp">... </span>                                      
+<span class="go">[...*******************100%**********************]  5 of 5 info downloaded</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">][</span><span class="s1">&#39;longName&#39;</span><span class="p">]</span>
+<span class="go">&#39;Apple Inc.&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rs_rating.yf_utils.fetch_financials">
+<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">fetch_financials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'quarterly'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#fetch_financials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.fetch_financials" title="Link to this definition"></a></dt>
+<dd><p>Fetch the financials for a single ticker symbol using yfinance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>symbol</strong> (<em>str</em>) – Ticker symbol as a string</p></li>
+<li><p><strong>fields</strong> (<em>list</em><em>, </em><em>optional</em>) – List of fields to return. If None, all fields will be returned.
+Defaults to None.</p></li>
+<li><p><strong>frequency</strong> (<em>str</em>) – The frequency of the financial data (‘quarterly’ or ‘annual’).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>DataFrame containing the ticker’s financials</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataFrame</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-rs_rating">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-rs_rating" title="Link to this heading"></a></h2>
+<p>Initialize widgetify package.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="Source" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, York Jong.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
