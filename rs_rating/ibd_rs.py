@@ -43,9 +43,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.5"
+__version__ = "4.6"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/04 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/05 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -253,8 +253,8 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
     ema_returns_stock = returns_stock.ewm(span=span, adjust=False).mean()
     ema_returns_ref = returns_ref.ewm(span=span, adjust=False).mean()
 
-    # Calculate the relative strength (RS). Add 1 to avoid negative values
-    rs = (ema_returns_stock + 1) / (ema_returns_ref + 1) * 100
+    # Calculate the relative strength (RS).
+    rs = ema_returns_stock / ema_returns_ref.abs() * 100
 
     return rs.round(2)  # Return the RS values rounded to two decimal places
 
