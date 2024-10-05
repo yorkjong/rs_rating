@@ -43,9 +43,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.7"
+__version__ = "4.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/05 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/06 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -249,16 +249,20 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
     returns_stock = closes.pct_change(fill_method=None).fillna(0)
     returns_ref = closes_ref.pct_change(fill_method=None).fillna(0)
 
-    # Calculate the Exponential Moving Average (EMA) of the returns
-    ema_returns_stock = returns_stock.ewm(span=span, adjust=False).mean()
-    ema_returns_ref = returns_ref.ewm(span=span, adjust=False).mean()
+    # Calculate daily growth factors
+    gf_stock = returns_stock + 1
+    gf_ref = returns_ref + 1
 
-    # Calculate the cumulative sums
-    cumsum_sotck = ema_returns_stock.rolling(window=span).sum()
-    cumsum_ref = ema_returns_ref.rolling(window=span).sum()
+    # Calculate the Exponential Moving Average (EMA) of the growth factors
+    ema_gf_stock = gf_stock.ewm(span=span, adjust=False).mean()
+    ema_gf_ref = gf_ref.ewm(span=span, adjust=False).mean()
+
+    # Calculate the cumulative growth factors
+    cum_gf_stock = ema_gf_stock.rolling(window=span).apply(np.prod, raw=True)
+    cum_gf_ref = ema_gf_ref.rolling(window=span).apply(np.prod, raw=True)
 
     # Calculate the relative strength (RS).
-    rs = (cumsum_sotck + 1) / (cumsum_ref + 1).abs() * 100
+    rs = cum_gf_stock / cum_gf_ref * 100
 
     return rs.round(2)  # Return the RS values rounded to two decimal places
 
