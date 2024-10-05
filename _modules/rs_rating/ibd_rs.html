@@ -168,13 +168,13 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    closes : pd.Series</span>
+<span class="sd">    closes: pd.Series</span>
 <span class="sd">        Closing prices of the stock.</span>
 
-<span class="sd">    closes_ref : pd.Series</span>
+<span class="sd">    closes_ref: pd.Series</span>
 <span class="sd">        Closing prices of the reference index.</span>
 
-<span class="sd">    interval : str, optional</span>
+<span class="sd">    interval: str, optional</span>
 <span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
 <span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data. Defaults to &#39;1d&#39;.</span>
 
@@ -251,13 +251,13 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    closes : pd.Series</span>
+<span class="sd">    closes: pd.Series</span>
 <span class="sd">        Closing prices of the stock or index.</span>
 
-<span class="sd">    n : int</span>
+<span class="sd">    n: int</span>
 <span class="sd">        Number of quarters to look back.</span>
 
-<span class="sd">    interval : str, optional</span>
+<span class="sd">    interval: str, optional</span>
 <span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
 <span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data.</span>
 
@@ -300,13 +300,13 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    closes : pd.Series</span>
+<span class="sd">    closes: pd.Series</span>
 <span class="sd">        Closing prices of the stock.</span>
 
-<span class="sd">    closes_ref : pd.Series</span>
+<span class="sd">    closes_ref: pd.Series</span>
 <span class="sd">        Closing prices of the reference index.</span>
 
-<span class="sd">    interval : str, optional</span>
+<span class="sd">    interval: str, optional</span>
 <span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
 <span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data. Defaults to &#39;1d&#39;.</span>
 
@@ -325,15 +325,19 @@
     <span class="p">}[</span><span class="n">interval</span><span class="p">]</span>
 
     <span class="c1"># Calculate daily returns for the stock and reference index</span>
-    <span class="n">returns_stock</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">returns_ref</span> <span class="o">=</span> <span class="n">closes_ref</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">returns_stock</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">returns_ref</span> <span class="o">=</span> <span class="n">closes_ref</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># Calculate the Exponential Moving Average (EMA) of the returns</span>
     <span class="n">ema_returns_stock</span> <span class="o">=</span> <span class="n">returns_stock</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">ema_returns_ref</span> <span class="o">=</span> <span class="n">returns_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
+    <span class="c1"># Calculate the cumulative sums</span>
+    <span class="n">cumsum_sotck</span> <span class="o">=</span> <span class="n">ema_returns_stock</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">cumsum_ref</span> <span class="o">=</span> <span class="n">ema_returns_ref</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+
     <span class="c1"># Calculate the relative strength (RS).</span>
-    <span class="n">rs</span> <span class="o">=</span> <span class="n">ema_returns_stock</span> <span class="o">/</span> <span class="n">ema_returns_ref</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="n">cumsum_sotck</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">cumsum_ref</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
 
     <span class="k">return</span> <span class="n">rs</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Return the RS values rounded to two decimal places</span></div>
 
@@ -346,7 +350,7 @@
 <div class="viewcode-block" id="rankings">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.rankings">[docs]</a>
 <span class="k">def</span> <span class="nf">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
-             <span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="n">rs_period</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">):</span>
+             <span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Analyze stocks and generate ranking tables for individual stocks and</span>
 <span class="sd">    industries.</span>
@@ -358,25 +362,25 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    tickers : List[str]</span>
+<span class="sd">    tickers: List[str]</span>
 <span class="sd">        A list of stock tickers to analyze.</span>
 
-<span class="sd">    ticker_ref : str, optional</span>
+<span class="sd">    ticker_ref: str, optional</span>
 <span class="sd">        The ticker symbol for the reference index. Defaults to &#39;^GSPC&#39; (S&amp;P 500).</span>
 
-<span class="sd">    period : str, optional</span>
+<span class="sd">    period: str, optional</span>
 <span class="sd">        The period for which to fetch historical data. Defaults to &#39;2y&#39; (two years).</span>
 
-<span class="sd">    interval : str, optional</span>
+<span class="sd">    interval: str, optional</span>
 <span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
 <span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data. Defaults to &#39;1d&#39;.</span>
 
-<span class="sd">    percentile_method : str, optional</span>
+<span class="sd">    percentile_method: str, optional</span>
 <span class="sd">        Method to calculate percentiles. Either &#39;rank&#39; or &#39;qcut&#39;. Defaults to &#39;rank&#39;.</span>
 
-<span class="sd">    rs_period : str, optional</span>
-<span class="sd">        Specify the period for Relative Strength calculation (&#39;12mo&#39; or &#39;3mo&#39;).</span>
-<span class="sd">        Defaults to &#39;12mo&#39;.</span>
+<span class="sd">    rs_window: str, optional</span>
+<span class="sd">        Specify the time window (&#39;3mo&#39; or &#39;12mo&#39;) for Relative Strength</span>
+<span class="sd">        calculation. Default to &#39;12mo&#39;.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -396,11 +400,11 @@
 <span class="sd">              Percentile (current), Percentile (1 month ago),</span>
 <span class="sd">              Percentile (3 months ago), Percentile (6 months ago)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Select the appropriate relative strength function based on the rs_period</span>
+    <span class="c1"># Select the appropriate relative strength function based on the rs_window</span>
     <span class="n">rs_func</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;3mo&#39;</span><span class="p">:</span> <span class="n">relative_strength_3m</span><span class="p">,</span>
         <span class="s1">&#39;12mo&#39;</span><span class="p">:</span> <span class="n">relative_strength</span><span class="p">,</span>
-    <span class="p">}[</span><span class="n">rs_period</span><span class="p">]</span>
+    <span class="p">}[</span><span class="n">rs_window</span><span class="p">]</span>
 
     <span class="c1"># Batch download stock data</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
@@ -488,9 +492,9 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    series : pd.Series</span>
+<span class="sd">    series: pd.Series</span>
 <span class="sd">        The input data series for which to calculate percentiles.</span>
-<span class="sd">    percentile_method : str, optional</span>
+<span class="sd">    percentile_method: str, optional</span>
 <span class="sd">        The method to use for calculating percentiles.</span>
 <span class="sd">        Either &#39;rank&#39; (default) for rank-based percentiles or</span>
 <span class="sd">        &#39;qcut&#39; for quantile-based percentiles.</span>
@@ -520,15 +524,15 @@
 <span class="c1">#------------------------------------------------------------------------------</span>
 
 <span class="k">def</span> <span class="nf">test_rankings</span><span class="p">(</span><span class="n">min_percentile</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span>
-                  <span class="n">rs_period</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
+                  <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    min_percentile : int, optional</span>
+<span class="sd">    min_percentile: int, optional</span>
 <span class="sd">        The minimum percentile for a stock to be included in the rankings.</span>
 <span class="sd">        Defaults to 80.</span>
 
-<span class="sd">    out_dir : str, optional</span>
+<span class="sd">    out_dir: str, optional</span>
 <span class="sd">        The output directory to store CSV tables. Defaults to &#39;out&#39;.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="kn">import</span> <span class="nn">os</span>
@@ -539,7 +543,7 @@
     <span class="n">tickers</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">get_tickers</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
     <span class="n">rank_stock</span><span class="p">,</span> <span class="n">rank_indust</span> <span class="o">=</span> <span class="n">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
                                        <span class="n">percentile_method</span><span class="o">=</span><span class="n">percentile_method</span><span class="p">,</span>
-                                       <span class="n">rs_period</span><span class="o">=</span><span class="n">rs_period</span><span class="p">)</span>
+                                       <span class="n">rs_window</span><span class="o">=</span><span class="n">rs_window</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">rank_stock</span><span class="o">.</span><span class="n">empty</span> <span class="ow">or</span> <span class="n">rank_indust</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Not enough data to generate rankings.&quot;</span><span class="p">)</span>
@@ -557,7 +561,7 @@
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">kind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">rank_stock</span><span class="p">,</span> <span class="n">rank_indust</span><span class="p">],</span>
                            <span class="p">[</span><span class="s1">&#39;stocks&#39;</span><span class="p">,</span> <span class="s1">&#39;industries&#39;</span><span class="p">]):</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;rs_</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">rs_period</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">percentile_method</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;rs_</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">rs_window</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">percentile_method</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s1">.csv&#39;</span>
         <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Your &quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; is in the &quot;</span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s1">&quot; folder.&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -567,7 +571,7 @@
     <span class="kn">import</span> <span class="nn">time</span>
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">test_rankings</span><span class="p">(</span><span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span> <span class="n">rs_period</span><span class="o">=</span><span class="s1">&#39;3mo&#39;</span><span class="p">)</span>
+    <span class="n">test_rankings</span><span class="p">(</span><span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span> <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;3mo&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Execution time: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
 
 </pre></div>

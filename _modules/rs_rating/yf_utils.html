@@ -116,20 +116,20 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    financials : dict</span>
+<span class="sd">    financials: dict</span>
 <span class="sd">        A dictionary where each key is a stock ticker and the value is a</span>
 <span class="sd">        DataFrame of the ticker&#39;s quarterly financials.</span>
-<span class="sd">    tickers_info : dict</span>
+<span class="sd">    tickers_info: dict</span>
 <span class="sd">        A dictionary where each key is a stock ticker and the value is a</span>
 <span class="sd">        dictionary of the ticker&#39;s info, including market cap, shares</span>
 <span class="sd">        outstanding, etc.</span>
-<span class="sd">    metric : str</span>
+<span class="sd">    metric: str</span>
 <span class="sd">        The name of the financial metric to calculate (e.g., &#39;Basic EPS&#39;,</span>
 <span class="sd">        &#39;Total Revenue&#39;, &#39;Operating Revenue&#39;).</span>
-<span class="sd">    weight_field : str</span>
+<span class="sd">    weight_field: str</span>
 <span class="sd">        The field name to use for weighting (e.g., &#39;marketCap&#39;,</span>
 <span class="sd">        &#39;sharesOutstanding&#39;).</span>
-<span class="sd">    threshold : float, optional</span>
+<span class="sd">    threshold: float, optional</span>
 <span class="sd">        The minimum percentage of the total possible weight required for a valid</span>
 <span class="sd">        weighted average (default is 0.7, meaning 70%).</span>
 
