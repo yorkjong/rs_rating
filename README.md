@@ -6,6 +6,16 @@
 - **Source code:** [github.com/yorkjong/rs_rating](https://github.com/yorkjong/rs_rating)
 - **Report issues:** [github.com/yorkjong/rs_rating/issues](https://github.com/yorkjong/rs_rating/issues)
 
+## Getting Started on Colab
+
+1. Click [ibd.ipynb](https://colab.research.google.com/github/yorkjong/rs_rating/blob/main/notebooks/ibd.ipynb) (or [rsm.ipynb](https://colab.research.google.com/github/yorkjong/rs_rating/blob/main/notebooks/rsm.ipynb)) to open it in Colab.
+2. Sign in to your Google account if required.
+3. Fill in the parameters of the form.
+4. Manually click the ► button (which means "start run") to generate tables.
+   * You will see the `[ ]` symbol at the beginning of a cell, which will change to the ► button when you hover over it.
+   * The `rs_rating` package will be installed automatically if it has not been done yet.
+   * After running a cell manually, it will auto-run if you change the selected parameter value.
+
 ## Dive Into It on Your Computer
 
 1. **Install `rs_rating` from GitHub:**
