@@ -58,13 +58,19 @@ def table_from_wikipedia(article, class_, id):
     Fetches a table from a Wikipedia article and returns it as a pandas
     DataFrame.
 
-    Args:
-        article (str): The name of the Wikipedia article.
-        class_ (str): The class attribute of the table to retrieve.
-        id (str): The id attribute of the table to retrieve.
+    Parameters
+    ----------
+    article : str
+        The name of the Wikipedia article.
+    class_ : str
+        The class attribute of the table to retrieve.
+    id : str
+        The id attribute of the table to retrieve.
 
-    Returns:
-        pandas.DataFrame: The retrieved table.
+    Returns
+    -------
+    pandas.DataFrame
+        The retrieved table.
     """
     url = f"https://en.wikipedia.org/wiki/{article}"
     response = requests.get(url)
@@ -85,15 +91,19 @@ def symbols_from_wikipedia_table(article,
     """
     Extracts stock symbols from a table in a Wikipedia article.
 
-    Args:
-        article (str): The name of the Wikipedia article.
-        class_ (str, optional): The class attribute of the table. Defaults to
-            'wikitable sortable'.
-        id (str, optional): The id attribute of the table. Defaults to
-            'constituents'.
+    Parameters
+    ----------
+    article : str
+        The name of the Wikipedia article.
+    class_ : str, optional
+        The class attribute of the table. Defaults to 'wikitable sortable'.
+    id : str, optional
+        The id attribute of the table. Defaults to 'constituents'.
 
-    Returns:
-        list: A list of stock symbols.
+    Returns
+    -------
+    list
+        A list of stock symbols.
     """
     df = table_from_wikipedia(article, class_, id)
     if 'Symbol' in df.columns:
@@ -121,13 +131,15 @@ def table_from_bullishbears(article):
     """
     Fetches the first table from a specified Bullish Bears article.
 
-    Args:
-        article (str): The relative path of the article on the Bullish Bears
-            website.
+    Parameters
+    ----------
+    article : str
+        The relative path of the article on the Bullish Bears website.
 
-    Returns:
-        pd.DataFrame: The first table found in the specified URL, parsed into
-            a Pandas DataFrame.
+    Returns
+    -------
+    pd.DataFrame
+        The first table found in the specified URL, parsed into a Pandas DataFrame.
     """
     url = f'https://bullishbears.com/{article}'
     return pd.read_html(url)[0]
@@ -137,29 +149,32 @@ def symbols_from_bullishbears_table(article):
     """
     Extracts stock symbols from a table in a Bullish Bears article.
 
-    Args:
-        article (str): The relative path of the article on the Bullish Bears
-            website.
+    Parameters
+    ----------
+    article : str
+        The relative path of the article on the Bullish Bears website.
 
-    Returns:
-        list: A list of stock symbols from the table's "Symbol" column.
+    Returns
+    -------
+    list
+        A list of stock symbols from the table's "Symbol" column.
 
-    Examples:
-        >>> symbols = symbols_from_bullishbears_table('sp500-stocks-list')
-        >>> len(symbols)
-        502
-        >>> symbols = symbols_from_bullishbears_table('dow-jones-stocks-list')
-        >>> len(symbols)
-        30
-        >>> symbols = symbols_from_bullishbears_table('nasdaq-stocks-list')
-        >>> len(symbols)
-        100
-        >>> symbols = symbols_from_bullishbears_table(
-        ...     'russell-2000-stocks-list')
-        >>> 'SMCI' in symbols
-        True
-        >>> len(symbols) > 1990
-        True
+    Examples
+    --------
+    >>> symbols = symbols_from_bullishbears_table('sp500-stocks-list')
+    >>> len(symbols)
+    502
+    >>> symbols = symbols_from_bullishbears_table('dow-jones-stocks-list')
+    >>> len(symbols)
+    30
+    >>> symbols = symbols_from_bullishbears_table('nasdaq-stocks-list')
+    >>> len(symbols)
+    100
+    >>> symbols = symbols_from_bullishbears_table('russell-2000-stocks-list')
+    >>> 'SMCI' in symbols
+    True
+    >>> len(symbols) > 1990
+    True
     """
     df = table_from_bullishbears(article)
     symbols = list(df['Symbol'])
@@ -177,7 +192,7 @@ rut_tickers = functools.partial(
 def us_listed_tickers():
     """
     Fetches all symbols of U.S. listed stocks from the StatementDog US stock
-    list page, and returns them as a list.
+    list page and returns them as a list.
 
     This function mimics the Wilshire 5000 Index by using the StatementDog
     website's US stock list as a proxy for all listed U.S. stocks. The list
@@ -185,16 +200,19 @@ def us_listed_tickers():
     NASDAQ, and serves as a comprehensive dataset of publicly traded companies
     in the U.S.
 
-    Returns:
-        list: A list of stock symbols from the StatementDog US stock list.
-              Returns an empty list if the request fails.
+    Returns
+    -------
+    list
+        A list of stock symbols from the StatementDog US stock list.
+        Returns an empty list if the request fails.
 
-    Example:
-        >>> tickers = us_listed_tickers()
-        >>> len(tickers) > 5000
-        True
-        >>> 'AAPL' in tickers
-        True
+    Examples
+    --------
+    >>> tickers = us_listed_tickers()
+    >>> len(tickers) > 5000
+    True
+    >>> 'AAPL' in tickers
+    True
     """
     # URL of the target page
     url = 'https://statementdog.com/us-stock-list'
@@ -227,21 +245,26 @@ def sox_tickers():
 
     This function returns a manually maintained list of SOX tickers.
 
-    Note: This list may not be up-to-date and requires periodic updates.
+    Note
+    ----
+    This list may not be up-to-date and requires periodic updates.
 
-    Returns:
-        list: A list of SOX tickers.
+    Returns
+    -------
+    list
+        A list of SOX tickers.
 
-    Examples:
-        >>> tickers = sox_tickers()
-        >>> len(tickers) == 30
-        True
-        >>> 'NVDA' in tickers
-        True
-        >>> 'AVGO' in tickers
-        True
-        >>> 'TSM' in tickers
-        True
+    Examples
+    --------
+    >>> tickers = sox_tickers()
+    >>> len(tickers) == 30
+    True
+    >>> 'NVDA' in tickers
+    True
+    >>> 'AVGO' in tickers
+    True
+    >>> 'TSM' in tickers
+    True
     """
     tickers = [
         'AMD', 'ADI', 'AMAT', 'ASML', 'AZTA', 'AVGO', 'COHR', 'ENTG', 'GFS',
@@ -259,59 +282,65 @@ def get_tickers(source):
     """
     Retrieve a list of tickers for the specified index or combined indices.
 
-    Args:
-        source (str): The ticker symbol or common abbreviation for the index
-            or indices.
+    Parameters
+    ----------
+    source : str
+        The ticker symbol or common abbreviation for the index or indices.
 
-            - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX'
-              for NASDAQ-100).
-            - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
-              NASDAQ-100).
-            - Multiple indices can be combined using '+' (e.g., '^GSPC+^NDX').
+        - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX'
+          for NASDAQ-100).
+        - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
+          NASDAQ-100).
+        - Multiple indices can be combined using '+' (e.g., '^GSPC+^NDX').
 
-            Possible values include:
+        Possible values include:
 
-            - '^GSPC', 'SPX': S&P 500
-            - '^DJI', 'DJIA': Dow Jones Industrial Average
-            - '^NDX', 'NDX': NASDAQ-100
-            - '^RUI', 'RUI': Russell 1000
-            - '^RUT', 'RUT': Russell 2000
-            - '^SOX', 'SOX': PHLX Semiconductor
-            - '^W5000', 'W5000': Wilshire 5000 Total Market Index
-            - 'U.S. listed': U.S. listed stocks
+        - '^GSPC', 'SPX': S&P 500
+        - '^DJI', 'DJIA': Dow Jones Industrial Average
+        - '^NDX', 'NDX': NASDAQ-100
+        - '^RUI', 'RUI': Russell 1000
+        - '^RUT', 'RUT': Russell 2000
+        - '^SOX', 'SOX': PHLX Semiconductor
+        - '^W5000', 'W5000': Wilshire 5000 Total Market Index
+        - 'U.S. listed': U.S. listed stocks
 
-    Returns:
-        list: A list of tickers for the specified source.
+    Returns
+    -------
+    list
+        A list of tickers for the specified source.
 
-    Raises:
-        KeyError: If the provided source is not recognized or does not
+    Raises
+    ------
+    KeyError
+        If the provided source is not recognized or does not
         correspond to a known index.
 
-    Examples:
-        >>> len(get_tickers('SPX')) >= 500
-        True
-        >>> len(get_tickers('^GSPC')) >= 500
-        True
-        >>> len(get_tickers('^NDX')) >= 100
-        True
-        >>> len(get_tickers('^RUI')) >= 1000
-        True
-        >>> len(get_tickers('^RUT')) > 1900
-        True
-        >>> len(get_tickers('^W5000')) > 5000
-        True
-        >>> len(get_tickers('U.S.Listed')) > 5000
-        True
-        >>> len(get_tickers('USLS')) > 5000
-        True
-        >>> 500 < len(get_tickers('^GSPC+^NDX')) < (500+100)
-        True
-        >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
-        True
-        >>> get_tickers('^UNKNOWN')
-        Traceback (most recent call last):
-            ...
-        KeyError: "Index symbol '^UNKNOWN' not found."
+    Examples
+    --------
+    >>> len(get_tickers('SPX')) >= 500
+    True
+    >>> len(get_tickers('^GSPC')) >= 500
+    True
+    >>> len(get_tickers('^NDX')) >= 100
+    True
+    >>> len(get_tickers('^RUI')) >= 1000
+    True
+    >>> len(get_tickers('^RUT')) > 1900
+    True
+    >>> len(get_tickers('^W5000')) > 5000
+    True
+    >>> len(get_tickers('U.S.Listed')) > 5000
+    True
+    >>> len(get_tickers('USLS')) > 5000
+    True
+    >>> 500 < len(get_tickers('^GSPC+^NDX')) < (500+100)
+    True
+    >>> 500 < len(get_tickers('SPX+SOX+NDX')) < (500+30+100)
+    True
+    >>> get_tickers('^UNKNOWN')
+    Traceback (most recent call last):
+        ...
+    KeyError: "Index symbol '^UNKNOWN' not found."
     """
     dic = {
         '^GSPC': spx_tickers,
@@ -360,13 +389,18 @@ def ticker_from_name(name):
     """
     Get ticker symbol of an index from its long name.
 
-    Args:
-        name (str): the long name of a ticker.
+    Parameters
+    ----------
+    name : str
+        The long name of a ticker.
 
-    Returns:
-        str: the ticker symbol
+    Returns
+    -------
+    str
+        The ticker symbol.
 
-    Examples:
+    Examples
+    --------
     >>> ticker_from_name('S&P 500')
     '^GSPC'
     >>> ticker_from_name('Dow Jones Industrial Average')
@@ -406,68 +440,71 @@ def get_name(index_symbol):
     """
     Return the name of the index based on the provided symbol.
 
-    Args:
-        index_symbol (str): The ticker symbol or common abbreviation for the
-            index.
+    Parameters
+    ----------
+    index_symbol : str
+        The ticker symbol or common abbreviation for the index.
 
-            - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX' for
-              NASDAQ-100).
-            - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
-              NASDAQ-100).
+        - Yahoo Finance ticker symbols (e.g., '^GSPC' for S&P 500, '^NDX' for
+          NASDAQ-100).
+        - Common abbreviations (e.g., 'SPX' for S&P 500, 'NDX' for
+          NASDAQ-100).
 
-            Possible values include:
+        Possible values include:
 
-            - '^GSPC', 'SPX': S&P 500
-            - '^DJI', 'DJIA': Dow Jones Industrial Average
-            - '^NDX', 'NDX': NASDAQ 100
-            - '^IXIC', 'COMP': NASDAQ Composite
-            - '^RUI', 'RUI', 'R1000': Russell 1000
-            - '^RUT', 'RUT', 'R2000': Russell 2000
-            - '^SOX', 'SOX': PHLX Semiconductor
-            - '^NYA', 'NYA': NYSE Composite
-            - '^MID', 'MID': S&P MidCap 400
-            - '^TWII', 'TWII': Taiwan Weighted Index
-            - '^W5000', 'W5000': Wilshire 5000 Total Market Index
-            - 'USLS': U.S. Listed Stocks
-            - '^STOXX50E': Euro Stoxx 50
-            - '^FTSE': FTSE 100
-            - '^GDAXI': DAX
-            - '^FCHI': CAC 40
-            - '^GSPTSE': S&P/TSX Composite
-            - '^N225': Nikkei 225
-            - '^HSI': Hang Seng Index
+        - '^GSPC', 'SPX': S&P 500
+        - '^DJI', 'DJIA': Dow Jones Industrial Average
+        - '^NDX', 'NDX': NASDAQ 100
+        - '^IXIC', 'COMP': NASDAQ Composite
+        - '^RUI', 'RUI', 'R1000': Russell 1000
+        - '^RUT', 'RUT', 'R2000': Russell 2000
+        - '^SOX', 'SOX': PHLX Semiconductor
+        - '^NYA', 'NYA': NYSE Composite
+        - '^MID', 'MID': S&P MidCap 400
+        - '^TWII', 'TWII': Taiwan Weighted Index
+        - '^W5000', 'W5000': Wilshire 5000 Total Market Index
+        - 'USLS': U.S. Listed Stocks
+        - '^STOXX50E': Euro Stoxx 50
+        - '^FTSE': FTSE 100
+        - '^GDAXI': DAX
+        - '^FCHI': CAC 40
+        - '^GSPTSE': S&P/TSX Composite
+        - '^N225': Nikkei 225
+        - '^HSI': Hang Seng Index
 
-    Returns:
-        str: The name of the index if found.
-        If not found, returns the original index_symbol.
+    Returns
+    -------
+    str
+        The name of the index if found. If not found, returns the original index_symbol.
 
-    Examples:
-        >>> get_name('SPX')
-        'S&P 500'
-        >>> get_name('^GSPC')
-        'S&P 500'
-        >>> get_name('^DJI')
-        'Dow Jones Industrial Average'
-        >>> get_name('^IXIC')
-        'NASDAQ Composite'
-        >>> get_name('^NDX')
-        'NASDAQ 100'
-        >>> get_name('^RUI')
-        'Russell 1000'
-        >>> get_name('^RUT')
-        'Russell 2000'
-        >>> get_name('^SOX')
-        'PHLX Semiconductor'
-        >>> get_name('^W5000')
-        'Wilshire 5000 Total Market Index'
-        >>> get_name('^TWII')
-        'Taiwan Weighted Index'
-        >>> get_name('^HSI')
-        'Hang Seng Index'
-        >>> get_name('SOXX')
-        'iShares Semiconductor ETF'
-        >>> get_name('AAPL')
-        'AAPL'
+    Examples
+    --------
+    >>> get_name('SPX')
+    'S&P 500'
+    >>> get_name('^GSPC')
+    'S&P 500'
+    >>> get_name('^DJI')
+    'Dow Jones Industrial Average'
+    >>> get_name('^IXIC')
+    'NASDAQ Composite'
+    >>> get_name('^NDX')
+    'NASDAQ 100'
+    >>> get_name('^RUI')
+    'Russell 1000'
+    >>> get_name('^RUT')
+    'Russell 2000'
+    >>> get_name('^SOX')
+    'PHLX Semiconductor'
+    >>> get_name('^W5000')
+    'Wilshire 5000 Total Market Index'
+    >>> get_name('^TWII')
+    'Taiwan Weighted Index'
+    >>> get_name('^HSI')
+    'Hang Seng Index'
+    >>> get_name('SOXX')
+    'iShares Semiconductor ETF'
+    >>> get_name('AAPL')
+    'AAPL'
     """
     dic = {
         '^GSPC': 'S&P 500',
