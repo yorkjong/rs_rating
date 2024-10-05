@@ -264,7 +264,7 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 #------------------------------------------------------------------------------
 
 def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
-             percentile_method='qcut', rs_period='12mo'):
+             percentile_method='rank', rs_period='12mo'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
@@ -399,7 +399,7 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     return stock_df, industry_df
 
 
-def calc_percentile(series, percentile_method='qcut'):
+def calc_percentile(series, percentile_method='rank'):
     """
     Calculate percentiles for a given Pandas Series.
 
