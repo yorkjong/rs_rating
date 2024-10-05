@@ -19,10 +19,10 @@ Import this module to access functions for analyzing and ranking financial data.
 For example:
 ::
 
-from ibd_fin import financial_metric_ranking
+    from ibd_fin import financial_metric_ranking
 
-# Example usage
-ranking_df = financial_metric_ranking(stock_data)
+    # Example usage
+    ranking_df = financial_metric_ranking(stock_data)
 """
 __version__ = "1.4"
 __author__ = "York <york.jong@gmail.com>"
