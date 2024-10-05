@@ -32,7 +32,7 @@
 
     There are three main modules for stock ratings:
 
-    - [ibd_rs.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_rs.py) — IBD RS Rating, evaluates stocks based on IBD’s relative strength methodology.
+    - [ibd_rs.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_rs.py) — IBD RS Rating, includes both 12-month and 3-month versions for short-term trading.
     - [ibd_fin.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_fin.py) — IBD Financial Ratings, includes metrics such as EPS Rating and Revenue Rating.
     - [rsm.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/rsm.py) — Mansfield RS Rating, an alternative method for evaluating stock performance.
 
