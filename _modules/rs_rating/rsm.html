@@ -415,15 +415,15 @@
     <span class="c1"># Combine rows into a single DataFrame</span>
     <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
+    <span class="c1"># Sort by current RS</span>
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;RS (%)&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
     <span class="c1"># Rank based on Relative Strength</span>
     <span class="n">rank_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RS Rank (P)&#39;</span><span class="p">,]</span>
     <span class="n">rs_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RS (%)&#39;</span><span class="p">,]</span>
     <span class="k">for</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">rs_col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rank_columns</span><span class="p">,</span> <span class="n">rs_columns</span><span class="p">):</span>
         <span class="n">rank_pct</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="p">[</span><span class="n">rs_col</span><span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">ranking_df</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank_pct</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-
-    <span class="c1"># Sort by current rank</span>
-    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;RS Rank (%)&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">move_columns_to_end</span><span class="p">(</span>
         <span class="n">ranking_df</span><span class="p">,</span>

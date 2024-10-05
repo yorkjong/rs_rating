@@ -356,7 +356,7 @@
     <span class="c1"># Combine results into a single DataFrame</span>
     <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
-    <span class="c1"># Sort by current rank</span>
+    <span class="c1"># Sort by current EPS RS</span>
     <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="c1"># Rank based on Relative Strength</span>
