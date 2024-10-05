@@ -333,8 +333,8 @@
     <span class="n">ema_returns_ref</span> <span class="o">=</span> <span class="n">returns_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
     <span class="c1"># Calculate the cumulative sums</span>
-    <span class="n">cumsum_sotck</span> <span class="o">=</span> <span class="n">ema_returns_stock</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
-    <span class="n">cumsum_ref</span> <span class="o">=</span> <span class="n">ema_returns_ref</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">cumsum_sotck</span> <span class="o">=</span> <span class="n">ema_returns_stock</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">cumsum_ref</span> <span class="o">=</span> <span class="n">ema_returns_ref</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="c1"># Calculate the relative strength (RS).</span>
     <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="n">cumsum_sotck</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">cumsum_ref</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
