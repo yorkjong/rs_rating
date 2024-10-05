@@ -254,8 +254,8 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
     ema_returns_ref = returns_ref.ewm(span=span, adjust=False).mean()
 
     # Calculate the cumulative sums
-    cumsum_sotck = ema_returns_stock.cumsum()
-    cumsum_ref = ema_returns_ref.cumsum()
+    cumsum_sotck = ema_returns_stock.rolling(window=span).sum()
+    cumsum_ref = ema_returns_ref.rolling(window=span).sum()
 
     # Calculate the relative strength (RS).
     rs = (cumsum_sotck + 1) / (cumsum_ref + 1).abs() * 100
