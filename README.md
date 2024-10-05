@@ -28,11 +28,11 @@
 
     There are three main modules for stock ratings:
 
-    - [ibd_rs.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_rs.py) — IBD RS Rating
-    - [ibd_fin.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_fin.py) — IBD Financial Ratings (e.g., EPS Rating, Revenue Rating)
-    - [rsm.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/rsm.py) — Mansfield RS Rating
+    - [ibd_rs.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_rs.py) — IBD RS Rating, evaluates stocks based on IBD’s relative strength methodology.
+    - [ibd_fin.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_fin.py) — IBD Financial Ratings, includes metrics such as EPS Rating and Revenue Rating.
+    - [rsm.py](https://github.com/yorkjong/rs_rating/blob/main/rs_rating/rsm.py) — Mansfield RS Rating, an alternative method for evaluating stock performance.
 
-    To run a test and generate CSV tables for a given set of stocks, execute the following (use ibd_rs.py as an example):
+    To run a test and generate CSV tables for a given set of stocks, execute the following command (using `ibd_rs.py` as an example):
 
     ```bash
     python -m rs_rating.ibd_rs
