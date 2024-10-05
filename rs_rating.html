@@ -524,8 +524,7 @@ index source.</p></li>
 <dd><p>Return the name of the index based on the provided symbol.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>index_symbol</strong> (<em>str</em>) – <p>The ticker symbol or common abbreviation for the
-index.</p>
+<dd class="field-odd"><p><strong>index_symbol</strong> (<em>str</em>) – <p>The ticker symbol or common abbreviation for the index.</p>
 <ul class="simple">
 <li><p>Yahoo Finance ticker symbols (e.g., ‘^GSPC’ for S&amp;P 500, ‘^NDX’ for
 NASDAQ-100).</p></li>
@@ -557,8 +556,7 @@ NASDAQ-100).</p></li>
 </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The name of the index if found.
-If not found, returns the original index_symbol.</p>
+<dd class="field-even"><p>The name of the index if found. If not found, returns the original index_symbol.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -601,8 +599,7 @@ If not found, returns the original index_symbol.</p>
 <dd><p>Retrieve a list of tickers for the specified index or combined indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>source</strong> (<em>str</em>) – <p>The ticker symbol or common abbreviation for the index
-or indices.</p>
+<dd class="field-odd"><p><strong>source</strong> (<em>str</em>) – <p>The ticker symbol or common abbreviation for the index or indices.</p>
 <ul class="simple">
 <li><p>Yahoo Finance ticker symbols (e.g., ‘^GSPC’ for S&amp;P 500, ‘^NDX’
 for NASDAQ-100).</p></li>
@@ -630,10 +627,8 @@ NASDAQ-100).</p></li>
 <dd class="field-odd"><p>list</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>KeyError</strong> – If the provided source is not recognized or does not</p></li>
-<li><p><strong>correspond to a known index.</strong> – </p></li>
-</ul>
+<dd class="field-even"><p><strong>KeyError</strong> – If the provided source is not recognized or does not
+    correspond to a known index.</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -671,28 +666,30 @@ NASDAQ-100).</p></li>
 <dd><p>Get ticker symbol of an index from its long name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – the long name of a ticker.</p>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The long name of a ticker.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the ticker symbol</p>
+<dd class="field-even"><p>The ticker symbol.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
 </dd>
 </dl>
-<p>Examples:
-&gt;&gt;&gt; ticker_from_name(‘S&amp;P 500’)
-‘^GSPC’
-&gt;&gt;&gt; ticker_from_name(‘Dow Jones Industrial Average’)
-‘^DJI’
-&gt;&gt;&gt; ticker_from_name(‘NASDAQ 100’)
-‘^NDX’
-&gt;&gt;&gt; ticker_from_name(‘Russell 1000’)
-‘^RUI’
-&gt;&gt;&gt; ticker_from_name(‘Wilshire 5000 Total Market Index’)
-‘^W5000’
-&gt;&gt;&gt; ticker_from_name(‘Taiwan Weighted Index’)
-‘^TWII’</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ticker_from_name</span><span class="p">(</span><span class="s1">&#39;S&amp;P 500&#39;</span><span class="p">)</span>
+<span class="go">&#39;^GSPC&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ticker_from_name</span><span class="p">(</span><span class="s1">&#39;Dow Jones Industrial Average&#39;</span><span class="p">)</span>
+<span class="go">&#39;^DJI&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ticker_from_name</span><span class="p">(</span><span class="s1">&#39;NASDAQ 100&#39;</span><span class="p">)</span>
+<span class="go">&#39;^NDX&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ticker_from_name</span><span class="p">(</span><span class="s1">&#39;Russell 1000&#39;</span><span class="p">)</span>
+<span class="go">&#39;^RUI&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ticker_from_name</span><span class="p">(</span><span class="s1">&#39;Wilshire 5000 Total Market Index&#39;</span><span class="p">)</span>
+<span class="go">&#39;^W5000&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ticker_from_name</span><span class="p">(</span><span class="s1">&#39;Taiwan Weighted Index&#39;</span><span class="p">)</span>
+<span class="go">&#39;^TWII&#39;</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>

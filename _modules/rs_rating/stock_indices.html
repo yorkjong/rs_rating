@@ -132,13 +132,19 @@
 <span class="sd">    Fetches a table from a Wikipedia article and returns it as a pandas</span>
 <span class="sd">    DataFrame.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        article (str): The name of the Wikipedia article.</span>
-<span class="sd">        class_ (str): The class attribute of the table to retrieve.</span>
-<span class="sd">        id (str): The id attribute of the table to retrieve.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    article : str</span>
+<span class="sd">        The name of the Wikipedia article.</span>
+<span class="sd">    class_ : str</span>
+<span class="sd">        The class attribute of the table to retrieve.</span>
+<span class="sd">    id : str</span>
+<span class="sd">        The id attribute of the table to retrieve.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        pandas.DataFrame: The retrieved table.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pandas.DataFrame</span>
+<span class="sd">        The retrieved table.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://en.wikipedia.org/wiki/</span><span class="si">{</span><span class="n">article</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -159,15 +165,19 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts stock symbols from a table in a Wikipedia article.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        article (str): The name of the Wikipedia article.</span>
-<span class="sd">        class_ (str, optional): The class attribute of the table. Defaults to</span>
-<span class="sd">            &#39;wikitable sortable&#39;.</span>
-<span class="sd">        id (str, optional): The id attribute of the table. Defaults to</span>
-<span class="sd">            &#39;constituents&#39;.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    article : str</span>
+<span class="sd">        The name of the Wikipedia article.</span>
+<span class="sd">    class_ : str, optional</span>
+<span class="sd">        The class attribute of the table. Defaults to &#39;wikitable sortable&#39;.</span>
+<span class="sd">    id : str, optional</span>
+<span class="sd">        The id attribute of the table. Defaults to &#39;constituents&#39;.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        list: A list of stock symbols.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of stock symbols.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">table_from_wikipedia</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">class_</span><span class="p">,</span> <span class="nb">id</span><span class="p">)</span>
     <span class="k">if</span> <span class="s1">&#39;Symbol&#39;</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
@@ -195,13 +205,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetches the first table from a specified Bullish Bears article.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        article (str): The relative path of the article on the Bullish Bears</span>
-<span class="sd">            website.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    article : str</span>
+<span class="sd">        The relative path of the article on the Bullish Bears website.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        pd.DataFrame: The first table found in the specified URL, parsed into</span>
-<span class="sd">            a Pandas DataFrame.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        The first table found in the specified URL, parsed into a Pandas DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;https://bullishbears.com/</span><span class="si">{</span><span class="n">article</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -211,29 +223,32 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts stock symbols from a table in a Bullish Bears article.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        article (str): The relative path of the article on the Bullish Bears</span>
-<span class="sd">            website.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    article : str</span>
+<span class="sd">        The relative path of the article on the Bullish Bears website.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        list: A list of stock symbols from the table&#39;s &quot;Symbol&quot; column.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of stock symbols from the table&#39;s &quot;Symbol&quot; column.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(&#39;sp500-stocks-list&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; len(symbols)</span>
-<span class="sd">        502</span>
-<span class="sd">        &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(&#39;dow-jones-stocks-list&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; len(symbols)</span>
-<span class="sd">        30</span>
-<span class="sd">        &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(&#39;nasdaq-stocks-list&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; len(symbols)</span>
-<span class="sd">        100</span>
-<span class="sd">        &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(</span>
-<span class="sd">        ...     &#39;russell-2000-stocks-list&#39;)</span>
-<span class="sd">        &gt;&gt;&gt; &#39;SMCI&#39; in symbols</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(symbols) &gt; 1990</span>
-<span class="sd">        True</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(&#39;sp500-stocks-list&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; len(symbols)</span>
+<span class="sd">    502</span>
+<span class="sd">    &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(&#39;dow-jones-stocks-list&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; len(symbols)</span>
+<span class="sd">    30</span>
+<span class="sd">    &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(&#39;nasdaq-stocks-list&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; len(symbols)</span>
+<span class="sd">    100</span>
+<span class="sd">    &gt;&gt;&gt; symbols = symbols_from_bullishbears_table(&#39;russell-2000-stocks-list&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; &#39;SMCI&#39; in symbols</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(symbols) &gt; 1990</span>
+<span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">table_from_bullishbears</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
     <span class="n">symbols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;Symbol&#39;</span><span class="p">])</span>
@@ -251,7 +266,7 @@
 <span class="k">def</span> <span class="nf">us_listed_tickers</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetches all symbols of U.S. listed stocks from the StatementDog US stock</span>
-<span class="sd">    list page, and returns them as a list.</span>
+<span class="sd">    list page and returns them as a list.</span>
 
 <span class="sd">    This function mimics the Wilshire 5000 Index by using the StatementDog</span>
 <span class="sd">    website&#39;s US stock list as a proxy for all listed U.S. stocks. The list</span>
@@ -259,16 +274,19 @@
 <span class="sd">    NASDAQ, and serves as a comprehensive dataset of publicly traded companies</span>
 <span class="sd">    in the U.S.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        list: A list of stock symbols from the StatementDog US stock list.</span>
-<span class="sd">              Returns an empty list if the request fails.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of stock symbols from the StatementDog US stock list.</span>
+<span class="sd">        Returns an empty list if the request fails.</span>
 
-<span class="sd">    Example:</span>
-<span class="sd">        &gt;&gt;&gt; tickers = us_listed_tickers()</span>
-<span class="sd">        &gt;&gt;&gt; len(tickers) &gt; 5000</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; &#39;AAPL&#39; in tickers</span>
-<span class="sd">        True</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; tickers = us_listed_tickers()</span>
+<span class="sd">    &gt;&gt;&gt; len(tickers) &gt; 5000</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; &#39;AAPL&#39; in tickers</span>
+<span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># URL of the target page</span>
     <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://statementdog.com/us-stock-list&#39;</span>
@@ -301,21 +319,26 @@
 
 <span class="sd">    This function returns a manually maintained list of SOX tickers.</span>
 
-<span class="sd">    Note: This list may not be up-to-date and requires periodic updates.</span>
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This list may not be up-to-date and requires periodic updates.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        list: A list of SOX tickers.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of SOX tickers.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; tickers = sox_tickers()</span>
-<span class="sd">        &gt;&gt;&gt; len(tickers) == 30</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; &#39;NVDA&#39; in tickers</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; &#39;AVGO&#39; in tickers</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; &#39;TSM&#39; in tickers</span>
-<span class="sd">        True</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; tickers = sox_tickers()</span>
+<span class="sd">    &gt;&gt;&gt; len(tickers) == 30</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; &#39;NVDA&#39; in tickers</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; &#39;AVGO&#39; in tickers</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; &#39;TSM&#39; in tickers</span>
+<span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s1">&#39;AMD&#39;</span><span class="p">,</span> <span class="s1">&#39;ADI&#39;</span><span class="p">,</span> <span class="s1">&#39;AMAT&#39;</span><span class="p">,</span> <span class="s1">&#39;ASML&#39;</span><span class="p">,</span> <span class="s1">&#39;AZTA&#39;</span><span class="p">,</span> <span class="s1">&#39;AVGO&#39;</span><span class="p">,</span> <span class="s1">&#39;COHR&#39;</span><span class="p">,</span> <span class="s1">&#39;ENTG&#39;</span><span class="p">,</span> <span class="s1">&#39;GFS&#39;</span><span class="p">,</span>
@@ -335,59 +358,65 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieve a list of tickers for the specified index or combined indices.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        source (str): The ticker symbol or common abbreviation for the index</span>
-<span class="sd">            or indices.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    source : str</span>
+<span class="sd">        The ticker symbol or common abbreviation for the index or indices.</span>
 
-<span class="sd">            - Yahoo Finance ticker symbols (e.g., &#39;^GSPC&#39; for S&amp;P 500, &#39;^NDX&#39;</span>
-<span class="sd">              for NASDAQ-100).</span>
-<span class="sd">            - Common abbreviations (e.g., &#39;SPX&#39; for S&amp;P 500, &#39;NDX&#39; for</span>
-<span class="sd">              NASDAQ-100).</span>
-<span class="sd">            - Multiple indices can be combined using &#39;+&#39; (e.g., &#39;^GSPC+^NDX&#39;).</span>
+<span class="sd">        - Yahoo Finance ticker symbols (e.g., &#39;^GSPC&#39; for S&amp;P 500, &#39;^NDX&#39;</span>
+<span class="sd">          for NASDAQ-100).</span>
+<span class="sd">        - Common abbreviations (e.g., &#39;SPX&#39; for S&amp;P 500, &#39;NDX&#39; for</span>
+<span class="sd">          NASDAQ-100).</span>
+<span class="sd">        - Multiple indices can be combined using &#39;+&#39; (e.g., &#39;^GSPC+^NDX&#39;).</span>
 
-<span class="sd">            Possible values include:</span>
+<span class="sd">        Possible values include:</span>
 
-<span class="sd">            - &#39;^GSPC&#39;, &#39;SPX&#39;: S&amp;P 500</span>
-<span class="sd">            - &#39;^DJI&#39;, &#39;DJIA&#39;: Dow Jones Industrial Average</span>
-<span class="sd">            - &#39;^NDX&#39;, &#39;NDX&#39;: NASDAQ-100</span>
-<span class="sd">            - &#39;^RUI&#39;, &#39;RUI&#39;: Russell 1000</span>
-<span class="sd">            - &#39;^RUT&#39;, &#39;RUT&#39;: Russell 2000</span>
-<span class="sd">            - &#39;^SOX&#39;, &#39;SOX&#39;: PHLX Semiconductor</span>
-<span class="sd">            - &#39;^W5000&#39;, &#39;W5000&#39;: Wilshire 5000 Total Market Index</span>
-<span class="sd">            - &#39;U.S. listed&#39;: U.S. listed stocks</span>
+<span class="sd">        - &#39;^GSPC&#39;, &#39;SPX&#39;: S&amp;P 500</span>
+<span class="sd">        - &#39;^DJI&#39;, &#39;DJIA&#39;: Dow Jones Industrial Average</span>
+<span class="sd">        - &#39;^NDX&#39;, &#39;NDX&#39;: NASDAQ-100</span>
+<span class="sd">        - &#39;^RUI&#39;, &#39;RUI&#39;: Russell 1000</span>
+<span class="sd">        - &#39;^RUT&#39;, &#39;RUT&#39;: Russell 2000</span>
+<span class="sd">        - &#39;^SOX&#39;, &#39;SOX&#39;: PHLX Semiconductor</span>
+<span class="sd">        - &#39;^W5000&#39;, &#39;W5000&#39;: Wilshire 5000 Total Market Index</span>
+<span class="sd">        - &#39;U.S. listed&#39;: U.S. listed stocks</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        list: A list of tickers for the specified source.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list</span>
+<span class="sd">        A list of tickers for the specified source.</span>
 
-<span class="sd">    Raises:</span>
-<span class="sd">        KeyError: If the provided source is not recognized or does not</span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    KeyError</span>
+<span class="sd">        If the provided source is not recognized or does not</span>
 <span class="sd">        correspond to a known index.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;SPX&#39;)) &gt;= 500</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;^GSPC&#39;)) &gt;= 500</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;^NDX&#39;)) &gt;= 100</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;^RUI&#39;)) &gt;= 1000</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;^RUT&#39;)) &gt; 1900</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;^W5000&#39;)) &gt; 5000</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;U.S.Listed&#39;)) &gt; 5000</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; len(get_tickers(&#39;USLS&#39;)) &gt; 5000</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; 500 &lt; len(get_tickers(&#39;^GSPC+^NDX&#39;)) &lt; (500+100)</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; 500 &lt; len(get_tickers(&#39;SPX+SOX+NDX&#39;)) &lt; (500+30+100)</span>
-<span class="sd">        True</span>
-<span class="sd">        &gt;&gt;&gt; get_tickers(&#39;^UNKNOWN&#39;)</span>
-<span class="sd">        Traceback (most recent call last):</span>
-<span class="sd">            ...</span>
-<span class="sd">        KeyError: &quot;Index symbol &#39;^UNKNOWN&#39; not found.&quot;</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;SPX&#39;)) &gt;= 500</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;^GSPC&#39;)) &gt;= 500</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;^NDX&#39;)) &gt;= 100</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;^RUI&#39;)) &gt;= 1000</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;^RUT&#39;)) &gt; 1900</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;^W5000&#39;)) &gt; 5000</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;U.S.Listed&#39;)) &gt; 5000</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; len(get_tickers(&#39;USLS&#39;)) &gt; 5000</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; 500 &lt; len(get_tickers(&#39;^GSPC+^NDX&#39;)) &lt; (500+100)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; 500 &lt; len(get_tickers(&#39;SPX+SOX+NDX&#39;)) &lt; (500+30+100)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; get_tickers(&#39;^UNKNOWN&#39;)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">    KeyError: &quot;Index symbol &#39;^UNKNOWN&#39; not found.&quot;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dic</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;^GSPC&#39;</span><span class="p">:</span> <span class="n">spx_tickers</span><span class="p">,</span>
@@ -439,13 +468,18 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get ticker symbol of an index from its long name.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        name (str): the long name of a ticker.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The long name of a ticker.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        str: the ticker symbol</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The ticker symbol.</span>
 
-<span class="sd">    Examples:</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; ticker_from_name(&#39;S&amp;P 500&#39;)</span>
 <span class="sd">    &#39;^GSPC&#39;</span>
 <span class="sd">    &gt;&gt;&gt; ticker_from_name(&#39;Dow Jones Industrial Average&#39;)</span>
@@ -488,68 +522,71 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the name of the index based on the provided symbol.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        index_symbol (str): The ticker symbol or common abbreviation for the</span>
-<span class="sd">            index.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    index_symbol : str</span>
+<span class="sd">        The ticker symbol or common abbreviation for the index.</span>
 
-<span class="sd">            - Yahoo Finance ticker symbols (e.g., &#39;^GSPC&#39; for S&amp;P 500, &#39;^NDX&#39; for</span>
-<span class="sd">              NASDAQ-100).</span>
-<span class="sd">            - Common abbreviations (e.g., &#39;SPX&#39; for S&amp;P 500, &#39;NDX&#39; for</span>
-<span class="sd">              NASDAQ-100).</span>
+<span class="sd">        - Yahoo Finance ticker symbols (e.g., &#39;^GSPC&#39; for S&amp;P 500, &#39;^NDX&#39; for</span>
+<span class="sd">          NASDAQ-100).</span>
+<span class="sd">        - Common abbreviations (e.g., &#39;SPX&#39; for S&amp;P 500, &#39;NDX&#39; for</span>
+<span class="sd">          NASDAQ-100).</span>
 
-<span class="sd">            Possible values include:</span>
+<span class="sd">        Possible values include:</span>
 
-<span class="sd">            - &#39;^GSPC&#39;, &#39;SPX&#39;: S&amp;P 500</span>
-<span class="sd">            - &#39;^DJI&#39;, &#39;DJIA&#39;: Dow Jones Industrial Average</span>
-<span class="sd">            - &#39;^NDX&#39;, &#39;NDX&#39;: NASDAQ 100</span>
-<span class="sd">            - &#39;^IXIC&#39;, &#39;COMP&#39;: NASDAQ Composite</span>
-<span class="sd">            - &#39;^RUI&#39;, &#39;RUI&#39;, &#39;R1000&#39;: Russell 1000</span>
-<span class="sd">            - &#39;^RUT&#39;, &#39;RUT&#39;, &#39;R2000&#39;: Russell 2000</span>
-<span class="sd">            - &#39;^SOX&#39;, &#39;SOX&#39;: PHLX Semiconductor</span>
-<span class="sd">            - &#39;^NYA&#39;, &#39;NYA&#39;: NYSE Composite</span>
-<span class="sd">            - &#39;^MID&#39;, &#39;MID&#39;: S&amp;P MidCap 400</span>
-<span class="sd">            - &#39;^TWII&#39;, &#39;TWII&#39;: Taiwan Weighted Index</span>
-<span class="sd">            - &#39;^W5000&#39;, &#39;W5000&#39;: Wilshire 5000 Total Market Index</span>
-<span class="sd">            - &#39;USLS&#39;: U.S. Listed Stocks</span>
-<span class="sd">            - &#39;^STOXX50E&#39;: Euro Stoxx 50</span>
-<span class="sd">            - &#39;^FTSE&#39;: FTSE 100</span>
-<span class="sd">            - &#39;^GDAXI&#39;: DAX</span>
-<span class="sd">            - &#39;^FCHI&#39;: CAC 40</span>
-<span class="sd">            - &#39;^GSPTSE&#39;: S&amp;P/TSX Composite</span>
-<span class="sd">            - &#39;^N225&#39;: Nikkei 225</span>
-<span class="sd">            - &#39;^HSI&#39;: Hang Seng Index</span>
+<span class="sd">        - &#39;^GSPC&#39;, &#39;SPX&#39;: S&amp;P 500</span>
+<span class="sd">        - &#39;^DJI&#39;, &#39;DJIA&#39;: Dow Jones Industrial Average</span>
+<span class="sd">        - &#39;^NDX&#39;, &#39;NDX&#39;: NASDAQ 100</span>
+<span class="sd">        - &#39;^IXIC&#39;, &#39;COMP&#39;: NASDAQ Composite</span>
+<span class="sd">        - &#39;^RUI&#39;, &#39;RUI&#39;, &#39;R1000&#39;: Russell 1000</span>
+<span class="sd">        - &#39;^RUT&#39;, &#39;RUT&#39;, &#39;R2000&#39;: Russell 2000</span>
+<span class="sd">        - &#39;^SOX&#39;, &#39;SOX&#39;: PHLX Semiconductor</span>
+<span class="sd">        - &#39;^NYA&#39;, &#39;NYA&#39;: NYSE Composite</span>
+<span class="sd">        - &#39;^MID&#39;, &#39;MID&#39;: S&amp;P MidCap 400</span>
+<span class="sd">        - &#39;^TWII&#39;, &#39;TWII&#39;: Taiwan Weighted Index</span>
+<span class="sd">        - &#39;^W5000&#39;, &#39;W5000&#39;: Wilshire 5000 Total Market Index</span>
+<span class="sd">        - &#39;USLS&#39;: U.S. Listed Stocks</span>
+<span class="sd">        - &#39;^STOXX50E&#39;: Euro Stoxx 50</span>
+<span class="sd">        - &#39;^FTSE&#39;: FTSE 100</span>
+<span class="sd">        - &#39;^GDAXI&#39;: DAX</span>
+<span class="sd">        - &#39;^FCHI&#39;: CAC 40</span>
+<span class="sd">        - &#39;^GSPTSE&#39;: S&amp;P/TSX Composite</span>
+<span class="sd">        - &#39;^N225&#39;: Nikkei 225</span>
+<span class="sd">        - &#39;^HSI&#39;: Hang Seng Index</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        str: The name of the index if found.</span>
-<span class="sd">        If not found, returns the original index_symbol.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The name of the index if found. If not found, returns the original index_symbol.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;SPX&#39;)</span>
-<span class="sd">        &#39;S&amp;P 500&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^GSPC&#39;)</span>
-<span class="sd">        &#39;S&amp;P 500&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^DJI&#39;)</span>
-<span class="sd">        &#39;Dow Jones Industrial Average&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^IXIC&#39;)</span>
-<span class="sd">        &#39;NASDAQ Composite&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^NDX&#39;)</span>
-<span class="sd">        &#39;NASDAQ 100&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^RUI&#39;)</span>
-<span class="sd">        &#39;Russell 1000&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^RUT&#39;)</span>
-<span class="sd">        &#39;Russell 2000&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^SOX&#39;)</span>
-<span class="sd">        &#39;PHLX Semiconductor&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^W5000&#39;)</span>
-<span class="sd">        &#39;Wilshire 5000 Total Market Index&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^TWII&#39;)</span>
-<span class="sd">        &#39;Taiwan Weighted Index&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;^HSI&#39;)</span>
-<span class="sd">        &#39;Hang Seng Index&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;SOXX&#39;)</span>
-<span class="sd">        &#39;iShares Semiconductor ETF&#39;</span>
-<span class="sd">        &gt;&gt;&gt; get_name(&#39;AAPL&#39;)</span>
-<span class="sd">        &#39;AAPL&#39;</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;SPX&#39;)</span>
+<span class="sd">    &#39;S&amp;P 500&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^GSPC&#39;)</span>
+<span class="sd">    &#39;S&amp;P 500&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^DJI&#39;)</span>
+<span class="sd">    &#39;Dow Jones Industrial Average&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^IXIC&#39;)</span>
+<span class="sd">    &#39;NASDAQ Composite&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^NDX&#39;)</span>
+<span class="sd">    &#39;NASDAQ 100&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^RUI&#39;)</span>
+<span class="sd">    &#39;Russell 1000&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^RUT&#39;)</span>
+<span class="sd">    &#39;Russell 2000&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^SOX&#39;)</span>
+<span class="sd">    &#39;PHLX Semiconductor&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^W5000&#39;)</span>
+<span class="sd">    &#39;Wilshire 5000 Total Market Index&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^TWII&#39;)</span>
+<span class="sd">    &#39;Taiwan Weighted Index&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;^HSI&#39;)</span>
+<span class="sd">    &#39;Hang Seng Index&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;SOXX&#39;)</span>
+<span class="sd">    &#39;iShares Semiconductor ETF&#39;</span>
+<span class="sd">    &gt;&gt;&gt; get_name(&#39;AAPL&#39;)</span>
+<span class="sd">    &#39;AAPL&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dic</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;^GSPC&#39;</span><span class="p">:</span> <span class="s1">&#39;S&amp;P 500&#39;</span><span class="p">,</span>
