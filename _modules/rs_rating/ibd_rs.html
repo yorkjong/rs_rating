@@ -73,24 +73,24 @@
              
   <h1>Source code for rs_rating.ibd_rs</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">ibd.py - Stock Analysis and Ranking Module</span>
+<span class="sd">IBD RS (Relative Strength) Rating Module</span>
+<span class="sd">----------------------------------------</span>
 
 <span class="sd">This module provides tools for analyzing and ranking stocks based on their</span>
 <span class="sd">relative strength compared to a benchmark index, inspired by the Investor&#39;s</span>
 <span class="sd">Business Daily (IBD) methodology.</span>
 
 <span class="sd">Key Features:</span>
-<span class="sd">-------------</span>
+<span class="sd">~~~~~~~~~~~~~</span>
 <span class="sd">- Relative strength calculation</span>
 <span class="sd">- Stock and industry ranking generation</span>
 <span class="sd">- Percentile-based filtering of rankings</span>
 
 <span class="sd">Usage:</span>
-<span class="sd">------</span>
-
+<span class="sd">~~~~~~</span>
 <span class="sd">::</span>
 
-<span class="sd">    import ibd</span>
+<span class="sd">    import ibd_res as ibd</span>
 
 <span class="sd">    # Generate rankings for a list of stocks</span>
 <span class="sd">    tickers = [&#39;MSFT&#39;, &#39;NVDA&#39;, &#39;AAPL&#39;, &#39;GOOGL&#39;, &#39;AMZN&#39;, &#39;TSLA&#39;]</span>
@@ -104,7 +104,7 @@
 <span class="sd">    top_stocks = stock_rankings[stock_rankings[&quot;Percentile&quot;] &gt;= min_percentile]</span>
 
 <span class="sd">See Also:</span>
-<span class="sd">---------</span>
+<span class="sd">~~~~~~~~~</span>
 <span class="sd">- `RS Rating — Indicator by Fred6724 — tradingview</span>
 <span class="sd">  &lt;https://www.tradingview.com/script/pziQwiT2/&gt;`_</span>
 <span class="sd">- `Relative Strength (IBD Style) — Indicator by Skyte — TradingView</span>
@@ -117,17 +117,15 @@
 <span class="sd">  &lt;https://www.investors.com/ibd-university/</span>
 <span class="sd">  find-evaluate-stocks/exclusive-ratings/&gt;`_</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.5&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.6&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/04 (last revision)&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/05 (last revision)&quot;</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;relative_strength&#39;</span><span class="p">,</span>
     <span class="s1">&#39;relative_strength_3m&#39;</span><span class="p">,</span>
     <span class="s1">&#39;rankings&#39;</span><span class="p">,</span>
 <span class="p">]</span>
-
-<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -334,8 +332,8 @@
     <span class="n">ema_returns_stock</span> <span class="o">=</span> <span class="n">returns_stock</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="n">ema_returns_ref</span> <span class="o">=</span> <span class="n">returns_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
-    <span class="c1"># Calculate the relative strength (RS). Add 1 to avoid negative values</span>
-    <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="n">ema_returns_stock</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">ema_returns_ref</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="c1"># Calculate the relative strength (RS).</span>
+    <span class="n">rs</span> <span class="o">=</span> <span class="n">ema_returns_stock</span> <span class="o">/</span> <span class="n">ema_returns_ref</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
 
     <span class="k">return</span> <span class="n">rs</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Return the RS values rounded to two decimal places</span></div>
 
@@ -510,10 +508,12 @@
 <span class="sd">    out_dir : str, optional</span>
 <span class="sd">        The output directory to store CSV tables. Defaults to &#39;out&#39;.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
     <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">stock_indices</span> <span class="k">as</span> <span class="n">si</span>
 
-    <span class="n">tickers</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SOX&#39;</span><span class="p">)</span>
-    <span class="n">tickers</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SPX&#39;</span><span class="p">)</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;SPX&#39;</span>
+    <span class="n">tickers</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">get_tickers</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
     <span class="n">rank_stock</span><span class="p">,</span> <span class="n">rank_indust</span> <span class="o">=</span> <span class="n">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
                                        <span class="n">percentile_method</span><span class="o">=</span><span class="n">percentile_method</span><span class="p">,</span>
                                        <span class="n">rs_period</span><span class="o">=</span><span class="n">rs_period</span><span class="p">)</span>
@@ -530,10 +530,11 @@
 
     <span class="c1"># Save to CSV</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">***&quot;</span><span class="p">)</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">table</span><span class="p">,</span> <span class="n">kind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">rank_stock</span><span class="p">,</span> <span class="n">rank_indust</span><span class="p">],</span>
                            <span class="p">[</span><span class="s1">&#39;stocks&#39;</span><span class="p">,</span> <span class="s1">&#39;industries&#39;</span><span class="p">]):</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;rs_</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">.csv&#39;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;rs_</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">rs_period</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">percentile_method</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s1">.csv&#39;</span>
         <span class="n">table</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Your &quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&quot; is in the &quot;</span><span class="si">{</span><span class="n">out_dir</span><span class="si">}</span><span class="s1">&quot; folder.&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;***</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>

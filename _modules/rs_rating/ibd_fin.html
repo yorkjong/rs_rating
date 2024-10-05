@@ -73,13 +73,14 @@
              
   <h1>Source code for rs_rating.ibd_fin</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">ibd_fin.py -- IBD Financial Analysis Module</span>
+<span class="sd">IBD Financial Analysis Module</span>
+<span class="sd">-----------------------------</span>
 
 <span class="sd">This module provides functions for financial data analysis and comparison, using</span>
 <span class="sd">methods inspired by those used by Investors Business Daily (IBD).</span>
 
-<span class="sd">Key functionalities include:</span>
-
+<span class="sd">Key Features:</span>
+<span class="sd">~~~~~~~~~~~~~</span>
 <span class="sd">- Calculation of relative strength for various financial metrics (e.g., EPS,</span>
 <span class="sd">  Revenue) against benchmarks such as the S&amp;P 500.</span>
 <span class="sd">- Creation of comparative DataFrames that rank stocks based on their financial</span>
@@ -88,15 +89,15 @@
 <span class="sd">  custom ranking methods.</span>
 
 <span class="sd">Usage:</span>
-
+<span class="sd">~~~~~~</span>
 <span class="sd">Import this module to access functions for analyzing and ranking financial data.</span>
 <span class="sd">For example:</span>
 <span class="sd">::</span>
 
-<span class="sd">from ibd_fin import financial_metric_ranking</span>
+<span class="sd">    from ibd_fin import financial_metric_ranking</span>
 
-<span class="sd"># Example usage</span>
-<span class="sd">ranking_df = financial_metric_ranking(stock_data)</span>
+<span class="sd">    # Example usage</span>
+<span class="sd">    ranking_df = financial_metric_ranking(stock_data)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.4&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>

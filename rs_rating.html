@@ -50,23 +50,20 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">rs_rating package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.ibd_fin">rs_rating.ibd_fin module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ibd-financial-analysis-module">IBD Financial Analysis Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_fin.financial_metric_ranking"><code class="docutils literal notranslate"><span class="pre">financial_metric_ranking()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_fin.metric_strength_vs_benchmark"><code class="docutils literal notranslate"><span class="pre">metric_strength_vs_benchmark()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.ibd_rs">rs_rating.ibd_rs module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#key-features">Key Features:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#usage">Usage:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#see-also">See Also:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ibd-rs-relative-strength-rating-module">IBD RS (Relative Strength) Rating Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_rs.rankings"><code class="docutils literal notranslate"><span class="pre">rankings()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_rs.relative_strength"><code class="docutils literal notranslate"><span class="pre">relative_strength()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.ibd_rs.relative_strength_3m"><code class="docutils literal notranslate"><span class="pre">relative_strength_3m()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-rs_rating.rsm">rs_rating.rsm module</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#functions">Functions:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#examples">Examples:</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id1">See Also:</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#mansfield-relative-strength-rsm-module">Mansfield Relative Strength (RSM) Module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.rsm.dorsey_relative_strength"><code class="docutils literal notranslate"><span class="pre">dorsey_relative_strength()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.rsm.mansfield_relative_strength"><code class="docutils literal notranslate"><span class="pre">mansfield_relative_strength()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#rs_rating.rsm.ranking"><code class="docutils literal notranslate"><span class="pre">ranking()</span></code></a></li>
@@ -126,10 +123,12 @@
 </section>
 <section id="module-rs_rating.ibd_fin">
 <span id="rs-rating-ibd-fin-module"></span><h2>rs_rating.ibd_fin module<a class="headerlink" href="#module-rs_rating.ibd_fin" title="Link to this heading"></a></h2>
-<p>ibd_fin.py – IBD Financial Analysis Module</p>
+<section id="ibd-financial-analysis-module">
+<h3>IBD Financial Analysis Module<a class="headerlink" href="#ibd-financial-analysis-module" title="Link to this heading"></a></h3>
 <p>This module provides functions for financial data analysis and comparison, using
 methods inspired by those used by Investors Business Daily (IBD).</p>
-<p>Key functionalities include:</p>
+<section id="key-features">
+<h4>Key Features:<a class="headerlink" href="#key-features" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>Calculation of relative strength for various financial metrics (e.g., EPS,
 Revenue) against benchmarks such as the S&amp;P 500.</p></li>
@@ -138,12 +137,19 @@ metrics and performance.</p></li>
 <li><p>Sorting and analysis of financial performance across multiple stocks using
 custom ranking methods.</p></li>
 </ul>
-<p>Usage:</p>
+</section>
+<section id="usage">
+<h4>Usage:<a class="headerlink" href="#usage" title="Link to this heading"></a></h4>
 <p>Import this module to access functions for analyzing and ranking financial data.
 For example:</p>
-<p>from ibd_fin import financial_metric_ranking</p>
-<p># Example usage
-ranking_df = financial_metric_ranking(stock_data)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ibd_fin</span> <span class="kn">import</span> <span class="n">financial_metric_ranking</span>
+
+<span class="c1"># Example usage</span>
+<span class="n">ranking_df</span> <span class="o">=</span> <span class="n">financial_metric_ranking</span><span class="p">(</span><span class="n">stock_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
 <dl class="py function">
 <dt class="sig sig-object py" id="rs_rating.ibd_fin.financial_metric_ranking">
 <span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_fin.</span></span><span class="sig-name descname"><span class="pre">financial_metric_ranking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tickers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_fin.html#financial_metric_ranking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_fin.financial_metric_ranking" title="Link to this definition"></a></dt>
@@ -180,21 +186,22 @@ multiplied by 100.</p>
 </section>
 <section id="module-rs_rating.ibd_rs">
 <span id="rs-rating-ibd-rs-module"></span><h2>rs_rating.ibd_rs module<a class="headerlink" href="#module-rs_rating.ibd_rs" title="Link to this heading"></a></h2>
-<p>ibd.py - Stock Analysis and Ranking Module</p>
+<section id="ibd-rs-relative-strength-rating-module">
+<h3>IBD RS (Relative Strength) Rating Module<a class="headerlink" href="#ibd-rs-relative-strength-rating-module" title="Link to this heading"></a></h3>
 <p>This module provides tools for analyzing and ranking stocks based on their
 relative strength compared to a benchmark index, inspired by the Investor’s
 Business Daily (IBD) methodology.</p>
-<section id="key-features">
-<h3>Key Features:<a class="headerlink" href="#key-features" title="Link to this heading"></a></h3>
+<section id="id1">
+<h4>Key Features:<a class="headerlink" href="#id1" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>Relative strength calculation</p></li>
 <li><p>Stock and industry ranking generation</p></li>
 <li><p>Percentile-based filtering of rankings</p></li>
 </ul>
 </section>
-<section id="usage">
-<h3>Usage:<a class="headerlink" href="#usage" title="Link to this heading"></a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ibd</span>
+<section id="id2">
+<h4>Usage:<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ibd_res</span> <span class="k">as</span> <span class="nn">ibd</span>
 
 <span class="c1"># Generate rankings for a list of stocks</span>
 <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;NVDA&#39;</span><span class="p">,</span> <span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOGL&#39;</span><span class="p">,</span> <span class="s1">&#39;AMZN&#39;</span><span class="p">,</span> <span class="s1">&#39;TSLA&#39;</span><span class="p">]</span>
@@ -210,7 +217,7 @@ Business Daily (IBD) methodology.</p>
 </div>
 </section>
 <section id="see-also">
-<h3>See Also:<a class="headerlink" href="#see-also" title="Link to this heading"></a></h3>
+<h4>See Also:<a class="headerlink" href="#see-also" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.tradingview.com/script/pziQwiT2/">RS Rating — Indicator by Fred6724 — tradingview</a></p></li>
 <li><p><a class="reference external" href="https://www.tradingview.com/script/SHE1xOMC-Relative-Strength-IBD-Style/">Relative Strength (IBD Style) — Indicator by Skyte — TradingView</a></p>
@@ -220,6 +227,7 @@ Business Daily (IBD) methodology.</p>
 </li>
 <li><p><a class="reference external" href="https://www.investors.com/ibd-university/find-evaluate-stocks/exclusive-ratings/">Exclusive IBD Ratings | Stock News &amp; Stock Market Analysis - IBD</a></p></li>
 </ul>
+</section>
 </section>
 <dl class="py function">
 <dt class="sig sig-object py" id="rs_rating.ibd_rs.rankings">
@@ -353,25 +361,15 @@ benchmark index, with 100 indicating parity.</p>
 </section>
 <section id="module-rs_rating.rsm">
 <span id="rs-rating-rsm-module"></span><h2>rs_rating.rsm module<a class="headerlink" href="#module-rs_rating.rsm" title="Link to this heading"></a></h2>
-<p>Mansfield Relative Strength (RSM) Module</p>
+<section id="mansfield-relative-strength-rsm-module">
+<h3>Mansfield Relative Strength (RSM) Module<a class="headerlink" href="#mansfield-relative-strength-rsm-module" title="Link to this heading"></a></h3>
 <p>This module provides functions for calculating and ranking stocks based on
 Mansfield Relative Strength (RSM) and related metrics. It includes methods
 to compute Dorsey Relative Strength (RSD), Mansfield Relative Strength (RSM)
 using both Simple Moving Average (SMA) and Exponential Moving Average (EMA),
 as well as functionality to rank stocks against a benchmark index.</p>
-<section id="functions">
-<h3>Functions:<a class="headerlink" href="#functions" title="Link to this heading"></a></h3>
-<ul class="simple">
-<li><p>dorsey_relative_strength(closes, closes_index): Computes Dorsey Relative
-Strength (RSD).</p></li>
-<li><p>mansfield_relative_strength(closes, closes_index, window): Computes Mansfield
-Relative Strength (RSM)</p></li>
-<li><p>ranking(tickers, ticker_ref=’^GSPC’, period=’2y’, interval=’1wk’, ma=’SMA’,
-window=52): Ranks stocks based on their RSM.</p></li>
-</ul>
-</section>
 <section id="examples">
-<h3>Examples:<a class="headerlink" href="#examples" title="Link to this heading"></a></h3>
+<h4>Examples:<a class="headerlink" href="#examples" title="Link to this heading"></a></h4>
 <p>To calculate RSM for a list of stock tickers and rank them:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOGL&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">rank</span> <span class="o">=</span> <span class="n">ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1wk&#39;</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">52</span><span class="p">)</span>
@@ -386,12 +384,13 @@ window=52): Ranks stocks based on their RSM.</p></li>
 </pre></div>
 </div>
 </section>
-<section id="id1">
-<h3>See Also:<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<section id="id3">
+<h4>See Also:<a class="headerlink" href="#id3" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p><a class="reference external" href="https://www.chartmill.com/documentation/technical-analysis/indicators/35-Mansfield-Relative-Strength">Mansfield Relative Strength | ChartMill.com</a></p></li>
 <li><p><a class="reference external" href="https://www.stageanalysis.net/blog/4266/how-to-create-the-mansfield-relative-performance-indicator">How to create the Mansfield Relative Performance Indicator - Stage Analysis</a></p></li>
 </ul>
+</section>
 </section>
 <dl class="py function">
 <dt class="sig sig-object py" id="rs_rating.rsm.dorsey_relative_strength">

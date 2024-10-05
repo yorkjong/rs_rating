@@ -74,6 +74,7 @@
   <h1>Source code for rs_rating.rsm</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Mansfield Relative Strength (RSM) Module</span>
+<span class="sd">-----------------------------------------</span>
 
 <span class="sd">This module provides functions for calculating and ranking stocks based on</span>
 <span class="sd">Mansfield Relative Strength (RSM) and related metrics. It includes methods</span>
@@ -81,17 +82,8 @@
 <span class="sd">using both Simple Moving Average (SMA) and Exponential Moving Average (EMA),</span>
 <span class="sd">as well as functionality to rank stocks against a benchmark index.</span>
 
-<span class="sd">Functions:</span>
-<span class="sd">----------</span>
-<span class="sd">- dorsey_relative_strength(closes, closes_index): Computes Dorsey Relative</span>
-<span class="sd">  Strength (RSD).</span>
-<span class="sd">- mansfield_relative_strength(closes, closes_index, window): Computes Mansfield</span>
-<span class="sd">  Relative Strength (RSM)</span>
-<span class="sd">- ranking(tickers, ticker_ref=&#39;^GSPC&#39;, period=&#39;2y&#39;, interval=&#39;1wk&#39;, ma=&#39;SMA&#39;,</span>
-<span class="sd">  window=52): Ranks stocks based on their RSM.</span>
-
 <span class="sd">Examples:</span>
-<span class="sd">---------</span>
+<span class="sd">~~~~~~~~~</span>
 <span class="sd">To calculate RSM for a list of stock tickers and rank them:</span>
 
 <span class="sd">&gt;&gt;&gt; tickers = [&#39;AAPL&#39;, &#39;MSFT&#39;, &#39;GOOGL&#39;]</span>
@@ -106,7 +98,7 @@
 <span class="sd">&gt;&gt;&gt; print(rsm)</span>
 
 <span class="sd">See Also:</span>
-<span class="sd">---------</span>
+<span class="sd">~~~~~~~~~</span>
 <span class="sd">- `Mansfield Relative Strength | ChartMill.com</span>
 <span class="sd">  &lt;https://www.chartmill.com/documentation/technical-analysis/indicators/</span>
 <span class="sd">  35-Mansfield-Relative-Strength&gt;`_</span>
