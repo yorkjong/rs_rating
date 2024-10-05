@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.6"
+__version__ = "4.7"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/05 (last revision)"
 
@@ -264,7 +264,7 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 #------------------------------------------------------------------------------
 
 def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
-             percentile_method='rank', rs_period='12mo'):
+             percentile_method='qcut', rs_period='12mo'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
@@ -346,19 +346,9 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     # Create DataFrame from RS data
     stock_df = pd.DataFrame(rs_data)
 
-    # Calculate percentiles for RS values
-    def calc_percentile(series):
-        if percentile_method == 'rank':
-            return series.rank(pct=True).mul(100).round(2)
-        elif percentile_method == 'qcut':
-            return pd.qcut(series, 100, labels=False, duplicates='drop')
-        else:
-            raise ValueError(
-                "percentile_method must be either 'rank' or 'qcut'")
-
     for col in ['RS', '1M', '3M', '6M']:
-        stock_df[f'Percentile ({col})'] = calc_percentile(stock_df[col])
-
+        stock_df[f'Percentile ({col})'] = calc_percentile(stock_df[col],
+                                                          percentile_method)
     # Sort stocks
     stock_df = stock_df.sort_values('RS',
                                     ascending=False).reset_index(drop=True)
@@ -383,8 +373,8 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 
     # Calculate percentiles for industry RS values
     for col in ['RS', '1M', '3M', '6M']:
-        industry_df[f'Percentile ({col})'] = calc_percentile(industry_df[col])
-
+        industry_df[f'Percentile ({col})'] = calc_percentile(industry_df[col],
+                                                             percentile_method)
     # Sort industries
     industry_df = industry_df.sort_values(
         'RS', ascending=False).reset_index(drop=True)
@@ -407,6 +397,39 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     })
 
     return stock_df, industry_df
+
+
+def calc_percentile(series, percentile_method='qcut'):
+    """
+    Calculate percentiles for a given Pandas Series.
+
+    Parameters
+    ----------
+    series : pd.Series
+        The input data series for which to calculate percentiles.
+    percentile_method : str, optional
+        The method to use for calculating percentiles.
+        Either 'rank' (default) for rank-based percentiles or
+        'qcut' for quantile-based percentiles.
+
+    Returns
+    -------
+    pd.Series
+        A series of nullable integer percentile values corresponding to the
+        input series, ranging from 1 to 99.
+
+    Raises
+    ------
+    ValueError
+        If the percentile_method is not 'rank' or 'qcut'.
+    """
+    if percentile_method == 'rank':
+        percentiles = series.rank(pct=True).mul(99)
+    elif percentile_method == 'qcut':
+        percentiles = pd.qcut(series, 99, labels=False, duplicates='drop') + 1
+    else:
+        raise ValueError("percentile_method must be either 'rank' or 'qcut'")
+    return percentiles.round().astype('Int64')  # Use Int64 to allow NaN
 
 
 #------------------------------------------------------------------------------
