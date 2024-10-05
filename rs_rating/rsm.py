@@ -334,7 +334,7 @@ def ranking(tickers, ticker_ref='^GSPC',
     ranking_df = pd.DataFrame(rows)
 
     # Rank based on Relative Strength
-    rank_columns = ['RS Rank (%)',]
+    rank_columns = ['RS Rank (P)',]
     rs_columns = ['RS (%)',]
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)

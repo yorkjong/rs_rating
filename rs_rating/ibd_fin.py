@@ -281,7 +281,7 @@ def financial_metric_ranking(tickers):
     ranking_df = ranking_df.sort_values(by='EPS RS (%)', ascending=False)
 
     # Rank based on Relative Strength
-    rank_columns = ['EPS RS Rank (%)', 'RPS RS Rank (%)']
+    rank_columns = ['EPS RS Rank (P)', 'RPS RS Rank (P)']
     rs_columns = ['EPS RS (%)', 'Rev RS (%)']
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)
