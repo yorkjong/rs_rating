@@ -48,6 +48,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Read Me</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#rs-rating">RS Rating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started-on-colab">Getting Started on Colab</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dive-into-it-on-your-computer">Dive Into It on Your Computer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#project-background">Project Background</a></li>
 </ul>
@@ -90,6 +91,21 @@
 <li><p><strong>Report issues:</strong> <a class="reference external" href="https://github.com/yorkjong/rs_rating/issues">github.com/yorkjong/rs_rating/issues</a></p></li>
 </ul>
 </section>
+<section id="getting-started-on-colab">
+<h2>Getting Started on Colab<a class="headerlink" href="#getting-started-on-colab" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Click <a class="reference external" href="https://colab.research.google.com/github/yorkjong/rs_rating/blob/main/notebooks/ibd.ipynb">ibd.ipynb</a> (or <a class="reference external" href="https://colab.research.google.com/github/yorkjong/rs_rating/blob/main/notebooks/rsm.ipynb">rsm.ipynb</a>) to open it in Colab.</p></li>
+<li><p>Sign in to your Google account if required.</p></li>
+<li><p>Fill in the parameters of the form.</p></li>
+<li><p>Manually click the ► button (which means “start run”) to generate tables.</p>
+<ul class="simple">
+<li><p>You will see the <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">]</span></code> symbol at the beginning of a cell, which will change to the ► button when you hover over it.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">rs_rating</span></code> package will be installed automatically if it has not been done yet.</p></li>
+<li><p>After running a cell manually, it will auto-run if you change the selected parameter value.</p></li>
+</ul>
+</li>
+</ol>
+</section>
 <section id="dive-into-it-on-your-computer">
 <h2>Dive Into It on Your Computer<a class="headerlink" href="#dive-into-it-on-your-computer" title="Link to this heading"></a></h2>
 <ol class="arabic">
@@ -101,11 +117,11 @@
 <li><p><strong>Run a rating code:</strong></p>
 <p>There are three main modules for stock ratings:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_rs.py">ibd_rs.py</a> — IBD RS Rating</p></li>
-<li><p><a class="reference external" href="https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_fin.py">ibd_fin.py</a> — IBD Financial Ratings (e.g., EPS Rating, Revenue Rating)</p></li>
-<li><p><a class="reference external" href="https://github.com/yorkjong/rs_rating/blob/main/rs_rating/rsm.py">rsm.py</a> — Mansfield RS Rating</p></li>
+<li><p><a class="reference external" href="https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_rs.py">ibd_rs.py</a> — IBD RS Rating, evaluates stocks based on IBD’s relative strength methodology.</p></li>
+<li><p><a class="reference external" href="https://github.com/yorkjong/rs_rating/blob/main/rs_rating/ibd_fin.py">ibd_fin.py</a> — IBD Financial Ratings, includes metrics such as EPS Rating and Revenue Rating.</p></li>
+<li><p><a class="reference external" href="https://github.com/yorkjong/rs_rating/blob/main/rs_rating/rsm.py">rsm.py</a> — Mansfield RS Rating, an alternative method for evaluating stock performance.</p></li>
 </ul>
-<p>To run a test and generate CSV tables for a given set of stocks, execute the following (use ibd_rs.py as an example):</p>
+<p>To run a test and generate CSV tables for a given set of stocks, execute the following command (using <code class="docutils literal notranslate"><span class="pre">ibd_rs.py</span></code> as an example):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>rs_rating.ibd_rs
 </pre></div>
 </div>
