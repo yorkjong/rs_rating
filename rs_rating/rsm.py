@@ -333,15 +333,15 @@ def ranking(tickers, ticker_ref='^GSPC',
     # Combine rows into a single DataFrame
     ranking_df = pd.DataFrame(rows)
 
+    # Sort by current RS
+    ranking_df = ranking_df.sort_values(by='RS (%)', ascending=False)
+
     # Rank based on Relative Strength
     rank_columns = ['RS Rank (P)',]
     rs_columns = ['RS (%)',]
     for rank_col, rs_col in zip(rank_columns, rs_columns):
         rank_pct = ranking_df[rs_col].rank(pct=True)
         ranking_df[rank_col] = (rank_pct * 100).round(2)
-
-    # Sort by current rank
-    ranking_df = ranking_df.sort_values(by='RS Rank (%)', ascending=False)
 
     ranking_df = move_columns_to_end(
         ranking_df,
