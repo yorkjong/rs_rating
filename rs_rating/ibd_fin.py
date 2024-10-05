@@ -1,11 +1,12 @@
 """
-ibd_fin.py -- IBD Financial Analysis Module
+IBD Financial Analysis Module
+-----------------------------
 
 This module provides functions for financial data analysis and comparison, using
 methods inspired by those used by Investors Business Daily (IBD).
 
-Key functionalities include:
-
+Key Features:
+~~~~~~~~~~~~~
 - Calculation of relative strength for various financial metrics (e.g., EPS,
   Revenue) against benchmarks such as the S&P 500.
 - Creation of comparative DataFrames that rank stocks based on their financial
@@ -14,7 +15,7 @@ Key functionalities include:
   custom ranking methods.
 
 Usage:
-
+~~~~~~
 Import this module to access functions for analyzing and ranking financial data.
 For example:
 ::
