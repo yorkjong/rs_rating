@@ -4,8 +4,8 @@
 
 - **Website:** [yorkjong.github.io/rs_rating/](https://yorkjong.github.io/rs_rating/)
 - **Usage demo:**
-  - [github.com/yorkjong/rs_rating/blob/main/notebooks/ibd.ipynb](https://github.com/rs_rating/vistock/blob/main/notebooks/ibd.ipynb)
-  - [github.com/yorkjong/rs_rating/blob/main/notebooks/rsm.ipynb](https://github.com/rs_rating/vistock/blob/main/notebooks/rsm.ipynb)
+  - [github.com/yorkjong/rs_rating/blob/main/notebooks/ibd.ipynb](https://github.com/yorkjong/rs_rating/blob/main/notebooks/ibd.ipynb)
+  - [github.com/yorkjong/rs_rating/blob/main/notebooks/rsm.ipynb](https://github.com/yorkjong/rs_rating/blob/main/notebooks/rsm.ipynb)
 - **Documentation:** [yorkjong.github.io/rs_rating/modules.html](https://yorkjong.github.io/rs_rating/modules.html)
 - **Source code:** [github.com/yorkjong/rs_rating](https://github.com/yorkjong/rs_rating)
 - **Report issues:** [github.com/yorkjong/rs_rating/issues](https://github.com/yorkjong/rs_rating/issues)
