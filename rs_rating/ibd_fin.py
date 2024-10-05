@@ -277,7 +277,7 @@ def financial_metric_ranking(tickers):
     # Combine results into a single DataFrame
     ranking_df = pd.DataFrame(rows)
 
-    # Sort by current rank
+    # Sort by current EPS RS
     ranking_df = ranking_df.sort_values(by='EPS RS (%)', ascending=False)
 
     # Rank based on Relative Strength
