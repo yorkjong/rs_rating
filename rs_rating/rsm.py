@@ -74,14 +74,14 @@ def mansfield_relative_strength(closes, closes_index, window, ma='SMA'):
 
     Parameters
     ----------
-    closes : pandas.Series
+    closes: pandas.Series
         Series of closing prices for the stock.
-    closes_index : pandas.Series
+    closes_index: pandas.Series
         Series of closing prices for the benchmark index.
-    window : int
+    window: int
         Window size for calculating the Simple Moving Average of the Dorsey
         Relative Strength.
-    ma : str, optional
+    ma: str, optional
         Moving average type ('SMA', 'EMA'). Default to 'SMA'.
 
     Returns
@@ -131,10 +131,10 @@ def dorsey_relative_strength(closes, closes_index):
 
     Parameters
     ----------
-    closes : pandas.Series
+    closes: pandas.Series
         Series of closing prices for the stock.
 
-    closes_index : pandas.Series
+    closes_index: pandas.Series
         Series of closing prices for the benchmark index.
 
     Returns
@@ -220,21 +220,21 @@ def ranking(tickers, ticker_ref='^GSPC',
 
     Parameters
     ----------
-    tickers : list of str
+    tickers: list of str
         List of stock tickers to rank.
 
-    ticker_ref : str, optional
+    ticker_ref: str, optional
         Ticker symbol of the benchmark. Default to '^GSPC' (S&P 500)
 
-    period : str, optional
+    period: str, optional
         Period for historical data ('6mo', '1y', '2y', '5y', 'ytd', 'max').
         Default to '2y' (two years).
 
-    interval : str, optional
+    interval: str, optional
         Interval for historical data ('1d', '1wk').
         Default to '1wk' (one week).
 
-    ma : str, optional
+    ma: str, optional
         Moving average type ('SMA', 'EMA'). Default to 'SMA'.
 
     Returns
@@ -362,10 +362,10 @@ def move_columns_to_end(df, columns_to_move):
 
     Parameters
     ----------
-    df : pandas.DataFrame
+    df: pandas.DataFrame
         The DataFrame whose columns need to be reordered.
 
-    columns_to_move : list of str
+    columns_to_move: list of str
         List of column names to move to the end.
 
     Returns

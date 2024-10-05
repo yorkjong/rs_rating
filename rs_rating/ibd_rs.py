@@ -92,13 +92,13 @@ def relative_strength(closes, closes_ref, interval='1d'):
 
     Parameters
     ----------
-    closes : pd.Series
+    closes: pd.Series
         Closing prices of the stock.
 
-    closes_ref : pd.Series
+    closes_ref: pd.Series
         Closing prices of the reference index.
 
-    interval : str, optional
+    interval: str, optional
         The frequency of the data points. Must be one of '1d' for daily data,
         '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
 
@@ -174,13 +174,13 @@ def quarters_return(closes, n, interval):
 
     Parameters
     ----------
-    closes : pd.Series
+    closes: pd.Series
         Closing prices of the stock or index.
 
-    n : int
+    n: int
         Number of quarters to look back.
 
-    interval : str, optional
+    interval: str, optional
         The frequency of the data points. Must be one of '1d' for daily data,
         '1wk' for weekly data, or '1mo' for monthly data.
 
@@ -221,13 +221,13 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 
     Parameters
     ----------
-    closes : pd.Series
+    closes: pd.Series
         Closing prices of the stock.
 
-    closes_ref : pd.Series
+    closes_ref: pd.Series
         Closing prices of the reference index.
 
-    interval : str, optional
+    interval: str, optional
         The frequency of the data points. Must be one of '1d' for daily data,
         '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
 
@@ -264,7 +264,7 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 #------------------------------------------------------------------------------
 
 def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
-             percentile_method='rank', rs_period='12mo'):
+             percentile_method='rank', rs_window='12mo'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
@@ -276,25 +276,25 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 
     Parameters
     ----------
-    tickers : List[str]
+    tickers: List[str]
         A list of stock tickers to analyze.
 
-    ticker_ref : str, optional
+    ticker_ref: str, optional
         The ticker symbol for the reference index. Defaults to '^GSPC' (S&P 500).
 
-    period : str, optional
+    period: str, optional
         The period for which to fetch historical data. Defaults to '2y' (two years).
 
-    interval : str, optional
+    interval: str, optional
         The frequency of the data points. Must be one of '1d' for daily data,
         '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
 
-    percentile_method : str, optional
+    percentile_method: str, optional
         Method to calculate percentiles. Either 'rank' or 'qcut'. Defaults to 'rank'.
 
-    rs_period : str, optional
-        Specify the period for Relative Strength calculation ('12mo' or '3mo').
-        Defaults to '12mo'.
+    rs_window: str, optional
+        Specify the time window ('3mo' or '12mo') for Relative Strength
+        calculation. Default to '12mo'.
 
     Returns
     -------
@@ -314,11 +314,11 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
               Percentile (current), Percentile (1 month ago),
               Percentile (3 months ago), Percentile (6 months ago)
     """
-    # Select the appropriate relative strength function based on the rs_period
+    # Select the appropriate relative strength function based on the rs_window
     rs_func = {
         '3mo': relative_strength_3m,
         '12mo': relative_strength,
-    }[rs_period]
+    }[rs_window]
 
     # Batch download stock data
     df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
@@ -405,9 +405,9 @@ def calc_percentile(series, percentile_method='rank'):
 
     Parameters
     ----------
-    series : pd.Series
+    series: pd.Series
         The input data series for which to calculate percentiles.
-    percentile_method : str, optional
+    percentile_method: str, optional
         The method to use for calculating percentiles.
         Either 'rank' (default) for rank-based percentiles or
         'qcut' for quantile-based percentiles.
@@ -437,15 +437,15 @@ def calc_percentile(series, percentile_method='rank'):
 #------------------------------------------------------------------------------
 
 def test_rankings(min_percentile=80, percentile_method='qcut',
-                  rs_period='12mo', out_dir='out'):
+                  rs_window='12mo', out_dir='out'):
     '''
     Parameters
     ----------
-    min_percentile : int, optional
+    min_percentile: int, optional
         The minimum percentile for a stock to be included in the rankings.
         Defaults to 80.
 
-    out_dir : str, optional
+    out_dir: str, optional
         The output directory to store CSV tables. Defaults to 'out'.
     '''
     import os
@@ -456,7 +456,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     tickers = si.get_tickers(code)
     rank_stock, rank_indust = rankings(tickers, interval='1d',
                                        percentile_method=percentile_method,
-                                       rs_period=rs_period)
+                                       rs_window=rs_window)
 
     if rank_stock.empty or rank_indust.empty:
         print("Not enough data to generate rankings.")
@@ -474,7 +474,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     os.makedirs(out_dir, exist_ok=True)
     for table, kind in zip([rank_stock, rank_indust],
                            ['stocks', 'industries']):
-        filename = f'rs_{kind}_{rs_period}_{percentile_method}_{today}.csv'
+        filename = f'rs_{kind}_{rs_window}_{percentile_method}_{today}.csv'
         table.to_csv(os.path.join(out_dir, filename), index=False)
         print(f'Your "{filename}" is in the "{out_dir}" folder.')
     print("***\n")
@@ -484,6 +484,6 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    test_rankings(percentile_method='qcut', rs_period='3mo')
+    test_rankings(percentile_method='qcut', rs_window='3mo')
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 

@@ -56,13 +56,13 @@ def metric_strength_vs_benchmark(quarterly_metric, annual_metric,
 
     Parameters
     ----------
-    quarterly_metric : pd.Series
+    quarterly_metric: pd.Series
         Quarterly financial metric series.
-    annual_metric : pd.Series
+    annual_metric: pd.Series
         Annual financial metric series.
-    quarterly_bench : pd.Series
+    quarterly_bench: pd.Series
         Quarterly benchmark series.
-    annual_bench : pd.Series
+    annual_bench: pd.Series
         Annual benchmark series.
 
     Returns
@@ -100,9 +100,9 @@ def weighted_yoy_growth(quarterly_data, annual_data):
 
     Parameters
     ----------
-    quarterly_data : pd.Series
+    quarterly_data: pd.Series
         Quarterly financial data series.
-    annual_data : pd.Series
+    annual_data: pd.Series
         Annual financial data series.
 
     Returns
@@ -145,9 +145,9 @@ def yoy_growth(data_series, frequency):
 
     Parameters
     ----------
-    data_series : pd.Series
+    data_series: pd.Series
         Series of financial data (e.g., revenue, EPS, RPS).
-    frequency : str
+    frequency: str
         'Q' for quarterly data, 'A' for annual data.
 
     Returns
@@ -189,7 +189,7 @@ def qoq_growth(data_series):
 
     Parameters
     ----------
-    data_series : pd.Series
+    data_series: pd.Series
         Series of quarterly financial data (e.g., revenue, EPS, RPS).
 
     Returns

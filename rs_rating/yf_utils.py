@@ -40,20 +40,20 @@ def calc_weighted_metric(financials, tickers_info, metric, weight_field,
 
     Parameters
     ----------
-    financials : dict
+    financials: dict
         A dictionary where each key is a stock ticker and the value is a
         DataFrame of the ticker's quarterly financials.
-    tickers_info : dict
+    tickers_info: dict
         A dictionary where each key is a stock ticker and the value is a
         dictionary of the ticker's info, including market cap, shares
         outstanding, etc.
-    metric : str
+    metric: str
         The name of the financial metric to calculate (e.g., 'Basic EPS',
         'Total Revenue', 'Operating Revenue').
-    weight_field : str
+    weight_field: str
         The field name to use for weighting (e.g., 'marketCap',
         'sharesOutstanding').
-    threshold : float, optional
+    threshold: float, optional
         The minimum percentage of the total possible weight required for a valid
         weighted average (default is 0.7, meaning 70%).
 
