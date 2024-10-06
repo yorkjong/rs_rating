@@ -99,9 +99,9 @@
 <span class="sd">    # Example usage</span>
 <span class="sd">    ranking_df = financial_metric_ranking(stock_data)</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.4&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.5&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/09/15 (initial version) ~ 2024/10/04 (last revision)&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/09/15 (initial version) ~ 2024/10/07 (last revision)&quot;</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;metric_strength_vs_benchmark&#39;</span><span class="p">,</span>
@@ -112,7 +112,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
-
+<span class="kn">from</span> <span class="nn">.ranking_utils</span> <span class="kn">import</span> <span class="n">append_ratings</span>
 
 <span class="c1">#------------------------------------------------------------------------------</span>
 <span class="c1"># Financial Metric Relative Strength</span>
@@ -345,9 +345,9 @@
             <span class="s1">&#39;QoQ 3Q Algo (%)&#39;</span><span class="p">:</span> <span class="n">eps_qoq</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eps_qoq</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
             <span class="s1">&#39;EPS YoY (%)&#39;</span><span class="p">:</span> <span class="n">eps_yoy</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
             <span class="s1">&#39;YoY 2Q Algo (%)&#39;</span><span class="p">:</span> <span class="n">eps_yoy</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">eps_yoy</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
-            <span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">eps_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;EPS RS&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">eps_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
             <span class="s1">&#39;TTM EPS&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;trailingEps&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;Rev RS (%)&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">rev_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;Rev RS&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">rev_rs</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">),</span>
             <span class="s1">&#39;TTM RPS&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;revenuePerShare&#39;</span><span class="p">],</span>
             <span class="s1">&#39;TTM PE&#39;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">pe</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
         <span class="p">}</span>
@@ -357,14 +357,11 @@
     <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
     <span class="c1"># Sort by current EPS RS</span>
-    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;EPS RS&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="c1"># Rank based on Relative Strength</span>
-    <span class="n">rank_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EPS RS Rank (P)&#39;</span><span class="p">,</span> <span class="s1">&#39;RPS RS Rank (P)&#39;</span><span class="p">]</span>
-    <span class="n">rs_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EPS RS (%)&#39;</span><span class="p">,</span> <span class="s1">&#39;Rev RS (%)&#39;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">rank_col</span><span class="p">,</span> <span class="n">rs_col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">rank_columns</span><span class="p">,</span> <span class="n">rs_columns</span><span class="p">):</span>
-        <span class="n">rank_pct</span> <span class="o">=</span> <span class="n">ranking_df</span><span class="p">[</span><span class="n">rs_col</span><span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">ranking_df</span><span class="p">[</span><span class="n">rank_col</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank_pct</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Rating based on Relative Strength</span>
+    <span class="n">rs_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;EPS RS&#39;</span><span class="p">,</span> <span class="s1">&#39;Rev RS&#39;</span><span class="p">]</span>
+    <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">append_ratings</span><span class="p">(</span><span class="n">ranking_df</span><span class="p">,</span> <span class="n">rs_columns</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ranking_df</span></div>
 
