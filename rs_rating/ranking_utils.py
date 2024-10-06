@@ -67,8 +67,8 @@ def calc_percentile(series, method='rank'):
     ValueError
         If the method is not 'rank' or 'qcut'.
     """
-        percentiles = series.rank(pct=True).mul(99)
     if method == 'rank':
+        percentiles = series.rank(pct=True).mul(98) + 1
     elif method == 'qcut':
         percentiles = pd.qcut(series, 99, labels=False, duplicates='drop') + 1
     else:
