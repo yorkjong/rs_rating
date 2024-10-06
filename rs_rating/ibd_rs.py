@@ -10,7 +10,7 @@ Key Features:
 ~~~~~~~~~~~~~
 - Relative strength calculation
 - Stock and industry ranking generation
-- Percentile-based filtering of rankings
+- Rating-based filtering of rankings
 
 Usage:
 ~~~~~~
@@ -25,9 +25,9 @@ Usage:
     # Calculate relative strength for a single stock
     stock_rs = ibd.relative_strength(stock_closes, index_closes)
 
-    # Filter rankings based on a minimum percentile
-    min_percentile = 80
-    top_stocks = stock_rankings[stock_rankings["Percentile"] >= min_percentile]
+    # Filter rankings based on a minimum rating
+    min_rating = 80
+    top_stocks = stock_rankings[stock_rankings["Rating"] >= min_rating]
 
 See Also:
 ~~~~~~~~~
@@ -43,9 +43,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.9"
+__version__ = "5.0"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/06 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/07 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -58,7 +58,7 @@ import pandas as pd
 import yfinance as yf
 
 from . import yf_utils as yfu
-from .ranking_utils import *
+from .ranking_utils import append_ratings, groupby_industry
 
 
 #------------------------------------------------------------------------------
@@ -340,14 +340,14 @@ def build_stock_rs_df(tickers, ticker_ref='^GSPC', period='2y', interval= '1d',
 
 
 def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
-             percentile_method='rank', rs_window='12mo'):
+             rating_method='rank', rs_window='12mo'):
     """
     Analyze stocks and generate ranking tables for individual stocks and
     industries.
 
     This function calculates relative strength (RS) for the given stocks compared
     to a reference index, and then ranks both individual stocks and industries
-    based on their RS values. It provides historical RS data and percentile
+    based on their RS values. It provides historical RS data and rating
     rankings.
 
     Parameters
@@ -365,8 +365,8 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
         The frequency of the data points. Must be one of '1d' for daily data,
         '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
 
-    percentile_method: str, optional
-        Method to calculate percentiles. Either 'rank' or 'qcut'. Defaults to 'rank'.
+    rating_method: str, optional
+        Method to calculate ratings. Either 'rank' or 'qcut'. Defaults to 'rank'.
 
     rs_window: str, optional
         Specify the time window ('3mo' or '12mo') for Relative Strength
@@ -380,28 +380,28 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
         1. Stock Rankings DataFrame:
             - Columns: Rank, Ticker, Price, Sector, Industry, RS (current),
               RS (1 month ago), RS (3 months ago), RS (6 months ago),
-              Percentile (current), Percentile (1 month ago),
-              Percentile (3 months ago), Percentile (6 months ago)
+              Rating (current), Rating (1 month ago),
+              Rating (3 months ago), Rating (6 months ago)
 
         2. Industry Rankings DataFrame:
             - Columns: Rank, Industry, Sector, RS (current),
               RS (1 month ago), RS (3 months ago), RS (6 months ago),
               Tickers (list of tickers in the industry),
-              Percentile (current), Percentile (1 month ago),
-              Percentile (3 months ago), Percentile (6 months ago)
+              Rating (current), Rating (1 month ago),
+              Rating (3 months ago), Rating (6 months ago)
     """
     stock_df = build_stock_rs_df(tickers, ticker_ref,
                                  period, interval, rs_window)
     stock_df = stock_df.sort_values(by='RS', ascending=False)
 
     rs_columns = ['RS', '1 Month Ago', '3 Months Ago', '6 Months Ago']
-    stock_df = append_percentile(stock_df, rs_columns, percentile_method)
+    stock_df = append_ratings(stock_df, rs_columns, rating_method)
 
     columns =  ['Sector', 'Ticker'] + rs_columns
     industry_df = groupby_industry(stock_df, columns, key='RS')
 
     industry_df = industry_df.sort_values(by='RS', ascending=False)
-    industry_df = append_percentile(industry_df, rs_columns, percentile_method)
+    industry_df = append_ratings(industry_df, rs_columns, rating_method)
 
     industry_df = industry_df.rename(columns={
         'Ticker': 'Tickers',
@@ -414,13 +414,13 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
 # Unit Test
 #------------------------------------------------------------------------------
 
-def test_rankings(min_percentile=80, percentile_method='qcut',
+def test_rankings(min_rating=80, rating_method='qcut',
                   rs_window='12mo', out_dir='out'):
     '''
     Parameters
     ----------
-    min_percentile: int, optional
-        The minimum percentile for a stock to be included in the rankings.
+    min_rating: int, optional
+        The minimum rating for a stock to be included in the rankings.
         Defaults to 80.
 
     out_dir: str, optional
@@ -433,7 +433,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     code = 'SPX'
     tickers = si.get_tickers(code)
     rank_stock, rank_indust = rankings(tickers, interval='1d',
-                                       percentile_method=percentile_method,
+                                       rating_method=rating_method,
                                        rs_window=rs_window)
 
     if rank_stock.empty or rank_indust.empty:
@@ -441,7 +441,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
         return
 
     print('Stock Rankings:')
-    print(rank_stock[rank_stock["Pctl (RS)"] >= min_percentile])
+    print(rank_stock[rank_stock["Rating (RS)"] >= min_rating])
 
     print('\n\nIndustry Rankings:')
     print(rank_indust)
@@ -452,7 +452,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
     os.makedirs(out_dir, exist_ok=True)
     for table, kind in zip([rank_stock, rank_indust],
                            ['stocks', 'industries']):
-        filename = f'rs_{kind}_{rs_window}_{percentile_method}_{today}.csv'
+        filename = f'rs_{kind}_{rs_window}_{rating_method}_{today}.csv'
         table.to_csv(os.path.join(out_dir, filename), index=False)
         print(f'Your "{filename}" is in the "{out_dir}" folder.')
     print("***\n")
@@ -462,6 +462,6 @@ if __name__ == "__main__":
     import time
 
     start_time = time.time()
-    test_rankings(percentile_method='qcut', rs_window='3mo')
+    test_rankings(rating_method='qcut', rs_window='3mo')
     print(f"Execution time: {time.time() - start_time:.4f} seconds")
 

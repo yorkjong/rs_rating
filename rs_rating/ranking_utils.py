@@ -5,7 +5,7 @@ __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/10/06 (initial version) ~ 2024/10/07 (last revision)"
 
 __all__ = [
-    'append_percentile',
+    'append_ratings',
     'groupby_industry',
 ]
 import pandas as pd
@@ -13,53 +13,54 @@ import pandas as pd
 
 #------------------------------------------------------------------------------
 
-def append_percentile(stock_df, columns, method='rank'):
+def append_ratings(stock_df, columns, method='rank'):
     """
-    Calculates and appends percentile rankings to the stock DataFrame for RS
+    Calculates and appends rating rankings to the stock DataFrame for RS
     values and their historical comparisons.
 
     Parameters
     ----------
     stock_df: pd.DataFrame
-        DataFrame containing stock data with RS values to calculate percentiles.
+        DataFrame containing stock data with RS values to calculate ratings.
 
     columns: list of str
-        A list of column names for which to calculate and append percentile
+        A list of column names for which to calculate and append rating
         rankings.
 
     method: str, optional
-        Method to calculate percentiles. Either 'rank' or 'qcut'. Defaults to
+        Method to calculate ratings. Either 'rank' or 'qcut'. Defaults to
         'rank'.
 
     Returns
     -------
     pd.DataFrame
-        The original DataFrame with additional percentile columns for specified
+        The original DataFrame with additional rating columns for specified
         RS values.
     """
     for col in columns:
-        stock_df[f'Pctl ({col})'] = calc_percentile(stock_df[col], method)
+        stock_df[f'Rating ({col})'] = calc_ratings(stock_df[col], method)
     return stock_df
 
 
-def calc_percentile(series, method='rank'):
+def calc_ratings(series, method='rank'):
     """
-    Calculate percentiles for a given Pandas Series.
+    Calculate ratings for a given Pandas Series.
 
     Parameters
     ----------
     series: pd.Series
-        The input data series for which to calculate percentiles.
+        The input data series for which to calculate ratings.
+
     method: str, optional
-        The method to use for calculating percentiles.
-        Either 'rank' (default) for rank-based percentiles or
-        'qcut' for quantile-based percentiles.
+        The method to use for calculating ratings.
+        Either 'rank' (default) for rank-based ratings or
+        'qcut' for quantile-based ratings.
 
     Returns
     -------
     pd.Series
-        A series of nullable integer percentile values corresponding to the
-        input series, ranging from 1 to 99.
+        A series of nullable integer rating values corresponding to the
+        input series, ranging from 1 (worst) to 99 (best).
 
     Raises
     ------
@@ -67,12 +68,13 @@ def calc_percentile(series, method='rank'):
         If the method is not 'rank' or 'qcut'.
     """
     if method == 'rank':
-        percentiles = series.rank(pct=True).mul(98) + 1
+        ratings = series.rank(pct=True).mul(98) + 1
     elif method == 'qcut':
-        percentiles = pd.qcut(series, 99, labels=False, duplicates='drop') + 1
+        ratings = pd.qcut(series, 99, labels=False, duplicates='drop') + 1
     else:
         raise ValueError("method must be either 'rank' or 'qcut'")
-    return percentiles.round().astype('Int64')  # Use Int64 to allow NaN
+    return ratings.round().astype('Int64')  # Use Int64 to allow NaN
+
 
 #------------------------------------------------------------------------------
 
