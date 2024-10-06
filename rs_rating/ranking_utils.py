@@ -13,7 +13,7 @@ import pandas as pd
 
 #------------------------------------------------------------------------------
 
-def append_ratings(stock_df, columns, method='rank'):
+def append_ratings(stock_df, columns, rating_columns=None, method='rank'):
     """
     Calculates and appends rating rankings to the stock DataFrame for RS
     values and their historical comparisons.
@@ -27,6 +27,10 @@ def append_ratings(stock_df, columns, method='rank'):
         A list of column names for which to calculate and append rating
         rankings.
 
+    rating_columns: list of str, optional
+        A list of column names for the new rating columns. If None,
+        defaults to using 'Rating ({col})' format.
+
     method: str, optional
         Method to calculate ratings. Either 'rank' or 'qcut'. Defaults to
         'rank'.
@@ -37,8 +41,17 @@ def append_ratings(stock_df, columns, method='rank'):
         The original DataFrame with additional rating columns for specified
         RS values.
     """
-    for col in columns:
-        stock_df[f'Rating ({col})'] = calc_ratings(stock_df[col], method)
+    # If rating_columns is not provided, generate default names
+    if rating_columns is None:
+        rating_columns = [f'Rating ({col})' for col in columns]
+
+    # Check if the length of columns and rating_columns matches
+    if len(columns) != len(rating_columns):
+        raise ValueError("The length of columns and rating_columns must match.")
+
+    for col, rating_col_name in zip(columns, rating_columns):
+        stock_df[rating_col_name] = calc_ratings(stock_df[col], method)
+
     return stock_df
 
 
