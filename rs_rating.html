@@ -296,14 +296,14 @@ underperformance.</p>
 growth of the stock’s closing prices to the quarter-weighted growth of
 the reference index’s closing prices over the past year. The formula is as
 follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PR</span> <span class="o">=</span> <span class="n">current</span><span class="o">/</span><span class="n">previous</span> <span class="o">=</span> <span class="p">((</span><span class="n">current</span> <span class="o">-</span> <span class="n">previous</span><span class="p">)</span> <span class="o">/</span> <span class="n">previous</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-   <span class="o">=</span> <span class="k">return</span> <span class="o">+</span> <span class="mi">1</span>
-<span class="n">relative_rate</span> <span class="o">=</span> <span class="n">PR_stock</span> <span class="o">/</span> <span class="n">PR_index</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">growth</span> <span class="o">=</span> <span class="p">(</span><span class="n">current</span> <span class="o">-</span> <span class="n">previous</span><span class="p">)</span> <span class="o">/</span> <span class="n">previous</span>
+<span class="n">gf</span> <span class="o">=</span> <span class="n">current</span><span class="o">/</span><span class="n">previous</span> <span class="o">=</span> <span class="n">growth</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="n">relative_rate</span> <span class="o">=</span> <span class="n">gf_stock</span> <span class="o">/</span> <span class="n">gf_index</span>
 <span class="n">relative_strength</span> <span class="o">=</span> <span class="n">relative_rate</span> <span class="o">*</span> <span class="mi">100</span>
 </pre></div>
 </div>
-<p>Here PR means ‘price ratio’ or ‘price relative’</p>
-<p>The quarter-weighted growth is calculated using the <cite>weighted_return</cite>
+<p>Here gf means “growth factor”, i.e., “price ratio”</p>
+<p>The quarter-weighted growth is calculated using the <cite>weighted_growth</cite>
 function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -333,7 +333,7 @@ function.</p>
 <dt class="sig sig-object py" id="rs_rating.ibd_rs.relative_strength_3m">
 <span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_rs.</span></span><span class="sig-name descname"><span class="pre">relative_strength_3m</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">closes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">closes_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_rs.html#relative_strength_3m"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_rs.relative_strength_3m" title="Link to this definition"></a></dt>
 <dd><p>Calculate the 3-Month Relative Strength of a stock compared to a reference
-index, based on price performance (returns).</p>
+index, based on price performance (growths).</p>
 <p>The 3-Month Relative Strength Rating (RS Rating) measures the stock’s
 price performance against a benchmark index over a recent three-month
 period. This rating is designed to help investors quickly gauge the

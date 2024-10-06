@@ -117,9 +117,9 @@
 <span class="sd">  &lt;https://www.investors.com/ibd-university/</span>
 <span class="sd">  find-evaluate-stocks/exclusive-ratings/&gt;`_</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.7&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.8&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/05 (last revision)&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/06 (last revision)&quot;</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;relative_strength&#39;</span><span class="p">,</span>
@@ -156,14 +156,14 @@
 
 <span class="sd">    ::</span>
 
-<span class="sd">        PR = current/previous = ((current - previous) / previous) + 1</span>
-<span class="sd">           = return + 1</span>
-<span class="sd">        relative_rate = PR_stock / PR_index</span>
+<span class="sd">        growth = (current - previous) / previous</span>
+<span class="sd">        gf = current/previous = growth + 1</span>
+<span class="sd">        relative_rate = gf_stock / gf_index</span>
 <span class="sd">        relative_strength = relative_rate * 100</span>
 
-<span class="sd">    Here PR means &#39;price ratio&#39; or &#39;price relative&#39;</span>
+<span class="sd">    Here gf means &quot;growth factor&quot;, i.e., &quot;price ratio&quot;</span>
 
-<span class="sd">    The quarter-weighted growth is calculated using the `weighted_return`</span>
+<span class="sd">    The quarter-weighted growth is calculated using the `weighted_growth`</span>
 <span class="sd">    function.</span>
 
 <span class="sd">    Parameters</span>
@@ -190,22 +190,22 @@
 <span class="sd">    &gt;&gt;&gt; rs = relative_strength(stock_closes, index_closes)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ret_stock</span> <span class="o">=</span> <span class="n">weighted_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
-    <span class="n">ret_ref</span> <span class="o">=</span> <span class="n">weighted_return</span><span class="p">(</span><span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
+    <span class="n">ret_stock</span> <span class="o">=</span> <span class="n">weighted_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
+    <span class="n">ret_ref</span> <span class="o">=</span> <span class="n">weighted_growth</span><span class="p">(</span><span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
     <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">ret_stock</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">ret_ref</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
     <span class="k">return</span> <span class="nb">round</span><span class="p">(</span><span class="n">rs</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">weighted_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">weighted_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the performance of the last year, with the most recent quarter</span>
 <span class="sd">    weighted double.</span>
 
-<span class="sd">    This function calculates returns for each of the last four quarters and</span>
-<span class="sd">    applies a weighting scheme that emphasizes recent performance. The most</span>
-<span class="sd">    recent quarter is given a weight of 40%, while each of the three preceding</span>
-<span class="sd">    quarters are given a weight of 20%.</span>
+<span class="sd">    This function calculates growths (returns) for each of the last four</span>
+<span class="sd">    quarters and applies a weighting scheme that emphasizes recent performance.</span>
+<span class="sd">    The most recent quarter is given a weight of 40%, while each of the three</span>
+<span class="sd">    preceding quarters are given a weight of 20%.</span>
 
 <span class="sd">    Here is the formula for calculating the return:</span>
 
@@ -231,17 +231,17 @@
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; closes = pd.Series([100, 102, 105, 103, 107, 110, 112])</span>
-<span class="sd">    &gt;&gt;&gt; weighted_perf = weighted_return(closes)</span>
+<span class="sd">    &gt;&gt;&gt; weighted_perf = weighted_growth(closes)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Calculate performances over the last quarters</span>
-    <span class="n">p1</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last quarter</span>
-    <span class="n">p2</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last two quarters</span>
-    <span class="n">p3</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last three quarters</span>
-    <span class="n">p4</span> <span class="o">=</span> <span class="n">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last four quarters</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">quarters_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last quarter</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">quarters_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last two quarters</span>
+    <span class="n">p3</span> <span class="o">=</span> <span class="n">quarters_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last three quarters</span>
+    <span class="n">p4</span> <span class="o">=</span> <span class="n">quarters_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span> <span class="c1"># over the last four quarters</span>
     <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">+</span> <span class="n">p3</span> <span class="o">+</span> <span class="n">p4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span>
 
 
-<span class="k">def</span> <span class="nf">quarters_return</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">quarters_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the return (percentage change) over the last n quarters.</span>
 
@@ -269,7 +269,7 @@
 <span class="sd">    Example</span>
 <span class="sd">    -------</span>
 <span class="sd">    &gt;&gt;&gt; closes = pd.Series([100, 102, 105, 103, 107, 110, 112])</span>
-<span class="sd">    &gt;&gt;&gt; quarterly_return = quarters_return(closes, 1)</span>
+<span class="sd">    &gt;&gt;&gt; quarterly_growth = quarters_growth(closes, 1)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">quarter</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;1d&#39;</span><span class="p">:</span> <span class="mi">252</span><span class="o">//</span><span class="mi">4</span><span class="p">,</span>   <span class="c1"># 252 trading days in a year</span>
@@ -278,8 +278,8 @@
     <span class="p">}[</span><span class="n">interval</span><span class="p">]</span>
     <span class="n">periods</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">closes</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">quarter</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
 
-    <span class="n">ret</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">periods</span><span class="p">,</span> <span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ret</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">growth</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">ffill</span><span class="p">()</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="n">periods</span><span class="p">,</span> <span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">growth</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 
 <span class="c1">#------------------------------------------------------------------------------</span>
@@ -291,7 +291,7 @@
 <span class="k">def</span> <span class="nf">relative_strength_3m</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the 3-Month Relative Strength of a stock compared to a reference</span>
-<span class="sd">    index, based on price performance (returns).</span>
+<span class="sd">    index, based on price performance (growths).</span>
 
 <span class="sd">    The 3-Month Relative Strength Rating (RS Rating) measures the stock&#39;s</span>
 <span class="sd">    price performance against a benchmark index over a recent three-month</span>
@@ -324,17 +324,17 @@
         <span class="s1">&#39;1mo&#39;</span><span class="p">:</span> <span class="mi">12</span> <span class="o">//</span> <span class="mi">4</span><span class="p">,</span>  <span class="c1"># 3 months for monthly data</span>
     <span class="p">}[</span><span class="n">interval</span><span class="p">]</span>
 
-    <span class="c1"># Calculate daily returns for the stock and reference index</span>
-    <span class="n">returns_stock</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">returns_ref</span> <span class="o">=</span> <span class="n">closes_ref</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># Calculate daily growths (returns) for the stock and reference index</span>
+    <span class="n">growth_stock</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">growth_ref</span> <span class="o">=</span> <span class="n">closes_ref</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># Calculate the Exponential Moving Average (EMA) of the returns</span>
-    <span class="n">ema_returns_stock</span> <span class="o">=</span> <span class="n">returns_stock</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="n">ema_returns_ref</span> <span class="o">=</span> <span class="n">returns_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="c1"># Calculate the Exponential Moving Average (EMA) of the growths</span>
+    <span class="n">ema_growth_stock</span> <span class="o">=</span> <span class="n">growth_stock</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">ema_growth_ref</span> <span class="o">=</span> <span class="n">growth_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
     <span class="c1"># Calculate the cumulative sums</span>
-    <span class="n">cum_sotck</span> <span class="o">=</span> <span class="n">ema_returns_stock</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="n">cum_ref</span> <span class="o">=</span> <span class="n">ema_returns_ref</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">cum_sotck</span> <span class="o">=</span> <span class="n">ema_growth_stock</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">cum_ref</span> <span class="o">=</span> <span class="n">ema_growth_ref</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="c1"># Calculate the relative strength (RS).</span>
     <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="n">cum_sotck</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">cum_ref</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
