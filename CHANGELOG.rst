@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+1.5
+----------------
+* refined relative_strength_3m
+* Extracted groupby_industry, append_percentile from ibd_rs.rankings function
+* applied groupby_industry, append_percentile to generate and display
+  industry_df
+
 1.0 [2024-10-04]
 ----------------
 * Extracted from vistock project (https://github.com/yorkjong/vistock.git)
