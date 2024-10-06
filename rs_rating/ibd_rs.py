@@ -43,7 +43,7 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.8"
+__version__ = "4.9"
 __author__ = "York <york.jong@gmail.com>"
 __date__ = "2024/08/05 (initial version) ~ 2024/10/06 (last revision)"
 
@@ -58,6 +58,7 @@ import pandas as pd
 import yfinance as yf
 
 from . import yf_utils as yfu
+from .ranking_utils import *
 
 
 #------------------------------------------------------------------------------
@@ -267,6 +268,77 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
+def stock_ranking(tickers, ticker_ref='^GSPC', period='2y', interval= '1d',
+                  rs_window='12mo'):
+    """
+    Analyzes stocks and calculates relative strength (RS) for the given stock
+    tickers compared to a reference index. Returns a DataFrame of stock
+    rankings.
+
+    Parameters
+    ----------
+    tickers: list
+        A list of stock tickers to analyze.
+
+    ticker_ref: str, optional
+        The ticker symbol for the reference index. Defaults to '^GSPC' (S&P
+        500).
+
+    period: str, optional
+        The period for which to fetch historical data. Defaults to '2y' (two
+        years).
+
+    interval: str, optional
+        The frequency of the data points. Must be one of '1d' for daily data,
+        '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
+
+    rs_window: str, optional
+        Specify the time window ('3mo' or '12mo') for Relative Strength
+        calculation.  Defaults to '12mo'.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing stock rankings with columns:
+        Ticker, Price, Sector, Industry, RS (current), RS (1 month ago),
+        RS (3 months ago), RS (6 months ago).
+    """
+    # Select the appropriate relative strength function based on the rs_window
+    rs_func = {
+        '3mo': relative_strength_3m,
+        '12mo': relative_strength,
+    }[rs_window]
+
+    # Batch download stock data
+    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df = df.xs('Close', level='Price', axis=1)
+
+    # Batch download stock info
+    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
+
+    # Calculate RS values for all stocks
+    rs_data = []
+    for ticker in tickers:
+        rs_series = rs_func(df[ticker], df[ticker_ref], interval)
+        end_date = rs_series.index[-1]
+
+        rs_data.append({
+            'Ticker': ticker,
+            'Price': df[ticker].asof(end_date).round(2),
+            'Sector': info[ticker]['sector'],
+            'Industry': info[ticker]['industry'],
+            'RS': rs_series.asof(end_date),
+            '1 Month Ago': rs_series.asof(end_date - pd.DateOffset(months=1)),
+            '3 Months Ago': rs_series.asof(end_date - pd.DateOffset(months=3)),
+            '6 Months Ago': rs_series.asof(end_date - pd.DateOffset(months=6)),
+        })
+
+    # Create DataFrame from RS data
+    stock_df = pd.DataFrame(rs_data)
+
+    return stock_df
+
+
 def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
              percentile_method='rank', rs_window='12mo'):
     """
@@ -318,122 +390,23 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
               Percentile (current), Percentile (1 month ago),
               Percentile (3 months ago), Percentile (6 months ago)
     """
-    # Select the appropriate relative strength function based on the rs_window
-    rs_func = {
-        '3mo': relative_strength_3m,
-        '12mo': relative_strength,
-    }[rs_window]
+    stock_df = stock_ranking(tickers,ticker_ref, period, interval, rs_window)
+    stock_df = stock_df.sort_values(by='RS', ascending=False)
 
-    # Batch download stock data
-    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
-    df = df.xs('Close', level='Price', axis=1)
+    rs_columns = ['RS', '1 Month Ago', '3 Months Ago', '6 Months Ago']
+    stock_df = append_percentile(stock_df, rs_columns, percentile_method)
 
-    # Batch download stock info
-    info = yfu.download_tickers_info(tickers, ['sector', 'industry'])
-    # Calculate RS values for all stocks
-    rs_data = []
-    for ticker in tickers:
-        rs_series = rs_func(df[ticker], df[ticker_ref], interval)
-        end_date = rs_series.index[-1]
+    columns =  ['Sector', 'Ticker'] + rs_columns
+    industry_df = groupby_industry(stock_df, columns, key='RS')
 
-        rs_data.append({
-            'Ticker': ticker,
-            'Price': df[ticker].asof(end_date).round(2),
-            'Sector': info[ticker]['sector'],
-            'Industry': info[ticker]['industry'],
-            'RS': rs_series.asof(end_date),
-            '1M': rs_series.asof(end_date - pd.DateOffset(months=1)),
-            '3M': rs_series.asof(end_date - pd.DateOffset(months=3)),
-            '6M': rs_series.asof(end_date - pd.DateOffset(months=6))
-        })
+    industry_df = industry_df.sort_values(by='RS', ascending=False)
+    industry_df = append_percentile(industry_df, rs_columns, percentile_method)
 
-    # Create DataFrame from RS data
-    stock_df = pd.DataFrame(rs_data)
-
-    for col in ['RS', '1M', '3M', '6M']:
-        stock_df[f'Percentile ({col})'] = calc_percentile(stock_df[col],
-                                                          percentile_method)
-    # Sort stocks
-    stock_df = stock_df.sort_values('RS',
-                                    ascending=False).reset_index(drop=True)
-
-    def get_sorted_tickers(tickers):
-        return ','.join(
-            sorted(tickers,
-                   key=lambda t:
-                        stock_df.loc[stock_df['Ticker'] == t, 'RS'].values[0],
-                   reverse=True)
-        )
-
-    # Calculate industry rankings
-    industry_df = stock_df.groupby('Industry').agg({
-        'Sector': 'first',
-        'RS': lambda x: round(x.mean(), 2),
-        '1M': lambda x: round(x.mean(), 2),
-        '3M': lambda x: round(x.mean(), 2),
-        '6M': lambda x: round(x.mean(), 2),
-        'Ticker': get_sorted_tickers
-    }).reset_index()
-
-    # Calculate percentiles for industry RS values
-    for col in ['RS', '1M', '3M', '6M']:
-        industry_df[f'Percentile ({col})'] = calc_percentile(industry_df[col],
-                                                             percentile_method)
-    # Sort industries
-    industry_df = industry_df.sort_values(
-        'RS', ascending=False).reset_index(drop=True)
-
-    # Rename columns for clarity
-    stock_df = stock_df.rename(columns={
-        'RS': 'Relative Strength',
-        '1M': '1 Month Ago',
-        '3M': '3 Months Ago',
-        '6M': '6 Months Ago',
-        'Percentile (RS)': 'Percentile'
-    })
     industry_df = industry_df.rename(columns={
-        'RS': 'Relative Strength',
-        '1M': '1 Month Ago',
-        '3M': '3 Months Ago',
-        '6M': '6 Months Ago',
         'Ticker': 'Tickers',
-        'Percentile (RS)': 'Percentile'
     })
 
     return stock_df, industry_df
-
-
-def calc_percentile(series, percentile_method='rank'):
-    """
-    Calculate percentiles for a given Pandas Series.
-
-    Parameters
-    ----------
-    series: pd.Series
-        The input data series for which to calculate percentiles.
-    percentile_method: str, optional
-        The method to use for calculating percentiles.
-        Either 'rank' (default) for rank-based percentiles or
-        'qcut' for quantile-based percentiles.
-
-    Returns
-    -------
-    pd.Series
-        A series of nullable integer percentile values corresponding to the
-        input series, ranging from 1 to 99.
-
-    Raises
-    ------
-    ValueError
-        If the percentile_method is not 'rank' or 'qcut'.
-    """
-    if percentile_method == 'rank':
-        percentiles = series.rank(pct=True).mul(99)
-    elif percentile_method == 'qcut':
-        percentiles = pd.qcut(series, 99, labels=False, duplicates='drop') + 1
-    else:
-        raise ValueError("percentile_method must be either 'rank' or 'qcut'")
-    return percentiles.round().astype('Int64')  # Use Int64 to allow NaN
 
 
 #------------------------------------------------------------------------------
@@ -467,7 +440,7 @@ def test_rankings(min_percentile=80, percentile_method='qcut',
         return
 
     print('Stock Rankings:')
-    print(rank_stock[rank_stock["Percentile"] >= min_percentile])
+    print(rank_stock[rank_stock["Pctl (RS)"] >= min_percentile])
 
     print('\n\nIndustry Rankings:')
     print(rank_indust)
