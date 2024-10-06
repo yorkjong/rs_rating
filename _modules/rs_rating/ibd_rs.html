@@ -117,9 +117,9 @@
 <span class="sd">  &lt;https://www.investors.com/ibd-university/</span>
 <span class="sd">  find-evaluate-stocks/exclusive-ratings/&gt;`_</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.8&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.7&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/06 (last revision)&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/05 (last revision)&quot;</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;relative_strength&#39;</span><span class="p">,</span>
@@ -328,20 +328,16 @@
     <span class="n">returns_stock</span> <span class="o">=</span> <span class="n">closes</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">returns_ref</span> <span class="o">=</span> <span class="n">closes_ref</span><span class="o">.</span><span class="n">pct_change</span><span class="p">(</span><span class="n">fill_method</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-    <span class="c1"># Calculate daily growth factors</span>
-    <span class="n">gf_stock</span> <span class="o">=</span> <span class="n">returns_stock</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">gf_ref</span> <span class="o">=</span> <span class="n">returns_ref</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="c1"># Calculate the Exponential Moving Average (EMA) of the returns</span>
+    <span class="n">ema_returns_stock</span> <span class="o">=</span> <span class="n">returns_stock</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">ema_returns_ref</span> <span class="o">=</span> <span class="n">returns_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
-    <span class="c1"># Calculate the Exponential Moving Average (EMA) of the growth factors</span>
-    <span class="n">ema_gf_stock</span> <span class="o">=</span> <span class="n">gf_stock</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="n">ema_gf_ref</span> <span class="o">=</span> <span class="n">gf_ref</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-
-    <span class="c1"># Calculate the cumulative growth factors</span>
-    <span class="n">cum_gf_stock</span> <span class="o">=</span> <span class="n">ema_gf_stock</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">cum_gf_ref</span> <span class="o">=</span> <span class="n">ema_gf_ref</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="c1"># Calculate the cumulative sums</span>
+    <span class="n">cum_sotck</span> <span class="o">=</span> <span class="n">ema_returns_stock</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">cum_ref</span> <span class="o">=</span> <span class="n">ema_returns_ref</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">span</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
     <span class="c1"># Calculate the relative strength (RS).</span>
-    <span class="n">rs</span> <span class="o">=</span> <span class="n">cum_gf_stock</span> <span class="o">/</span> <span class="n">cum_gf_ref</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">rs</span> <span class="o">=</span> <span class="p">(</span><span class="n">cum_sotck</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">cum_ref</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span>
 
     <span class="k">return</span> <span class="n">rs</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># Return the RS values rounded to two decimal places</span></div>
 
