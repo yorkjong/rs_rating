@@ -33,9 +33,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "4.7"
+__version__ = "4.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/10/04 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2024/10/07 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -48,6 +48,7 @@ import pandas as pd
 import yfinance as yf
 
 from . import yf_utils as yfu
+from .ranking_utils import append_ratings
 
 
 #------------------------------------------------------------------------------
@@ -313,7 +314,7 @@ def ranking(tickers, ticker_ref='^GSPC',
             'Ticker': ticker,
             'Sector': info[ticker]['sector'],
             'Industry': info[ticker]['industry'],
-            'RS (%)': rsm.asof(end_date),
+            'RS': rsm.asof(end_date),
             '1 Week Ago': rsm.asof(end_date - pd.DateOffset(weeks=1)),
             '1 Month Ago': rsm.asof(end_date - pd.DateOffset(months=1)),
             '3 Months Ago': rsm.asof(end_date - pd.DateOffset(months=3)),
@@ -334,14 +335,11 @@ def ranking(tickers, ticker_ref='^GSPC',
     ranking_df = pd.DataFrame(rows)
 
     # Sort by current RS
-    ranking_df = ranking_df.sort_values(by='RS (%)', ascending=False)
+    ranking_df = ranking_df.sort_values(by='RS', ascending=False)
 
-    # Rank based on Relative Strength
-    rank_columns = ['RS Rank (P)',]
-    rs_columns = ['RS (%)',]
-    for rank_col, rs_col in zip(rank_columns, rs_columns):
-        rank_pct = ranking_df[rs_col].rank(pct=True)
-        ranking_df[rank_col] = (rank_pct * 100).round(2)
+    # Rating based on Relative Strength
+    rs_columns = ['RS',]
+    ranking_df = append_ratings(ranking_df, rs_columns)
 
     ranking_df = move_columns_to_end(
         ranking_df,
