@@ -43,9 +43,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "4.7"
+__version__ = "4.8"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/05 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/06 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -80,14 +80,14 @@ def relative_strength(closes, closes_ref, interval='1d'):
 
     ::
 
-        PR = current/previous = ((current - previous) / previous) + 1
-           = return + 1
-        relative_rate = PR_stock / PR_index
+        growth = (current - previous) / previous
+        gf = current/previous = growth + 1
+        relative_rate = gf_stock / gf_index
         relative_strength = relative_rate * 100
 
-    Here PR means 'price ratio' or 'price relative'
+    Here gf means "growth factor", i.e., "price ratio"
 
-    The quarter-weighted growth is calculated using the `weighted_return`
+    The quarter-weighted growth is calculated using the `weighted_growth`
     function.
 
     Parameters
@@ -114,21 +114,21 @@ def relative_strength(closes, closes_ref, interval='1d'):
     >>> rs = relative_strength(stock_closes, index_closes)
 
     """
-    ret_stock = weighted_return(closes, interval)
-    ret_ref = weighted_return(closes_ref, interval)
+    ret_stock = weighted_growth(closes, interval)
+    ret_ref = weighted_growth(closes_ref, interval)
     rs = (1 + ret_stock) / (1 + ret_ref) * 100
     return round(rs, 2)
 
 
-def weighted_return(closes, interval):
+def weighted_growth(closes, interval):
     """
     Calculate the performance of the last year, with the most recent quarter
     weighted double.
 
-    This function calculates returns for each of the last four quarters and
-    applies a weighting scheme that emphasizes recent performance. The most
-    recent quarter is given a weight of 40%, while each of the three preceding
-    quarters are given a weight of 20%.
+    This function calculates growths (returns) for each of the last four
+    quarters and applies a weighting scheme that emphasizes recent performance.
+    The most recent quarter is given a weight of 40%, while each of the three
+    preceding quarters are given a weight of 20%.
 
     Here is the formula for calculating the return:
 
@@ -154,17 +154,17 @@ def weighted_return(closes, interval):
     Example
     -------
     >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
-    >>> weighted_perf = weighted_return(closes)
+    >>> weighted_perf = weighted_growth(closes)
     """
     # Calculate performances over the last quarters
-    p1 = quarters_return(closes, 1, interval) # over the last quarter
-    p2 = quarters_return(closes, 2, interval) # over the last two quarters
-    p3 = quarters_return(closes, 3, interval) # over the last three quarters
-    p4 = quarters_return(closes, 4, interval) # over the last four quarters
+    p1 = quarters_growth(closes, 1, interval) # over the last quarter
+    p2 = quarters_growth(closes, 2, interval) # over the last two quarters
+    p3 = quarters_growth(closes, 3, interval) # over the last three quarters
+    p4 = quarters_growth(closes, 4, interval) # over the last four quarters
     return (2 * p1 + p2 + p3 + p4) / 5
 
 
-def quarters_return(closes, n, interval):
+def quarters_growth(closes, n, interval):
     """
     Calculate the return (percentage change) over the last n quarters.
 
@@ -192,7 +192,7 @@ def quarters_return(closes, n, interval):
     Example
     -------
     >>> closes = pd.Series([100, 102, 105, 103, 107, 110, 112])
-    >>> quarterly_return = quarters_return(closes, 1)
+    >>> quarterly_growth = quarters_growth(closes, 1)
     """
     quarter = {
         '1d': 252//4,   # 252 trading days in a year
@@ -201,8 +201,8 @@ def quarters_return(closes, n, interval):
     }[interval]
     periods = min(len(closes) - 1, quarter * n)
 
-    ret = closes.ffill().pct_change(periods=periods, fill_method=None)
-    return ret.fillna(0)
+    growth = closes.ffill().pct_change(periods=periods, fill_method=None)
+    return growth.fillna(0)
 
 
 #------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ def quarters_return(closes, n, interval):
 def relative_strength_3m(closes, closes_ref, interval='1d'):
     """
     Calculate the 3-Month Relative Strength of a stock compared to a reference
-    index, based on price performance (returns).
+    index, based on price performance (growths).
 
     The 3-Month Relative Strength Rating (RS Rating) measures the stock's
     price performance against a benchmark index over a recent three-month
@@ -245,17 +245,17 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
         '1mo': 12 // 4,  # 3 months for monthly data
     }[interval]
 
-    # Calculate daily returns for the stock and reference index
-    returns_stock = closes.pct_change(fill_method=None).fillna(0)
-    returns_ref = closes_ref.pct_change(fill_method=None).fillna(0)
+    # Calculate daily growths (returns) for the stock and reference index
+    growth_stock = closes.pct_change(fill_method=None).fillna(0)
+    growth_ref = closes_ref.pct_change(fill_method=None).fillna(0)
 
-    # Calculate the Exponential Moving Average (EMA) of the returns
-    ema_returns_stock = returns_stock.ewm(span=span, adjust=False).mean()
-    ema_returns_ref = returns_ref.ewm(span=span, adjust=False).mean()
+    # Calculate the Exponential Moving Average (EMA) of the growths
+    ema_growth_stock = growth_stock.ewm(span=span, adjust=False).mean()
+    ema_growth_ref = growth_ref.ewm(span=span, adjust=False).mean()
 
     # Calculate the cumulative sums
-    cum_sotck = ema_returns_stock.rolling(window=span, min_periods=1).sum()
-    cum_ref = ema_returns_ref.rolling(window=span, min_periods=1).sum()
+    cum_sotck = ema_growth_stock.rolling(window=span, min_periods=1).sum()
+    cum_ref = ema_growth_ref.rolling(window=span, min_periods=1).sum()
 
     # Calculate the relative strength (RS).
     rs = (cum_sotck + 1) / (cum_ref + 1).abs() * 100
