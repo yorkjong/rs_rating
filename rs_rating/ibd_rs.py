@@ -395,13 +395,13 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     stock_df = stock_df.sort_values(by='RS', ascending=False)
 
     rs_columns = ['RS', '1 Month Ago', '3 Months Ago', '6 Months Ago']
-    stock_df = append_ratings(stock_df, rs_columns, rating_method)
+    stock_df = append_ratings(stock_df, rs_columns, method=rating_method)
 
     columns =  ['Sector', 'Ticker'] + rs_columns
     industry_df = groupby_industry(stock_df, columns, key='RS')
 
     industry_df = industry_df.sort_values(by='RS', ascending=False)
-    industry_df = append_ratings(industry_df, rs_columns, rating_method)
+    industry_df = append_ratings(industry_df, rs_columns, method=rating_method)
 
     industry_df = industry_df.rename(columns={
         'Ticker': 'Tickers',
