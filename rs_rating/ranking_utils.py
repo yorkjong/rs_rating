@@ -2,7 +2,7 @@
 Utilities for Ranking tables
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/10/06 (initial version) ~ 2024/10/06 (last revision)"
+__date__ = "2024/10/06 (initial version) ~ 2024/10/07 (last revision)"
 
 __all__ = [
     'append_percentile',
@@ -13,7 +13,7 @@ import pandas as pd
 
 #------------------------------------------------------------------------------
 
-def append_percentile(stock_df, columns, percentile_method='rank'):
+def append_percentile(stock_df, columns, method='rank'):
     """
     Calculates and appends percentile rankings to the stock DataFrame for RS
     values and their historical comparisons.
@@ -27,7 +27,7 @@ def append_percentile(stock_df, columns, percentile_method='rank'):
         A list of column names for which to calculate and append percentile
         rankings.
 
-    percentile_method: str, optional
+    method: str, optional
         Method to calculate percentiles. Either 'rank' or 'qcut'. Defaults to
         'rank'.
 
@@ -39,11 +39,11 @@ def append_percentile(stock_df, columns, percentile_method='rank'):
     """
     for col in columns:
         stock_df[f'Pctl ({col})'] = calc_percentile(stock_df[col],
-                                                    percentile_method)
+                                                    method)
     return stock_df
 
 
-def calc_percentile(series, percentile_method='rank'):
+def calc_percentile(series, method='rank'):
     """
     Calculate percentiles for a given Pandas Series.
 
@@ -51,7 +51,7 @@ def calc_percentile(series, percentile_method='rank'):
     ----------
     series: pd.Series
         The input data series for which to calculate percentiles.
-    percentile_method: str, optional
+    method: str, optional
         The method to use for calculating percentiles.
         Either 'rank' (default) for rank-based percentiles or
         'qcut' for quantile-based percentiles.
@@ -65,14 +65,14 @@ def calc_percentile(series, percentile_method='rank'):
     Raises
     ------
     ValueError
-        If the percentile_method is not 'rank' or 'qcut'.
+        If the method is not 'rank' or 'qcut'.
     """
-    if percentile_method == 'rank':
         percentiles = series.rank(pct=True).mul(99)
-    elif percentile_method == 'qcut':
+    if method == 'rank':
+    elif method == 'qcut':
         percentiles = pd.qcut(series, 99, labels=False, duplicates='drop') + 1
     else:
-        raise ValueError("percentile_method must be either 'rank' or 'qcut'")
+        raise ValueError("method must be either 'rank' or 'qcut'")
     return percentiles.round().astype('Int64')  # Use Int64 to allow NaN
 
 #------------------------------------------------------------------------------
