@@ -196,7 +196,7 @@ Business Daily (IBD) methodology.</p>
 <ul class="simple">
 <li><p>Relative strength calculation</p></li>
 <li><p>Stock and industry ranking generation</p></li>
-<li><p>Percentile-based filtering of rankings</p></li>
+<li><p>Rating-based filtering of rankings</p></li>
 </ul>
 </section>
 <section id="id2">
@@ -210,9 +210,9 @@ Business Daily (IBD) methodology.</p>
 <span class="c1"># Calculate relative strength for a single stock</span>
 <span class="n">stock_rs</span> <span class="o">=</span> <span class="n">ibd</span><span class="o">.</span><span class="n">relative_strength</span><span class="p">(</span><span class="n">stock_closes</span><span class="p">,</span> <span class="n">index_closes</span><span class="p">)</span>
 
-<span class="c1"># Filter rankings based on a minimum percentile</span>
-<span class="n">min_percentile</span> <span class="o">=</span> <span class="mi">80</span>
-<span class="n">top_stocks</span> <span class="o">=</span> <span class="n">stock_rankings</span><span class="p">[</span><span class="n">stock_rankings</span><span class="p">[</span><span class="s2">&quot;Percentile&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_percentile</span><span class="p">]</span>
+<span class="c1"># Filter rankings based on a minimum rating</span>
+<span class="n">min_rating</span> <span class="o">=</span> <span class="mi">80</span>
+<span class="n">top_stocks</span> <span class="o">=</span> <span class="n">stock_rankings</span><span class="p">[</span><span class="n">stock_rankings</span><span class="p">[</span><span class="s2">&quot;Rating&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_rating</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
@@ -231,12 +231,12 @@ Business Daily (IBD) methodology.</p>
 </section>
 <dl class="py function">
 <dt class="sig sig-object py" id="rs_rating.ibd_rs.rankings">
-<span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_rs.</span></span><span class="sig-name descname"><span class="pre">rankings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tickers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticker_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'^GSPC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentile_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rank'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rs_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'12mo'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_rs.html#rankings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_rs.rankings" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_rs.</span></span><span class="sig-name descname"><span class="pre">rankings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tickers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticker_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'^GSPC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rank'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rs_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'12mo'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_rs.html#rankings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_rs.rankings" title="Link to this definition"></a></dt>
 <dd><p>Analyze stocks and generate ranking tables for individual stocks and
 industries.</p>
 <p>This function calculates relative strength (RS) for the given stocks compared
 to a reference index, and then ranks both individual stocks and industries
-based on their RS values. It provides historical RS data and percentile
+based on their RS values. It provides historical RS data and rating
 rankings.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -246,7 +246,7 @@ rankings.</p>
 <li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – The period for which to fetch historical data. Defaults to ‘2y’ (two years).</p></li>
 <li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – The frequency of the data points. Must be one of ‘1d’ for daily data,
 ‘1wk’ for weekly data, or ‘1mo’ for monthly data. Defaults to ‘1d’.</p></li>
-<li><p><strong>percentile_method</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to calculate percentiles. Either ‘rank’ or ‘qcut’. Defaults to ‘rank’.</p></li>
+<li><p><strong>rating_method</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to calculate ratings. Either ‘rank’ or ‘qcut’. Defaults to ‘rank’.</p></li>
 <li><p><strong>rs_window</strong> (<em>str</em><em>, </em><em>optional</em>) – Specify the time window (‘3mo’ or ‘12mo’) for Relative Strength
 calculation. Default to ‘12mo’.</p></li>
 </ul>
@@ -258,8 +258,8 @@ calculation. Default to ‘12mo’.</p></li>
 <dt>Stock Rankings DataFrame:</dt><dd><ul class="simple">
 <li><p>Columns: Rank, Ticker, Price, Sector, Industry, RS (current),
 RS (1 month ago), RS (3 months ago), RS (6 months ago),
-Percentile (current), Percentile (1 month ago),
-Percentile (3 months ago), Percentile (6 months ago)</p></li>
+Rating (current), Rating (1 month ago),
+Rating (3 months ago), Rating (6 months ago)</p></li>
 </ul>
 </dd>
 </dl>
@@ -269,8 +269,8 @@ Percentile (3 months ago), Percentile (6 months ago)</p></li>
 <li><p>Columns: Rank, Industry, Sector, RS (current),
 RS (1 month ago), RS (3 months ago), RS (6 months ago),
 Tickers (list of tickers in the industry),
-Percentile (current), Percentile (1 month ago),
-Percentile (3 months ago), Percentile (6 months ago)</p></li>
+Rating (current), Rating (1 month ago),
+Rating (3 months ago), Rating (6 months ago)</p></li>
 </ul>
 </dd>
 </dl>
