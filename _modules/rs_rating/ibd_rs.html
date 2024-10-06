@@ -117,7 +117,7 @@
 <span class="sd">  &lt;https://www.investors.com/ibd-university/</span>
 <span class="sd">  find-evaluate-stocks/exclusive-ratings/&gt;`_</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.8&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.9&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
 <span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/06 (last revision)&quot;</span>
 
@@ -132,6 +132,7 @@
 <span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
+<span class="kn">from</span> <span class="nn">.ranking_utils</span> <span class="kn">import</span> <span class="o">*</span>
 
 
 <span class="c1">#------------------------------------------------------------------------------</span>
@@ -347,6 +348,77 @@
 <span class="c1"># IBD RS Rankings (with RS rating)</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
+<span class="k">def</span> <span class="nf">build_stock_rs_df</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span> <span class="s1">&#39;1d&#39;</span><span class="p">,</span>
+                      <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Analyzes stocks and calculates relative strength (RS) for the given stock</span>
+<span class="sd">    tickers compared to a reference index. Returns a DataFrame of stock</span>
+<span class="sd">    rankings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tickers: list</span>
+<span class="sd">        A list of stock tickers to analyze.</span>
+
+<span class="sd">    ticker_ref: str, optional</span>
+<span class="sd">        The ticker symbol for the reference index. Defaults to &#39;^GSPC&#39; (S&amp;P</span>
+<span class="sd">        500).</span>
+
+<span class="sd">    period: str, optional</span>
+<span class="sd">        The period for which to fetch historical data. Defaults to &#39;2y&#39; (two</span>
+<span class="sd">        years).</span>
+
+<span class="sd">    interval: str, optional</span>
+<span class="sd">        The frequency of the data points. Must be one of &#39;1d&#39; for daily data,</span>
+<span class="sd">        &#39;1wk&#39; for weekly data, or &#39;1mo&#39; for monthly data. Defaults to &#39;1d&#39;.</span>
+
+<span class="sd">    rs_window: str, optional</span>
+<span class="sd">        Specify the time window (&#39;3mo&#39; or &#39;12mo&#39;) for Relative Strength</span>
+<span class="sd">        calculation.  Defaults to &#39;12mo&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        DataFrame containing stock rankings with columns:</span>
+<span class="sd">        Ticker, Price, Sector, Industry, RS (current), RS (1 month ago),</span>
+<span class="sd">        RS (3 months ago), RS (6 months ago).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Select the appropriate relative strength function based on the rs_window</span>
+    <span class="n">rs_func</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;3mo&#39;</span><span class="p">:</span> <span class="n">relative_strength_3m</span><span class="p">,</span>
+        <span class="s1">&#39;12mo&#39;</span><span class="p">:</span> <span class="n">relative_strength</span><span class="p">,</span>
+    <span class="p">}[</span><span class="n">rs_window</span><span class="p">]</span>
+
+    <span class="c1"># Batch download stock data</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;Close&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Batch download stock info</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_tickers_info</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;industry&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Calculate RS values for all stocks</span>
+    <span class="n">rs_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
+        <span class="n">rs_series</span> <span class="o">=</span> <span class="n">rs_func</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">ticker</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">ticker_ref</span><span class="p">],</span> <span class="n">interval</span><span class="p">)</span>
+        <span class="n">end_date</span> <span class="o">=</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">rs_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="n">ticker</span><span class="p">,</span>
+            <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">ticker</span><span class="p">]</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;Sector&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;sector&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;Industry&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;industry&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">),</span>
+            <span class="s1">&#39;1 Month Ago&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
+            <span class="s1">&#39;3 Months Ago&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+            <span class="s1">&#39;6 Months Ago&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">6</span><span class="p">)),</span>
+        <span class="p">})</span>
+
+    <span class="c1"># Create DataFrame from RS data</span>
+    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rs_data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">stock_df</span>
+
+
 <div class="viewcode-block" id="rankings">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.rankings">[docs]</a>
 <span class="k">def</span> <span class="nf">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
@@ -400,123 +472,25 @@
 <span class="sd">              Percentile (current), Percentile (1 month ago),</span>
 <span class="sd">              Percentile (3 months ago), Percentile (6 months ago)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Select the appropriate relative strength function based on the rs_window</span>
-    <span class="n">rs_func</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;3mo&#39;</span><span class="p">:</span> <span class="n">relative_strength_3m</span><span class="p">,</span>
-        <span class="s1">&#39;12mo&#39;</span><span class="p">:</span> <span class="n">relative_strength</span><span class="p">,</span>
-    <span class="p">}[</span><span class="n">rs_window</span><span class="p">]</span>
+    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">build_stock_rs_df</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="p">,</span>
+                                 <span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="p">,</span> <span class="n">rs_window</span><span class="p">)</span>
+    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">stock_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="c1"># Batch download stock data</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;Close&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">rs_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="s1">&#39;1 Month Ago&#39;</span><span class="p">,</span> <span class="s1">&#39;3 Months Ago&#39;</span><span class="p">,</span> <span class="s1">&#39;6 Months Ago&#39;</span><span class="p">]</span>
+    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">append_percentile</span><span class="p">(</span><span class="n">stock_df</span><span class="p">,</span> <span class="n">rs_columns</span><span class="p">,</span> <span class="n">percentile_method</span><span class="p">)</span>
 
-    <span class="c1"># Batch download stock info</span>
-    <span class="n">info</span> <span class="o">=</span> <span class="n">yfu</span><span class="o">.</span><span class="n">download_tickers_info</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sector&#39;</span><span class="p">,</span> <span class="s1">&#39;industry&#39;</span><span class="p">])</span>
-    <span class="c1"># Calculate RS values for all stocks</span>
-    <span class="n">rs_data</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">ticker</span> <span class="ow">in</span> <span class="n">tickers</span><span class="p">:</span>
-        <span class="n">rs_series</span> <span class="o">=</span> <span class="n">rs_func</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">ticker</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">ticker_ref</span><span class="p">],</span> <span class="n">interval</span><span class="p">)</span>
-        <span class="n">end_date</span> <span class="o">=</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">columns</span> <span class="o">=</span>  <span class="p">[</span><span class="s1">&#39;Sector&#39;</span><span class="p">,</span> <span class="s1">&#39;Ticker&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">rs_columns</span>
+    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">groupby_industry</span><span class="p">(</span><span class="n">stock_df</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;RS&#39;</span><span class="p">)</span>
 
-        <span class="n">rs_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="n">ticker</span><span class="p">,</span>
-            <span class="s1">&#39;Price&#39;</span><span class="p">:</span> <span class="n">df</span><span class="p">[</span><span class="n">ticker</span><span class="p">]</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
-            <span class="s1">&#39;Sector&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;sector&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;Industry&#39;</span><span class="p">:</span> <span class="n">info</span><span class="p">[</span><span class="n">ticker</span><span class="p">][</span><span class="s1">&#39;industry&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span><span class="p">),</span>
-            <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span>
-            <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
-            <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="n">rs_series</span><span class="o">.</span><span class="n">asof</span><span class="p">(</span><span class="n">end_date</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">months</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span>
-        <span class="p">})</span>
+    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">industry_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">append_percentile</span><span class="p">(</span><span class="n">industry_df</span><span class="p">,</span> <span class="n">rs_columns</span><span class="p">,</span> <span class="n">percentile_method</span><span class="p">)</span>
 
-    <span class="c1"># Create DataFrame from RS data</span>
-    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rs_data</span><span class="p">)</span>
-
-    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="s1">&#39;1M&#39;</span><span class="p">,</span> <span class="s1">&#39;3M&#39;</span><span class="p">,</span> <span class="s1">&#39;6M&#39;</span><span class="p">]:</span>
-        <span class="n">stock_df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Percentile (</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_percentile</span><span class="p">(</span><span class="n">stock_df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-                                                          <span class="n">percentile_method</span><span class="p">)</span>
-    <span class="c1"># Sort stocks</span>
-    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">stock_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span>
-                                    <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">get_sorted_tickers</span><span class="p">(</span><span class="n">tickers</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="nb">sorted</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span>
-                   <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span>
-                        <span class="n">stock_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">stock_df</span><span class="p">[</span><span class="s1">&#39;Ticker&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">t</span><span class="p">,</span> <span class="s1">&#39;RS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                   <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="c1"># Calculate industry rankings</span>
-    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">stock_df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Industry&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span>
-        <span class="s1">&#39;Sector&#39;</span><span class="p">:</span> <span class="s1">&#39;first&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="n">get_sorted_tickers</span>
-    <span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-
-    <span class="c1"># Calculate percentiles for industry RS values</span>
-    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="s1">&#39;1M&#39;</span><span class="p">,</span> <span class="s1">&#39;3M&#39;</span><span class="p">,</span> <span class="s1">&#39;6M&#39;</span><span class="p">]:</span>
-        <span class="n">industry_df</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Percentile (</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">calc_percentile</span><span class="p">(</span><span class="n">industry_df</span><span class="p">[</span><span class="n">col</span><span class="p">],</span>
-                                                             <span class="n">percentile_method</span><span class="p">)</span>
-    <span class="c1"># Sort industries</span>
-    <span class="n">industry_df</span> <span class="o">=</span> <span class="n">industry_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
-        <span class="s1">&#39;RS&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-    <span class="c1"># Rename columns for clarity</span>
-    <span class="n">stock_df</span> <span class="o">=</span> <span class="n">stock_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
-        <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="s1">&#39;Relative Strength&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="s1">&#39;1 Month Ago&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="s1">&#39;3 Months Ago&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="s1">&#39;6 Months Ago&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Percentile (RS)&#39;</span><span class="p">:</span> <span class="s1">&#39;Percentile&#39;</span>
-    <span class="p">})</span>
     <span class="n">industry_df</span> <span class="o">=</span> <span class="n">industry_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
-        <span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="s1">&#39;Relative Strength&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;1M&#39;</span><span class="p">:</span> <span class="s1">&#39;1 Month Ago&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;3M&#39;</span><span class="p">:</span> <span class="s1">&#39;3 Months Ago&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;6M&#39;</span><span class="p">:</span> <span class="s1">&#39;6 Months Ago&#39;</span><span class="p">,</span>
         <span class="s1">&#39;Ticker&#39;</span><span class="p">:</span> <span class="s1">&#39;Tickers&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Percentile (RS)&#39;</span><span class="p">:</span> <span class="s1">&#39;Percentile&#39;</span>
     <span class="p">})</span>
 
     <span class="k">return</span> <span class="n">stock_df</span><span class="p">,</span> <span class="n">industry_df</span></div>
 
-
-
-<span class="k">def</span> <span class="nf">calc_percentile</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">percentile_method</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate percentiles for a given Pandas Series.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    series: pd.Series</span>
-<span class="sd">        The input data series for which to calculate percentiles.</span>
-<span class="sd">    percentile_method: str, optional</span>
-<span class="sd">        The method to use for calculating percentiles.</span>
-<span class="sd">        Either &#39;rank&#39; (default) for rank-based percentiles or</span>
-<span class="sd">        &#39;qcut&#39; for quantile-based percentiles.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    pd.Series</span>
-<span class="sd">        A series of nullable integer percentile values corresponding to the</span>
-<span class="sd">        input series, ranging from 1 to 99.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
-<span class="sd">        If the percentile_method is not &#39;rank&#39; or &#39;qcut&#39;.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">percentile_method</span> <span class="o">==</span> <span class="s1">&#39;rank&#39;</span><span class="p">:</span>
-        <span class="n">percentiles</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">99</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">percentile_method</span> <span class="o">==</span> <span class="s1">&#39;qcut&#39;</span><span class="p">:</span>
-        <span class="n">percentiles</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">qcut</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">duplicates</span><span class="o">=</span><span class="s1">&#39;drop&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;percentile_method must be either &#39;rank&#39; or &#39;qcut&#39;&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">percentiles</span><span class="o">.</span><span class="n">round</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;Int64&#39;</span><span class="p">)</span>  <span class="c1"># Use Int64 to allow NaN</span>
 
 
 <span class="c1">#------------------------------------------------------------------------------</span>
@@ -550,7 +524,7 @@
         <span class="k">return</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Stock Rankings:&#39;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">rank_stock</span><span class="p">[</span><span class="n">rank_stock</span><span class="p">[</span><span class="s2">&quot;Percentile&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_percentile</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">rank_stock</span><span class="p">[</span><span class="n">rank_stock</span><span class="p">[</span><span class="s2">&quot;Pctl (RS)&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">min_percentile</span><span class="p">])</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">Industry Rankings:&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">rank_indust</span><span class="p">)</span>
