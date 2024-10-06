@@ -38,8 +38,7 @@ def append_percentile(stock_df, columns, method='rank'):
         RS values.
     """
     for col in columns:
-        stock_df[f'Pctl ({col})'] = calc_percentile(stock_df[col],
-                                                    method)
+        stock_df[f'Pctl ({col})'] = calc_percentile(stock_df[col], method)
     return stock_df
 
 
