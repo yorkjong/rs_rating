@@ -280,7 +280,7 @@ def financial_metric_ranking(tickers):
     # Sort by current EPS RS
     ranking_df = ranking_df.sort_values(by='EPS RS', ascending=False)
 
-    # Rank based on Relative Strength
+    # Rating based on Relative Strength
     rs_columns = ['EPS RS', 'Rev RS']
     ranking_df = append_ratings(ranking_df, rs_columns)
 
