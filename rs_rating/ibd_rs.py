@@ -268,8 +268,8 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
-def stock_ranking(tickers, ticker_ref='^GSPC', period='2y', interval= '1d',
-                  rs_window='12mo'):
+def build_stock_rs_df(tickers, ticker_ref='^GSPC', period='2y', interval= '1d',
+                      rs_window='12mo'):
     """
     Analyzes stocks and calculates relative strength (RS) for the given stock
     tickers compared to a reference index. Returns a DataFrame of stock
@@ -390,7 +390,8 @@ def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
               Percentile (current), Percentile (1 month ago),
               Percentile (3 months ago), Percentile (6 months ago)
     """
-    stock_df = stock_ranking(tickers,ticker_ref, period, interval, rs_window)
+    stock_df = build_stock_rs_df(tickers, ticker_ref,
+                                 period, interval, rs_window)
     stock_df = stock_df.sort_values(by='RS', ascending=False)
 
     rs_columns = ['RS', '1 Month Ago', '3 Months Ago', '6 Months Ago']
