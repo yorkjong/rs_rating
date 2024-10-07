@@ -114,12 +114,12 @@ def groupby_industry(stock_df, columns, key='RS'):
     pd.DataFrame
         Aggregated DataFrame grouped by industry.
     """
-    def get_sorted_items(items):
+    def get_sorted_items(items, column):
         """Sorts items (e.g., Tickers or Names) based on RS values."""
         return ','.join(
             sorted(items,
                    key=lambda t:
-                        stock_df.loc[stock_df['Ticker'] == t, key].values[0],
+                        stock_df.loc[stock_df[column] == t, key].values[0],
                    reverse=True)
         )
 
@@ -127,8 +127,8 @@ def groupby_industry(stock_df, columns, key='RS'):
 
     # Process only the specified columns in columns
     for col in columns:
-        if col == 'Ticker' or col == 'Name':
-            agg_funcs[col] = get_sorted_items
+        if col in ['Ticker', 'Name']:
+            agg_funcs[col] = lambda i, c=col: get_sorted_items(i, c)
         elif pd.api.types.is_numeric_dtype(stock_df[col]):
             agg_funcs[col] = lambda x: round(x.mean(), 2)
         else:
