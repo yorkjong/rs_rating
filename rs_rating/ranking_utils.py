@@ -2,7 +2,7 @@
 Utilities for Ranking tables
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/10/06 (initial version) ~ 2024/10/07 (last revision)"
+__date__ = "2024/10/06 (initial version) ~ 2024/10/08 (last revision)"
 
 __all__ = [
     'append_ratings',
@@ -117,15 +117,18 @@ def groupby_industry(stock_df, columns, key='RS'):
     def get_sorted_items(items, column):
         """Sorts items (e.g., Tickers or Names) based on RS values."""
         return ','.join(
-            sorted(items,
-                   key=lambda t:
-                        stock_df.loc[stock_df[column] == t, key].values[0],
-                   reverse=True)
+            sorted(
+                map(str, items),  # Convert items to strings before joining
+                key=lambda t: stock_df.loc[stock_df[column] == t, key].values[0]
+                    if len(stock_df.loc[stock_df[column] == t, key].values) > 0
+                    else float('-inf'),  # Set default value if no matching RS
+                reverse=True
+            )
         )
 
     agg_funcs = {}
 
-    # Process only the specified columns in columns
+    # Process only the specified columns in `columns`
     for col in columns:
         if col in ['Ticker', 'Name']:
             agg_funcs[col] = lambda i, c=col: get_sorted_items(i, c)
