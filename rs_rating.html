@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rs_rating package &mdash; rs_rating 1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=7ab3649f" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -230,45 +230,57 @@ Business Daily (IBD) methodology.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="rs_rating.ibd_rs.rankings">
 <span class="sig-prename descclassname"><span class="pre">rs_rating.ibd_rs.</span></span><span class="sig-name descname"><span class="pre">rankings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tickers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ticker_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'^GSPC'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'2y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'1d'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rating_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rank'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rs_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'12mo'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/ibd_rs.html#rankings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.ibd_rs.rankings" title="Link to this definition"></a></dt>
-<dd><p>Analyze stocks and generate ranking tables for individual stocks and
-industries.</p>
-<p>This function calculates relative strength (RS) for the given stocks compared
-to a reference index, and then ranks both individual stocks and industries
-based on their RS values. It provides historical RS data and rating
-rankings.</p>
+<dd><p>Generates stock and industry ranking tables based on Relative Strength (RS)
+compared to a reference index.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tickers</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of stock tickers to analyze.</p></li>
-<li><p><strong>ticker_ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The ticker symbol for the reference index. Defaults to ‘^GSPC’ (S&amp;P 500).</p></li>
-<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – The period for which to fetch historical data. Defaults to ‘2y’ (two years).</p></li>
-<li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – The frequency of the data points. Must be one of ‘1d’ for daily data,
-‘1wk’ for weekly data, or ‘1mo’ for monthly data. Defaults to ‘1d’.</p></li>
-<li><p><strong>rating_method</strong> (<em>str</em><em>, </em><em>optional</em>) – Method to calculate ratings. Either ‘rank’ or ‘qcut’. Defaults to ‘rank’.</p></li>
-<li><p><strong>rs_window</strong> (<em>str</em><em>, </em><em>optional</em>) – Specify the time window (‘3mo’ or ‘12mo’) for Relative Strength
-calculation. Default to ‘12mo’.</p></li>
+<li><p><strong>tickers</strong> (<em>list</em>) – List of stock tickers to analyze.</p></li>
+<li><p><strong>ticker_ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The reference index ticker symbol. Default is ‘^GSPC’ (S&amp;P 500).</p></li>
+<li><p><strong>period</strong> (<em>str</em><em>, </em><em>optional</em>) – Duration for fetching historical stock data. Default is ‘2y’ (two
+years).</p></li>
+<li><p><strong>interval</strong> (<em>str</em><em>, </em><em>optional</em>) – Time interval between data points. Can be ‘1d’ (daily), ‘1wk’
+(weekly), or ‘1mo’ (monthly). Default is ‘1d’.</p></li>
+<li><p><strong>rating_method</strong> (<em>str</em><em>, </em><em>optional</em>) – Method for calculating stock ratings. Can be either ‘rank’ or ‘qcut’.
+Default is ‘rank’.</p></li>
+<li><p><strong>rs_window</strong> (<em>str</em><em>, </em><em>optional</em>) – Period for calculating RS. Either ‘3mo’ or ‘12mo’. Default is ‘12mo’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>A tuple of two Pandas DataFrames:</p>
-<ol class="arabic simple">
+<dd class="field-even"><p><ol class="arabic simple">
 <li><dl class="simple">
 <dt>Stock Rankings DataFrame:</dt><dd><ul class="simple">
-<li><p>Columns: Rank, Ticker, Price, Sector, Industry, RS (current),
-RS (1 month ago), RS (3 months ago), RS (6 months ago),
-Rating (current), Rating (1 month ago),
-Rating (3 months ago), Rating (6 months ago)</p></li>
+<li><p>’Rank’: Stock rank based on RS</p></li>
+<li><p>’Ticker’: Stock ticker</p></li>
+<li><p>’Price’: Latest stock price</p></li>
+<li><p>’Sector’: Sector of the stock</p></li>
+<li><p>’Industry’: Industry of the stock</p></li>
+<li><p>’RS’: Current RS value</p></li>
+<li><p>’1 Month Ago’: RS value one month ago</p></li>
+<li><p>’3 Months Ago’: RS value three months ago</p></li>
+<li><p>’6 Months Ago’: RS value six months ago</p></li>
+<li><p>’Rating’: Current rating</p></li>
+<li><p>’Rating (1 Month Ago)’: Rating one month ago</p></li>
+<li><p>’Rating (3 Months Ago)’: Rating three months ago</p></li>
+<li><p>’Rating (6 Months Ago)’: Rating six months ago</p></li>
 </ul>
 </dd>
 </dl>
 </li>
 <li><dl class="simple">
 <dt>Industry Rankings DataFrame:</dt><dd><ul class="simple">
-<li><p>Columns: Rank, Industry, Sector, RS (current),
-RS (1 month ago), RS (3 months ago), RS (6 months ago),
-Tickers (list of tickers in the industry),
-Rating (current), Rating (1 month ago),
-Rating (3 months ago), Rating (6 months ago)</p></li>
+<li><p>’Rank’: Industry rank based on RS</p></li>
+<li><p>’Industry’: Industry name</p></li>
+<li><p>’Sector’: Sector name</p></li>
+<li><p>’RS’: Current RS value</p></li>
+<li><p>’1 Month Ago’: RS value one month ago</p></li>
+<li><p>’3 Months Ago’: RS value three months ago</p></li>
+<li><p>’6 Months Ago’: RS value six months ago</p></li>
+<li><p>’Tickers’: List of stock tickers in the industry</p></li>
+<li><p>’Rating’: Current rating</p></li>
+<li><p>’Rating (1 Month Ago)’: Rating one month ago</p></li>
+<li><p>’Rating (3 Months Ago)’: Rating three months ago</p></li>
+<li><p>’Rating (6 Months Ago)’: Rating six months ago</p></li>
 </ul>
 </dd>
 </dl>
@@ -277,7 +289,7 @@ Rating (3 months ago), Rating (6 months ago)</p></li>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[pd.DataFrame, pd.DataFrame]</p>
+<dd class="field-odd"><p>tuple of pd.DataFrame</p>
 </dd>
 </dl>
 </dd></dl>
