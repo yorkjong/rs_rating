@@ -43,9 +43,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "5.0"
+__version__ = "5.1"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/07 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2024/10/10 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -268,40 +268,44 @@ def relative_strength_3m(closes, closes_ref, interval='1d'):
 # IBD RS Rankings (with RS rating)
 #------------------------------------------------------------------------------
 
-def build_stock_rs_df(tickers, ticker_ref='^GSPC', period='2y', interval= '1d',
+def build_stock_rs_df(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
                       rs_window='12mo'):
     """
-    Analyzes stocks and calculates relative strength (RS) for the given stock
-    tickers compared to a reference index. Returns a DataFrame of stock
-    rankings.
+    Calculates the Relative Strength (RS) of a list of stock tickers compared
+    to a reference index and returns a DataFrame of stock rankings.
 
     Parameters
     ----------
-    tickers: list
-        A list of stock tickers to analyze.
+    tickers : list
+        List of stock tickers to analyze.
 
-    ticker_ref: str, optional
-        The ticker symbol for the reference index. Defaults to '^GSPC' (S&P
-        500).
+    ticker_ref : str, optional
+        The reference index ticker symbol. Default is '^GSPC' (S&P 500).
 
-    period: str, optional
-        The period for which to fetch historical data. Defaults to '2y' (two
-        years).
+    period : str, optional
+        The duration for which historical stock data is fetched. Default is
+        '2y' (two years).
 
-    interval: str, optional
-        The frequency of the data points. Must be one of '1d' for daily data,
-        '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
+    interval : str, optional
+        The time interval between data points. Can be '1d' (daily), '1wk'
+        (weekly), or '1mo' (monthly). Default is '1d'.
 
-    rs_window: str, optional
-        Specify the time window ('3mo' or '12mo') for Relative Strength
-        calculation.  Defaults to '12mo'.
+    rs_window : str, optional
+        The period for calculating RS. Either '3mo' or '12mo'. Default is
+        '12mo'.
 
     Returns
     -------
     pd.DataFrame
-        DataFrame containing stock rankings with columns:
-        Ticker, Price, Sector, Industry, RS (current), RS (1 month ago),
-        RS (3 months ago), RS (6 months ago).
+        DataFrame containing stock information and RS values:
+        - 'Ticker': Stock ticker
+        - 'Price': Latest stock price
+        - 'Sector': Sector of the stock
+        - 'Industry': Industry of the stock
+        - 'RS': Current RS value
+        - '1 Month Ago': RS value one month ago
+        - '3 Months Ago': RS value three months ago
+        - '6 Months Ago': RS value six months ago
     """
     # Select the appropriate relative strength function based on the rs_window
     rs_func = {
@@ -342,53 +346,63 @@ def build_stock_rs_df(tickers, ticker_ref='^GSPC', period='2y', interval= '1d',
 def rankings(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
              rating_method='rank', rs_window='12mo'):
     """
-    Analyze stocks and generate ranking tables for individual stocks and
-    industries.
-
-    This function calculates relative strength (RS) for the given stocks compared
-    to a reference index, and then ranks both individual stocks and industries
-    based on their RS values. It provides historical RS data and rating
-    rankings.
+    Generates stock and industry ranking tables based on Relative Strength (RS)
+    compared to a reference index.
 
     Parameters
     ----------
-    tickers: List[str]
-        A list of stock tickers to analyze.
+    tickers : list
+        List of stock tickers to analyze.
 
-    ticker_ref: str, optional
-        The ticker symbol for the reference index. Defaults to '^GSPC' (S&P 500).
+    ticker_ref : str, optional
+        The reference index ticker symbol. Default is '^GSPC' (S&P 500).
 
-    period: str, optional
-        The period for which to fetch historical data. Defaults to '2y' (two years).
+    period : str, optional
+        Duration for fetching historical stock data. Default is '2y' (two
+        years).
 
-    interval: str, optional
-        The frequency of the data points. Must be one of '1d' for daily data,
-        '1wk' for weekly data, or '1mo' for monthly data. Defaults to '1d'.
+    interval : str, optional
+        Time interval between data points. Can be '1d' (daily), '1wk'
+        (weekly), or '1mo' (monthly). Default is '1d'.
 
-    rating_method: str, optional
-        Method to calculate ratings. Either 'rank' or 'qcut'. Defaults to 'rank'.
+    rating_method : str, optional
+        Method for calculating stock ratings. Can be either 'rank' or 'qcut'.
+        Default is 'rank'.
 
-    rs_window: str, optional
-        Specify the time window ('3mo' or '12mo') for Relative Strength
-        calculation. Default to '12mo'.
+    rs_window : str, optional
+        Period for calculating RS. Either '3mo' or '12mo'. Default is '12mo'.
 
     Returns
     -------
-    Tuple[pd.DataFrame, pd.DataFrame]
-        A tuple of two Pandas DataFrames:
-
+    tuple of pd.DataFrame
         1. Stock Rankings DataFrame:
-            - Columns: Rank, Ticker, Price, Sector, Industry, RS (current),
-              RS (1 month ago), RS (3 months ago), RS (6 months ago),
-              Rating (current), Rating (1 month ago),
-              Rating (3 months ago), Rating (6 months ago)
+            - 'Rank': Stock rank based on RS
+            - 'Ticker': Stock ticker
+            - 'Price': Latest stock price
+            - 'Sector': Sector of the stock
+            - 'Industry': Industry of the stock
+            - 'RS': Current RS value
+            - '1 Month Ago': RS value one month ago
+            - '3 Months Ago': RS value three months ago
+            - '6 Months Ago': RS value six months ago
+            - 'Rating': Current rating
+            - 'Rating (1 Month Ago)': Rating one month ago
+            - 'Rating (3 Months Ago)': Rating three months ago
+            - 'Rating (6 Months Ago)': Rating six months ago
 
         2. Industry Rankings DataFrame:
-            - Columns: Rank, Industry, Sector, RS (current),
-              RS (1 month ago), RS (3 months ago), RS (6 months ago),
-              Tickers (list of tickers in the industry),
-              Rating (current), Rating (1 month ago),
-              Rating (3 months ago), Rating (6 months ago)
+            - 'Rank': Industry rank based on RS
+            - 'Industry': Industry name
+            - 'Sector': Sector name
+            - 'RS': Current RS value
+            - '1 Month Ago': RS value one month ago
+            - '3 Months Ago': RS value three months ago
+            - '6 Months Ago': RS value six months ago
+            - 'Tickers': List of stock tickers in the industry
+            - 'Rating': Current rating
+            - 'Rating (1 Month Ago)': Rating one month ago
+            - 'Rating (3 Months Ago)': Rating three months ago
+            - 'Rating (6 Months Ago)': Rating six months ago
     """
     stock_df = build_stock_rs_df(tickers, ticker_ref,
                                  period, interval, rs_window)
