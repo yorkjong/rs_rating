@@ -7,14 +7,14 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rs_rating package &mdash; rs_rating 1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=f2a433a1"></script>
-      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -140,7 +140,7 @@ custom ranking methods.</p></li>
 <h4>Usage:<a class="headerlink" href="#usage" title="Link to this heading"></a></h4>
 <p>Import this module to access functions for analyzing and ranking financial data.
 For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ibd_fin</span> <span class="kn">import</span> <span class="n">financial_metric_ranking</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ibd_fin</span><span class="w"> </span><span class="kn">import</span> <span class="n">financial_metric_ranking</span>
 
 <span class="c1"># Example usage</span>
 <span class="n">ranking_df</span> <span class="o">=</span> <span class="n">financial_metric_ranking</span><span class="p">(</span><span class="n">stock_data</span><span class="p">)</span>
@@ -199,7 +199,7 @@ Business Daily (IBD) methodology.</p>
 </section>
 <section id="id2">
 <h4>Usage:<a class="headerlink" href="#id2" title="Link to this heading"></a></h4>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ibd_res</span> <span class="k">as</span> <span class="nn">ibd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">ibd_res</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ibd</span>
 
 <span class="c1"># Generate rankings for a list of stocks</span>
 <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;NVDA&#39;</span><span class="p">,</span> <span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOGL&#39;</span><span class="p">,</span> <span class="s1">&#39;AMZN&#39;</span><span class="p">,</span> <span class="s1">&#39;TSLA&#39;</span><span class="p">]</span>
@@ -512,7 +512,7 @@ index source.</p></li>
 </section>
 <section id="usage-examples">
 <h3>Usage Examples:<a class="headerlink" href="#usage-examples" title="Link to this heading"></a></h3>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">stock_indices</span> <span class="kn">import</span> <span class="n">get_tickers</span><span class="p">,</span> <span class="n">get_name</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">stock_indices</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_tickers</span><span class="p">,</span> <span class="n">get_name</span>
 
 <span class="c1"># Get tickers for the S&amp;P 500 index</span>
 <span class="n">spx_tickers</span> <span class="o">=</span> <span class="n">get_tickers</span><span class="p">(</span><span class="s1">&#39;SPX&#39;</span><span class="p">)</span>
@@ -741,7 +741,7 @@ number of quarters (or years).</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOG&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">financials</span> <span class="o">=</span> <span class="n">download_financials</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">])</span>
-<span class="gp">... </span>                            
+<span class="gp">...</span>
 <span class="go">[...**********************100%**********************]</span>
 <span class="go">3 of 3 financials downloaded</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">tickers_info</span> <span class="o">=</span> <span class="p">{</span>
@@ -764,7 +764,7 @@ number of quarters (or years).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rs_rating.yf_utils.download_financials">
-<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">download_financials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'quarterly'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#download_financials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.download_financials" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">download_financials</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'quarterly'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#download_financials"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.download_financials" title="Link to this definition"></a></dt>
 <dd><p>Downloads the financials (quarterly or annual) of multiple stocks and
 returns the specified fields.</p>
 <dl class="field-list simple">
@@ -790,7 +790,7 @@ DataFrame of the specified fields.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;TSLA&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOG&#39;</span><span class="p">,</span> <span class="s1">&#39;AMZN&#39;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">financials</span> <span class="o">=</span> <span class="n">download_financials</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="s1">&#39;annual&#39;</span><span class="p">)</span>
-<span class="gp">... </span>                            
+<span class="gp">...</span>
 <span class="go">[...*******************100%**********************]</span>
 <span class="go">  5 of 5 financials downloaded</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">epses</span> <span class="o">=</span> <span class="n">financials</span><span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">][</span><span class="s1">&#39;Basic EPS&#39;</span><span class="p">]</span>
@@ -804,7 +804,7 @@ DataFrame of the specified fields.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="rs_rating.yf_utils.download_tickers_info">
-<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">download_tickers_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#download_tickers_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.download_tickers_info" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">rs_rating.yf_utils.</span></span><span class="sig-name descname"><span class="pre">download_tickers_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rs_rating/yf_utils.html#download_tickers_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#rs_rating.yf_utils.download_tickers_info" title="Link to this definition"></a></dt>
 <dd><p>Downloads the basic information of multiple stocks and returns the
 specified fields.</p>
 <dl class="field-list simple">
@@ -826,8 +826,8 @@ dictionary of the specified fields.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">symbols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">,</span> <span class="s1">&#39;MSFT&#39;</span><span class="p">,</span> <span class="s1">&#39;TSLA&#39;</span><span class="p">,</span> <span class="s1">&#39;GOOG&#39;</span><span class="p">,</span> <span class="s1">&#39;AMZN&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">download_tickers_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span> 
-<span class="gp">... </span>                                      
+<span class="gp">&gt;&gt;&gt; </span><span class="n">info</span> <span class="o">=</span> <span class="n">download_tickers_info</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+<span class="gp">...</span>
 <span class="go">[...*******************100%**********************]  5 of 5 info downloaded</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;AAPL&#39;</span><span class="p">][</span><span class="s1">&#39;longName&#39;</span><span class="p">]</span>
 <span class="go">&#39;Apple Inc.&#39;</span>

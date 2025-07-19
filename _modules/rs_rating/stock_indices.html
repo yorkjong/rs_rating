@@ -6,14 +6,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rs_rating.stock_indices &mdash; rs_rating 1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -112,20 +112,20 @@
     <span class="s1">&#39;ticker_from_name&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
 
-<span class="kn">import</span> <span class="nn">requests</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
-<span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bs4</span><span class="w"> </span><span class="kn">import</span> <span class="n">BeautifulSoup</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
 
 
 <span class="c1">#------------------------------------------------------------------------------</span>
 <span class="c1"># Wikipedia look-up</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">table_from_wikipedia</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">class_</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">table_from_wikipedia</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">class_</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetches a table from a Wikipedia article and returns it as a pandas</span>
 <span class="sd">    DataFrame.</span>
@@ -157,7 +157,7 @@
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tag</span><span class="p">)))[</span><span class="mi">0</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">symbols_from_wikipedia_table</span><span class="p">(</span><span class="n">article</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">symbols_from_wikipedia_table</span><span class="p">(</span><span class="n">article</span><span class="p">,</span>
                                  <span class="n">class_</span><span class="o">=</span><span class="s1">&#39;wikitable sortable&#39;</span><span class="p">,</span>
                                  <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;constituents&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -199,7 +199,7 @@
 <span class="c1"># bullishbears.com look-up</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">table_from_bullishbears</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">table_from_bullishbears</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetches the first table from a specified Bullish Bears article.</span>
 
@@ -217,7 +217,7 @@
     <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_html</span><span class="p">(</span><span class="n">url</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">symbols_from_bullishbears_table</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">symbols_from_bullishbears_table</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts stock symbols from a table in a Bullish Bears article.</span>
 
@@ -261,7 +261,7 @@
 <span class="c1"># StatementDog.com look-up</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">us_listed_tickers</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">us_listed_tickers</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetches all symbols of U.S. listed stocks from the StatementDog US stock</span>
 <span class="sd">    list page and returns them as a list.</span>
@@ -311,7 +311,7 @@
 <span class="c1"># Manually keyed stock list</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">sox_tickers</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sox_tickers</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get a list of tickers for companies in the SOX (PHLX Semiconductor).</span>
 
@@ -352,7 +352,7 @@
 
 <div class="viewcode-block" id="get_tickers">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.stock_indices.get_tickers">[docs]</a>
-<span class="k">def</span> <span class="nf">get_tickers</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_tickers</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieve a list of tickers for the specified index or combined indices.</span>
 
@@ -462,7 +462,7 @@
 
 <div class="viewcode-block" id="ticker_from_name">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.stock_indices.ticker_from_name">[docs]</a>
-<span class="k">def</span> <span class="nf">ticker_from_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ticker_from_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get ticker symbol of an index from its long name.</span>
 
@@ -516,7 +516,7 @@
 
 <div class="viewcode-block" id="get_name">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.stock_indices.get_name">[docs]</a>
-<span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="n">index_symbol</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="n">index_symbol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the name of the index based on the provided symbol.</span>
 
@@ -639,7 +639,7 @@
 <span class="c1">#------------------------------------------------------------------------------</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">time</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span><span class="o">,</span><span class="w"> </span><span class="nn">time</span>
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>

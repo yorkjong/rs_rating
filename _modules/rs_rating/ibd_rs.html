@@ -6,14 +6,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rs_rating.ibd_rs &mdash; rs_rating 1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -115,9 +115,9 @@
 <span class="sd">  &lt;https://www.investors.com/ibd-university/</span>
 <span class="sd">  find-evaluate-stocks/exclusive-ratings/&gt;`_</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;5.1&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;5.2&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2024/10/10 (last revision)&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/05 (initial version) ~ 2025/07/19 (last revision)&quot;</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;relative_strength&#39;</span><span class="p">,</span>
@@ -125,12 +125,12 @@
     <span class="s1">&#39;rankings&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
-<span class="kn">from</span> <span class="nn">.ranking_utils</span> <span class="kn">import</span> <span class="n">append_ratings</span><span class="p">,</span> <span class="n">groupby_industry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.ranking_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">append_ratings</span><span class="p">,</span> <span class="n">groupby_industry</span>
 
 
 <span class="c1">#------------------------------------------------------------------------------</span>
@@ -139,7 +139,7 @@
 
 <div class="viewcode-block" id="relative_strength">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.relative_strength">[docs]</a>
-<span class="k">def</span> <span class="nf">relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the relative strength of a stock compared to a reference index.</span>
 
@@ -196,7 +196,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">weighted_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">weighted_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the performance of the last year, with the most recent quarter</span>
 <span class="sd">    weighted double.</span>
@@ -240,7 +240,7 @@
     <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">+</span> <span class="n">p2</span> <span class="o">+</span> <span class="n">p3</span> <span class="o">+</span> <span class="n">p4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span>
 
 
-<span class="k">def</span> <span class="nf">quarters_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">quarters_growth</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">interval</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the return (percentage change) over the last n quarters.</span>
 
@@ -287,7 +287,7 @@
 
 <div class="viewcode-block" id="relative_strength_3m">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.relative_strength_3m">[docs]</a>
-<span class="k">def</span> <span class="nf">relative_strength_3m</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">relative_strength_3m</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_ref</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the 3-Month Relative Strength of a stock compared to a reference</span>
 <span class="sd">    index, based on price performance (growths).</span>
@@ -346,7 +346,7 @@
 <span class="c1"># IBD RS Rankings (with RS rating)</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">build_stock_rs_df</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_stock_rs_df</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
                       <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the Relative Strength (RS) of a list of stock tickers compared</span>
@@ -392,7 +392,8 @@
     <span class="p">}[</span><span class="n">rs_window</span><span class="p">]</span>
 
     <span class="c1"># Batch download stock data</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span>
+                     <span class="n">auto_adjust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">&#39;Close&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># Batch download stock info</span>
@@ -423,7 +424,7 @@
 
 <div class="viewcode-block" id="rankings">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.ibd_rs.rankings">[docs]</a>
-<span class="k">def</span> <span class="nf">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rankings</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1d&#39;</span><span class="p">,</span>
              <span class="n">rating_method</span><span class="o">=</span><span class="s1">&#39;rank&#39;</span><span class="p">,</span> <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generates stock and industry ranking tables based on Relative Strength (RS)</span>
@@ -509,7 +510,7 @@
 <span class="c1"># Unit Test</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">test_rankings</span><span class="p">(</span><span class="n">min_rating</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">rating_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_rankings</span><span class="p">(</span><span class="n">min_rating</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">rating_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span>
                   <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;12mo&#39;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Parameters</span>
@@ -521,9 +522,9 @@
 <span class="sd">    out_dir: str, optional</span>
 <span class="sd">        The output directory to store CSV tables. Defaults to &#39;out&#39;.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
-    <span class="kn">import</span> <span class="nn">os</span>
-    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-    <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">stock_indices</span> <span class="k">as</span> <span class="n">si</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">stock_indices</span> <span class="k">as</span> <span class="n">si</span>
 
     <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;SPX&#39;</span>
     <span class="n">tickers</span> <span class="o">=</span> <span class="n">si</span><span class="o">.</span><span class="n">get_tickers</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
@@ -554,7 +555,7 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">time</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">test_rankings</span><span class="p">(</span><span class="n">rating_method</span><span class="o">=</span><span class="s1">&#39;qcut&#39;</span><span class="p">,</span> <span class="n">rs_window</span><span class="o">=</span><span class="s1">&#39;3mo&#39;</span><span class="p">)</span>

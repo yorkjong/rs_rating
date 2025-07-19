@@ -6,14 +6,14 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>rs_rating.rsm &mdash; rs_rating 1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=f2a433a1"></script>
-      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
       <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -105,9 +105,9 @@
 <span class="sd">  how-to-create-the-mansfield-relative-performance-indicator&gt;`_</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.8&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;4.9&quot;</span>
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;York &lt;york.jong@gmail.com&gt;&quot;</span>
-<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/23 (initial version) ~ 2024/10/07 (last revision)&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s2">&quot;2024/08/23 (initial version) ~ 2025/07/19 (last revision)&quot;</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">&#39;mansfield_relative_strength&#39;</span><span class="p">,</span>
@@ -115,23 +115,23 @@
     <span class="s1">&#39;ranking&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">yfinance</span> <span class="k">as</span> <span class="nn">yf</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">yfinance</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">yf</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
-<span class="kn">from</span> <span class="nn">.ranking_utils</span> <span class="kn">import</span> <span class="n">append_ratings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">yf_utils</span> <span class="k">as</span> <span class="n">yfu</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.ranking_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">append_ratings</span>
 
 
 <span class="c1">#------------------------------------------------------------------------------</span>
 <span class="c1"># Moving Average</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">simple_moving_average</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">simple_moving_average</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="n">min_periods</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">exponential_moving_average</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">exponential_moving_average</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">adjust</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">ewm</span><span class="p">(</span><span class="n">span</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="n">min_periods</span><span class="p">,</span>
                       <span class="n">adjust</span><span class="o">=</span><span class="n">adjust</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 
@@ -141,7 +141,7 @@
 
 <div class="viewcode-block" id="mansfield_relative_strength">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.rsm.mansfield_relative_strength">[docs]</a>
-<span class="k">def</span> <span class="nf">mansfield_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s1">&#39;SMA&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">mansfield_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s1">&#39;SMA&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate Mansfield Relative Strength (RSM) for given close prices, index</span>
 <span class="sd">    close prices, and window size using a given moving average method (&#39;SMA&#39;</span>
@@ -202,7 +202,7 @@
 
 <div class="viewcode-block" id="dorsey_relative_strength">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.rsm.dorsey_relative_strength">[docs]</a>
-<span class="k">def</span> <span class="nf">dorsey_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dorsey_relative_strength</span><span class="p">(</span><span class="n">closes</span><span class="p">,</span> <span class="n">closes_index</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate Dorsey Relative Strength (RSD) for given close prices and index</span>
 <span class="sd">    close prices.</span>
@@ -227,7 +227,7 @@
 <span class="c1"># EPS Relative Strength</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">relative_strength_vs_benchmark</span><span class="p">(</span><span class="n">metric_series</span><span class="p">,</span> <span class="n">bench_series</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">relative_strength_vs_benchmark</span><span class="p">(</span><span class="n">metric_series</span><span class="p">,</span> <span class="n">bench_series</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the relative strength of a financial metric relative to a</span>
 <span class="sd">    benchmark index.</span>
@@ -293,7 +293,7 @@
 
 <div class="viewcode-block" id="ranking">
 <a class="viewcode-back" href="../../rs_rating.html#rs_rating.rsm.ranking">[docs]</a>
-<span class="k">def</span> <span class="nf">ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ranking</span><span class="p">(</span><span class="n">tickers</span><span class="p">,</span> <span class="n">ticker_ref</span><span class="o">=</span><span class="s1">&#39;^GSPC&#39;</span><span class="p">,</span>
             <span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="s1">&#39;1wk&#39;</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s2">&quot;SMA&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Rank stocks based on their Mansfield Relative Strength (RSM) against an</span>
@@ -351,7 +351,8 @@
     <span class="n">tickers</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tickers</span> <span class="k">if</span> <span class="n">info</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="s1">&#39;quoteType&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;EQUITY&#39;</span><span class="p">]</span>
 
     <span class="c1"># Fetch data for stocks and index</span>
-    <span class="n">df_all</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">)</span>
+    <span class="n">df_all</span> <span class="o">=</span> <span class="n">yf</span><span class="o">.</span><span class="n">download</span><span class="p">([</span><span class="n">ticker_ref</span><span class="p">]</span> <span class="o">+</span> <span class="n">tickers</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="n">interval</span><span class="p">,</span>
+                         <span class="n">auto_adjust</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">df_ref</span> <span class="o">=</span> <span class="n">df_all</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="n">ticker_ref</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;Ticker&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Num of downloaded stocks: &quot;</span>
           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_all</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="s1">&#39;Ticker&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -435,7 +436,7 @@
 
 
 
-<span class="k">def</span> <span class="nf">move_columns_to_end</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns_to_move</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">move_columns_to_end</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns_to_move</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Move specified columns to the end of the DataFrame.</span>
 
@@ -463,10 +464,10 @@
 <span class="c1"># Unit Test</span>
 <span class="c1">#------------------------------------------------------------------------------</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s2">&quot;EMA&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
-    <span class="kn">import</span> <span class="nn">os</span>
-    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-    <span class="kn">from</span> <span class="nn">.stock_indices</span> <span class="kn">import</span> <span class="n">get_tickers</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">period</span><span class="o">=</span><span class="s1">&#39;2y&#39;</span><span class="p">,</span> <span class="n">ma</span><span class="o">=</span><span class="s2">&quot;EMA&quot;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">):</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.stock_indices</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_tickers</span>
 
     <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;SPX+DJIA+NDX+SOX&#39;</span>
     <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;SOX&#39;</span>
@@ -493,7 +494,7 @@
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">time</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
     <span class="n">main</span><span class="p">(</span><span class="n">ma</span><span class="o">=</span><span class="s2">&quot;SMA&quot;</span><span class="p">)</span>
