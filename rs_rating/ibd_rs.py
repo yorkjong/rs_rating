@@ -43,9 +43,9 @@ See Also:
   <https://www.investors.com/ibd-university/
   find-evaluate-stocks/exclusive-ratings/>`_
 """
-__version__ = "5.1"
+__version__ = "5.2"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/05 (initial version) ~ 2024/10/10 (last revision)"
+__date__ = "2024/08/05 (initial version) ~ 2025/07/19 (last revision)"
 
 __all__ = [
     'relative_strength',
@@ -314,7 +314,8 @@ def build_stock_rs_df(tickers, ticker_ref='^GSPC', period='2y', interval='1d',
     }[rs_window]
 
     # Batch download stock data
-    df = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df = yf.download([ticker_ref] + tickers, period=period, interval=interval,
+                     auto_adjust=True)
     df = df.xs('Close', level='Price', axis=1)
 
     # Batch download stock info

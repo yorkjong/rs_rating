@@ -33,9 +33,9 @@ See Also:
   how-to-create-the-mansfield-relative-performance-indicator>`_
 
 """
-__version__ = "4.8"
+__version__ = "4.9"
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/23 (initial version) ~ 2024/10/07 (last revision)"
+__date__ = "2024/08/23 (initial version) ~ 2025/07/19 (last revision)"
 
 __all__ = [
     'mansfield_relative_strength',
@@ -271,7 +271,8 @@ def ranking(tickers, ticker_ref='^GSPC',
     tickers = [t for t in tickers if info[t]['quoteType'] == 'EQUITY']
 
     # Fetch data for stocks and index
-    df_all = yf.download([ticker_ref] + tickers, period=period, interval=interval)
+    df_all = yf.download([ticker_ref] + tickers, period=period, interval=interval,
+                         auto_adjust=True)
     df_ref = df_all.xs(ticker_ref, level='Ticker', axis=1)
     print("Num of downloaded stocks: "
           f"{len(df_all.columns.get_level_values('Ticker').unique())}")
