@@ -5,7 +5,7 @@ This module contains various utility functions for retrieving and processing
 stock data using the Yahoo Finance API via the `yfinance` library.
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2024/08/26 (initial version) ~ 2024/10/04 (last revision)"
+__date__ = "2024/08/26 (initial version) ~ 2025/07/19 (last revision)"
 
 __all__ = [
     'calc_weighted_metric',
@@ -15,6 +15,8 @@ __all__ = [
 ]
 
 import sys
+import time
+import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 
@@ -166,6 +168,9 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
     DataFrame
         DataFrame containing the ticker's financials
     """
+    # Add random delay to reduce the risk of being rate-limited
+    time.sleep(random.uniform(.5, .9))  # Delay between .5 and .9 seconds
+
     try:
         ticker = yf.Ticker(symbol)
         try:
@@ -212,7 +217,7 @@ def fetch_financials(symbol, fields=None, frequency='quarterly'):
 
 
 def download_financials(symbols, fields=None, frequency='quarterly',
-                        max_workers=8, progress=True):
+                        max_workers=3, progress=True):
     """
     Downloads the financials (quarterly or annual) of multiple stocks and
     returns the specified fields.
@@ -278,7 +283,7 @@ def download_financials(symbols, fields=None, frequency='quarterly',
     return financials_dict
 
 
-def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
+def download_tickers_info(symbols, fields=None, max_workers=3, progress=True):
     """
     Downloads the basic information of multiple stocks and returns the
     specified fields.
@@ -322,6 +327,9 @@ def download_tickers_info(symbols, fields=None, max_workers=8, progress=True):
         dict
             Dictionary containing the ticker's info
         """
+        # Add random delay to reduce the risk of being rate-limited
+        time.sleep(random.uniform(.5, .9))  # Delay between .5 and .9 seconds
+
         try:
             info = yf.Ticker(symbol).info
             if fields is None:
